@@ -1,10 +1,10 @@
 "use client";
-
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "@/app/providers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/utils/supabase/client";
-import { generateRandomUsername } from "@/utils";
+import { ChevronRightIcon } from "lucide-react";
 
 const NextPage = () => {
   const { state } = useAppContext();
@@ -49,12 +49,28 @@ const NextPage = () => {
             </Avatar>
           </div>
           <div className="flex flex-col truncate">
-            <span className="text-sm/6 font-medium text-gray-950 dark:text-white">
+            <span className="text-sm/6 font-medium text-gray-950 dark:text-white w-[20em]">
               {info.full_name || "-"}
             </span>
-            <span className="truncate text-sm/6 text-gray-500 dark:text-gray-400">
+            <span className="truncate text-sm/6 text-gray-500 dark:text-gray-400 w-[25em]">
               ID: {user.id || "-"}
             </span>
+          </div>
+        </div>
+
+        <div>
+          <div className="text-gray-500 mb-2 text-sm">账户</div>
+          <div className="bg-gray-100 rounded-md text-base overflow-clip">
+            <Link
+              className="px-4 py-4 hover:bg-gray-200 cursor-pointer flex justify-between items-center"
+              href="/account/setting/user"
+            >
+              <span>设置个人资料</span>
+              <ChevronRightIcon />
+            </Link>
+            <div className="px-4 py-4 hover:bg-gray-200 cursor-pointer">
+              退出登录
+            </div>
           </div>
         </div>
       </div>

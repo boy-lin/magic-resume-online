@@ -166,16 +166,6 @@ export async function signUp(formData: FormData) {
     },
   });
 
-  async function updateInfo() {
-    await supabase
-      .from("users")
-      .update({
-        full_name: generateRandomUsername(),
-        avatar_url: "/images/avatar.jpeg",
-      })
-      .eq("id", data.user.id);
-  }
-
   if (error) {
     redirectPath = getErrorRedirect(
       "/account/signup",
@@ -183,7 +173,6 @@ export async function signUp(formData: FormData) {
       error.message
     );
   } else if (data.session) {
-    updateInfo();
     redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
   } else if (
     data.user &&
@@ -196,7 +185,6 @@ export async function signUp(formData: FormData) {
       "There is already an account associated with this email address. Try resetting your password."
     );
   } else if (data.user) {
-    updateInfo();
     redirectPath = getStatusRedirect(
       "/",
       "Success!",
