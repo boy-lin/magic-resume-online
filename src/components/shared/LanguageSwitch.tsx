@@ -32,7 +32,7 @@ export default function LanguageSwitch() {
           return (
             <DropdownMenuItem
               key={loc}
-              className={locale === loc ? "bg-accent" : ""}
+              // className={locale === loc ? "bg-accent" : ""}
             >
               <Link className="w-full" href={pathname} locale={loc}>
                 <span className="flex items-center gap-2">

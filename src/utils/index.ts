@@ -55,3 +55,32 @@ export const openAIRequest = async (prompt: string) => {
   const data = await response.json();
   return data.choices[0].message.content.trim();
 };
+
+export function generateRandomString() {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+export function generateRandomUsername() {
+  const nouns = [
+    "Panda",
+    "Lion",
+    "Eagle",
+    "Rabbit",
+    "Dolphin",
+    "Monkey",
+    "Penguin",
+    "Kangaroo",
+    "Giraffe",
+    "Elephant",
+  ];
+
+  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  return randomNoun + generateRandomString();
+}

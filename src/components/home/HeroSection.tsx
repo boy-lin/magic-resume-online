@@ -11,9 +11,9 @@ export default function HeroSection() {
   const t = useTranslations("home");
 
   return (
-    <section className="relative min-h-[85vh] flex items-center pt-16 overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center justify-center pt-16 overflow-hidden">
       <ScrollBackground />
-      <div className="mx-auto max-w-[1200px] px-4">
+      <div className="m-auto max-w-[1200px] px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <AnimatedFeature>
             <div className="max-w-xl relative text-center lg:text-left mx-auto lg:mx-0">

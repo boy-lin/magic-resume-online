@@ -10,10 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ThemeToggle = ({ children }: { children?: React.ReactNode }) => {
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const options = React.useMemo(() => ["Light", "Dark", "System"], []);
 
   // 确保组件挂载后再渲染
   React.useEffect(() => {
@@ -22,7 +24,7 @@ const ThemeToggle = ({ children }: { children?: React.ReactNode }) => {
 
   // 在客户端渲染之前返回null
   if (!mounted) {
-    return null;
+    return <Skeleton className="h-8 w-8" />;
   }
 
   // 获取当前实际主题
@@ -60,15 +62,19 @@ const ThemeToggle = ({ children }: { children?: React.ReactNode }) => {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
+        {options.map((it) => {
+          return (
+            <DropdownMenuItem
+              key={it}
+              onClick={() => setTheme(it.toLowerCase())}
+            >
+              {it}
+              {it.toLowerCase() === theme ? (
+                <span className="text-xs text-muted-foreground">✓</span>
+              ) : null}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

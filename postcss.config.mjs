@@ -3,10 +3,10 @@ const config = {
   plugins: {
     "postcss-normalize": {
       // 配置选项
-      allowDuplicates: false // 不允许重复导入
+      allowDuplicates: false, // 不允许重复导入
     },
-    tailwindcss: {}
-  }
+    tailwindcss: {},
+  },
 };
 
 export default config;
