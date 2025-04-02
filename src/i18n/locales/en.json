@@ -625,5 +625,11 @@
       "confirmText": "Delete",
       "cancelText": "Cancel"
     }
+  },
+  "account": {
+    "invalid": {
+      "email": "Email is invalid",
+      "pwd": "Password is invalid"
+    }
   }
 }
