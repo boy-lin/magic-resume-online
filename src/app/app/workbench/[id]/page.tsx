@@ -236,12 +236,13 @@ export default function Home() {
     >
       <EditorHeader />
       {/* 桌面端布局 */}
-      <div className="hidden md:block h-[calc(100vh-64px)]">
+      <div className="hidden md:block h-[calc(100vh-64px)] w-full overflow-x-auto">
         <ResizablePanelGroup
           key={panelSizes?.join("-")}
           direction="horizontal"
           className={cn(
             "h-full",
+            "md:min-w-[1600px]",
             "border border-gray-200 bg-white",
             "dark:border-neutral-800 dark:bg-neutral-900/50"
           )}
@@ -310,7 +311,7 @@ export default function Home() {
       </div>
 
       {/* 移动端布局 */}
-      <div className="md:hidden h-[calc(100vh-64px)]">
+      <div className="md:hidden h-[calc(100vh-64px)] w-full md:min-w-[1600px]">
         <div className="h-full overflow-y-auto">
           <PreviewPanel
             sidePanelCollapsed={true}

@@ -185,13 +185,13 @@ export interface ResumeData {
   draggingProjectId: string | null;
   menuSections: MenuSection[];
   globalSettings: GlobalSettings;
+  isNeedSync?: boolean;
 }
 
 export interface ResumeStore {
   resumes: ResumeData[];
   currentResumeId: string | null;
   currentResume: ResumeData | null;
-  addResume: (resume: Omit<ResumeData, "id">) => void;
   updateResume: (id: string, data: Partial<ResumeData>) => void;
   deleteResume: (id: string) => void;
   setCurrentResume: (id: string) => void;

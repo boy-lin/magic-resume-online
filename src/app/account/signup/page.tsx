@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-
+import Logo from "@/components/shared/Logo";
 import { isValidEmail } from "@/utils/reg";
 import { signUp } from "@/utils/auth-helpers/server";
 
@@ -13,134 +13,141 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/toasts/use-toast";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const RegisterPage = () => {
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    try {
-      const email = e.target[0].value;
-      const password = e.target[1].value;
-      const confirmPassword = e.target[2].value;
+  const formSchema = React.useMemo(
+    () =>
+      z.object({
+        fullName: z.string().min(5, { message: t("account.invalid.fName") }),
+        email: z.string().email({
+          message: t("account.invalid.email"),
+        }),
+        password: z.string().min(5, { message: t("account.invalid.minFive") }),
+        confirmPassword: z
+          .string()
+          .min(5, { message: t("account.invalid.minFive") }),
+      }),
+    []
+  );
 
-      if (!isValidEmail(email)) {
-        throw new Error(t("account.valid.email"));
-      }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
-      if (!password || password.length < 8) {
-        throw new Error(t("account.valid.pwd"));
-      }
-
-      if (confirmPassword !== password) {
-        throw new Error(t("Passwords are not equal"));
-      }
-
-      setIsSubmitting(true);
-
-      const formData = new FormData(e.currentTarget);
-      const redirectUrl: string = await signUp(formData);
-      router.push(redirectUrl);
-    } catch (e) {
-      toast({
-        title: "登录错误",
-        description: e.message || "unKnow error",
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (values.confirmPassword !== values.password) {
+      return toast({
+        title: t("common.msg.titleE"),
+        description: t("account.invalid.pwdUnequal"),
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+
+    setIsSubmitting(true);
+    const redirectUrl = await signUp(values);
+    setIsSubmitting(false);
+    router.push(redirectUrl);
+  }
 
   return (
     <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
       <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/">
+            <Logo size={48} />
+          </Link>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <h1 className="text-base/6 font-medium">
+              {t("account.signup.title")}
+            </h1>
+            <p className="text-sm/5 text-gray-600">{t("account.signup.sub")}</p>
           </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Password
-            </label>
-            <div className="mt-2">
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmpassword"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Confirm password
-            </label>
-            <div className="mt-2">
-              <Input
-                id="confirmpassword"
-                name="confirmpassword"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Checkbox
-                id="remember-me"
-                name="remember-me"
-                className="h-4 w-4 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm leading-6 text-gray-900"
-              >
-                Accept our terms and privacy policy
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <Button
-              type="submit"
-              className="flex w-full border border-black justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-white transition-colors hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              disabled={isSubmitting}
-            >
-              Sign up
+        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("account.field.fName")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Jack"
+                      autoComplete="fullName"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("account.field.email")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="example@gmail.com"
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("account.field.pwd")}</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("account.field.confirmPwd")}</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button disabled={isSubmitting} className="w-full" type="submit">
+              {t("common.btn.signU")}
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </div>
     </div>
   );

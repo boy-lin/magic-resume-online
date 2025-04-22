@@ -1,6 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, RefreshCcwDot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -12,18 +12,21 @@ import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import {
   HoverCard,
   HoverCardTrigger,
-  HoverCardContent
+  HoverCardContent,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
+import { upsertResumeById } from "@/utils/supabase/queries";
+import { createClient } from "@/utils/supabase/client";
+import { useState } from "react";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
 }
 
 export function EditorHeader({ isMobile }: EditorHeaderProps) {
-  const { activeResume, setActiveSection, updateResumeTitle } =
+  const { activeResume, updateResumeAsync, updateResumeTitle } =
     useResumeStore();
-  const { menuSections = [], activeSection } = activeResume || {};
+  const { menuSections = [], isNeedSync } = activeResume || {};
   const themeConfig = getThemeConfig();
   const { errors, selectError } = useGrammarCheck();
   const router = useRouter();
@@ -32,6 +35,22 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
     ?.filter((section) => section.enabled)
     .sort((a, b) => a.order - b.order);
 
+  const [loading, setLoading] = useState(false);
+
+  const asyncResume = async () => {
+    try {
+      setLoading(true);
+
+      const res = await updateResumeAsync({
+        ...activeResume,
+        isNeedSync: false,
+      });
+
+      console.log("res", res);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <motion.header
       className={`h-16 border-b sticky top-0 z-10`}
@@ -118,6 +137,18 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
           />
 
           <ThemeToggle></ThemeToggle>
+          <Button
+            variant="outline"
+            className="py-2"
+            onClick={asyncResume}
+            disabled={loading}
+          >
+            <RefreshCcwDot />
+            同步
+            {isNeedSync ? (
+              <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>
+            ) : null}
+          </Button>
           <div className="md:flex items-center ">
             <PdfExport />
           </div>

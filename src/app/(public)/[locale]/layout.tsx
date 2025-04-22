@@ -10,6 +10,8 @@ import {
 import Document from "@/components/Document";
 import { locales } from "@/i18n/config";
 import { Providers } from "@/app/providers";
+import LandingHeader from "@/components/home/LandingHeader";
+import Footer from "@/components/home/Footer";
 
 type Props = {
   children: ReactNode;
@@ -47,16 +49,22 @@ export default async function LocaleLayout({
 }: Props) {
   setRequestLocale(locale);
 
+  console.log("LocaleLayout", locale);
+
   if (!locales.includes(locale as any)) {
     notFound();
   }
-
   const messages = await getMessages();
-  console.log("LocaleLayout");
   return (
     <Document locale={locale}>
       <NextIntlClientProvider messages={messages}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
+            <LandingHeader showLanguage={true} />
+            <main className="m-auto max-w-[1200px] px-4 pt-16">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </NextIntlClientProvider>
     </Document>
   );

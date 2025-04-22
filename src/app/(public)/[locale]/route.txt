@@ -1,0 +1,7 @@
+import { NextResponse, NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const requestUrl = new URL("/home", request.url);
+  console.debug("locale  path", requestUrl);
+  return NextResponse.redirect(requestUrl);
+}

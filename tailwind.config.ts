@@ -72,6 +72,13 @@ const config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        letter: {
+          DEFAULT: "hsl(var(--text-letter))",
+          head: "hsl(var(--text-letter-head))",
+        },
+        paper: {
+          DEFAULT: "hsl(var(--paper))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

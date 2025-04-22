@@ -22,6 +22,8 @@ export function EditPanel() {
   if (!activeResume) return;
   const { activeSection = "", menuSections = [] } = activeResume || {};
 
+  console.log("activeResume", activeResume);
+
   const renderFields = () => {
     switch (activeSection) {
       case "basic":

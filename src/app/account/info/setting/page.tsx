@@ -24,35 +24,41 @@ import { Plus } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { updateUserInfoById } from "@/utils/supabase/queries";
 import { useAppContext } from "@/app/providers";
-
-const formSchema = z.object({
-  fullName: z.string().min(5, { message: "Must be 5 or more characters long" }),
-  avatarUrl: z.string(),
-});
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Page = () => {
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
   const { state } = useAppContext();
   const user = state.user || {};
   const supabase = createClient();
+
+  const formSchema = React.useMemo(
+    () =>
+      z.object({
+        fullName: z.string().min(5, { message: t("account.invalid.minFive") }),
+        avatarUrl: z.string(),
+      }),
+    []
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
-      avatarUrl: "",
+      avatarUrl: "/images/avatar.jpeg",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const res = await updateUserInfoById(supabase, user.id, {
-        full_name: values.fullName,
-        avatar_url: "/images/avatar.jpeg",
-      });
+      const res = await updateUserInfoById(supabase, user.id, values);
       console.debug("res", res);
     } catch (e) {
     } finally {
@@ -61,7 +67,7 @@ const Page = () => {
   }
 
   return (
-    <div className="w-[620px]">
+    <div className="">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -69,7 +75,7 @@ const Page = () => {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>{t("account.field.userName")}</FormLabel>
                 <FormControl>
                   <Input placeholder="jack" {...field} />
                 </FormControl>
@@ -77,26 +83,26 @@ const Page = () => {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="avatarUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload Avatar</FormLabel>
+                <FormLabel>{t("account.field.avatar")}</FormLabel>
                 <FormControl>
                   <Input type="hidden" {...field} />
                 </FormControl>
                 <div>
-                  <Button variant="ghost" size="icon">
+                  <Button disabled variant="ghost" size="icon">
                     <Plus />
                   </Button>
                 </div>
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <Button disabled={isSubmitting} className="w-full" type="submit">
-            Send
+            {t("common.btn.submit")}
           </Button>
         </form>
       </Form>

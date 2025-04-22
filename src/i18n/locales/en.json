@@ -1,17 +1,27 @@
 {
   "common": {
-    "title": "Magic Resume",
+    "title": "Resume Builder",
     "subtitle": "AI Driven Resume Editor",
-    "description": "Magic Resume is an open source resume editor, free, privacy-first. No registration required, all data stored locally, support data backup and export, ensuring your resume data is always available.",
+    "description": "Resume Builder is an open source resume editor, free, privacy-first. No registration required, all data stored locally, support data backup and export, ensuring your resume data is always available.",
     "dashboard": "Dashboard",
     "edit": "Edit",
     "delete": "Delete",
     "newResume": "New Resume",
-    "copy": "Copy"
+    "copy": "Copy",
+    "msg": {
+      "titleE": "Error Message",
+      "progress": "Under development"
+    },
+    "btn": {
+      "next": "Next Step",
+      "signI": "Sign in",
+      "signU": "Sign up",
+      "submit": "Submit"
+    }
   },
   "home": {
     "header": {
-      "title": "Magic Resume",
+      "title": "Resume Builder",
       "startButton": "Get Started",
       "features": "Features",
       "pricing": "Pricing",
@@ -23,12 +33,12 @@
     "hero": {
       "badge": "Smart Resume Creation",
       "title": "Make Resume Creation Simple and Smart",
-      "subtitle": "Magic Resume uses AI technology to help you quickly create professional resumes. No registration required, free to use, with secure data storage.",
+      "subtitle": "Resume Builder uses AI technology to help you quickly create professional resumes. No registration required, free to use, with secure data storage.",
       "cta": "Get Started",
       "secondary": "Browse Templates"
     },
     "features": {
-      "title": "Why Choose Magic Resume?",
+      "title": "Why Choose Resume Builder?",
       "subtitle": "We provide an all-in-one resume solution to make your job search journey smoother",
       "ai": {
         "badge": "AI Smart Check",
@@ -61,24 +71,20 @@
       "content": "New AI Resume Enhancement Feature is Live"
     },
     "footer": {
-      "copyright": " 2025 Magic Resume. All rights reserved."
+      "copyright": " 2025 Resume Builder. All rights reserved."
     },
     "changelog": "Changelog",
     "cta": {
       "title": "Start Your New Career Chapter",
-      "description": "Start using Magic Resume now to create an impressive resume",
+      "description": "Start using Resume Builder now to create an impressive resume",
       "button": "Start Using for Free"
     },
     "faq": {
       "title": "Frequently Asked Questions",
       "items": [
         {
-          "question": "Is Magic Resume free to use?",
-          "answer": "Magic Resume is currently free, meeting basic resume creation needs. The open-source version's features will remain unchanged, and the PDF export feature will always be free."
-        },
-        {
-          "question": "Is my resume data secure?",
-          "answer": "Yes, very secure. Magic Resume uses local storage, meaning all your data is stored on your own device with no cloud storage, ensuring complete privacy protection."
+          "question": "Is Resume Builder free to use?",
+          "answer": "Resume Builder is currently free, meeting basic resume creation needs. the PDF export feature will always be free."
         },
         {
           "question": "What export formats are supported?",
@@ -86,7 +92,7 @@
         },
         {
           "question": "How can I sync across devices?",
-          "answer": "We provide JSON configuration export, allowing you to save your resume settings in JSON format, accessible anytime, anywhere, on any device."
+          "answer": "Cloud encrypted storage."
         },
         {
           "question": "How customizable is it?",
@@ -628,8 +634,38 @@
   },
   "account": {
     "invalid": {
-      "email": "Email is invalid",
-      "pwd": "Password is invalid"
+      "email": "Invalid email address",
+      "minFive": "Must be 5 or more characters long",
+      "pwd": "Password is invalid",
+      "pwdUnequal": "Passwords are not equal"
+    },
+    "field": {
+      "email": "Email address",
+      "pwd": "Password",
+      "confirmPwd": "Confirm password",
+      "userName": "Full Name",
+      "avatar": "Avatar Url"
+    },
+    "signup": {
+      "title": "Welcome you!",
+      "sub": "Register your account to continue."
+    },
+    "signin": {
+      "title": "Welcome back!",
+      "sub": "Sign in to your account to continue.",
+      "remember": "Remember me",
+      "forgot": "Forgot password?",
+      "thirdL": "Or continue with"
+    },
+    "notAM": "Not a member?",
+    "createAA": "Create an account",
+    "signWP": "Sign in with email and password",
+    "forgot": {
+      "title": "Recover your password",
+      "sub": "Reset password via email"
+    },
+    "setting": {
+      "title": "Settings"
     }
   }
 }

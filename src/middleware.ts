@@ -1,10 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { updateSession } from "@/utils/supabase/middleware";
-
 import { routing } from "./i18n/routing.public";
 
-const i18nMatcher = ["/", "/zh", "/en", "/zh/changelog"];
+const langList = ["/zh", "/en"];
 
 export default async function middleware(request: NextRequest) {
   // request.headers.;
@@ -12,7 +11,7 @@ export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   console.log("middleware:request.url", request.nextUrl.pathname);
 
-  if (i18nMatcher.includes(pathname)) {
+  if (pathname === "/" || langList.some((it) => pathname.startsWith(it))) {
     const i18nMiddleware = createMiddleware(routing);
     return i18nMiddleware(request);
   }
@@ -28,7 +27,7 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!account/signup|account/signin|account/forgot-pwd|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest)$).*)",
+    "/((?!feedback|demo|account/signup|account/signin|account/forgot-pwd|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest)$).*)",
     // "/",
     // "/(zh|en)/:path*",
     // {

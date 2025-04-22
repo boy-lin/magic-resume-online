@@ -84,3 +84,10 @@ export function generateRandomUsername() {
 
   return randomNoun + generateRandomString();
 }
+
+export function filterValEqUndefined(vals) {
+  Object.entries(vals).forEach(([k, v]) => {
+    if (v === undefined) delete vals[k];
+  });
+  return vals;
+}
