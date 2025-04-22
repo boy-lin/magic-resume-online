@@ -14,11 +14,11 @@ type Props = {
 };
 
 export async function generateMetadata({
-  params: { locale }
+  params: { locale },
 }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "common" });
   return {
-    title: t("title") + " - " + t("dashboard")
+    title: t("title") + " - " + t("dashboard"),
   };
 }
 
@@ -28,10 +28,7 @@ export default async function LocaleLayout({ children }: Props) {
   const messages = await getMessages();
 
   return (
-    <Document
-      locale={locale}
-      bodyClassName="overflow-y-hidden w-full md:min-w-[1600px]"
-    >
+    <Document locale={locale} bodyClassName="overflow-y-hidden">
       <NextIntlClientProvider messages={messages}>
         <Providers>{children}</Providers>
         <Toaster position="top-center" richColors />

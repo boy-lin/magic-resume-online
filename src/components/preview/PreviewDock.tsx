@@ -265,25 +265,6 @@ const PreviewDock = ({
                 </TooltipContent>
               </Tooltip>
             </DockIcon>
-            <DockIcon>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={handleGoGitHub}
-                    className={cn(
-                      "flex h-[20px] w-[20px] items-center justify-center rounded-lg transition-all",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
-                      "active:scale-95"
-                    )}
-                  >
-                    <Icons.gitHub />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
-                  <p>{t("github")}</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
           </div>
         </Dock>
       </TooltipProvider>

@@ -120,10 +120,10 @@ export async function requestPasswordUpdate(formData) {
   return redirectPath;
 }
 
-export async function signInWithPassword(formData: FormData) {
+export async function signInWithPassword(formData) {
   const cookieStore = cookies();
-  const email = String(formData.get("email")).trim();
-  const password = String(formData.get("password")).trim();
+  const email = String(formData.email).trim();
+  const password = String(formData.password).trim();
   let redirectPath: string;
   const singInPath = "/account/signin";
   const supabase = createClient();
@@ -151,10 +151,11 @@ export async function signInWithPassword(formData: FormData) {
   return redirectPath;
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(formData) {
   const callbackURL = getURL("/auth/callback");
-  const email = String(formData.get("email")).trim();
-  const password = String(formData.get("password")).trim();
+  const email = String(formData.email).trim();
+  const password = String(formData.password).trim();
+  const fullName = String(formData.fullName).trim();
   let redirectPath: string;
 
   const supabase = createClient();
@@ -163,6 +164,9 @@ export async function signUp(formData: FormData) {
     password,
     options: {
       emailRedirectTo: callbackURL,
+      data: {
+        full_name: fullName,
+      },
     },
   });
 
@@ -185,11 +189,12 @@ export async function signUp(formData: FormData) {
       "There is already an account associated with this email address. Try resetting your password."
     );
   } else if (data.user) {
-    redirectPath = getStatusRedirect(
-      "/",
-      "Success!",
+    const path = "/feedback/success";
+    const title = encodeURIComponent("Success!");
+    const des = encodeURIComponent(
       "Please check your email for a confirmation link. You may now close this tab."
     );
+    redirectPath = `${path}?title=${title}&description=${des}`;
   } else {
     redirectPath = getErrorRedirect(
       "/account/signup",

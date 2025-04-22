@@ -39,11 +39,9 @@ export function AppProvider({ children }: Props) {
     [state]
   );
 
-  const supabase = createClient();
-
   useEffect(() => {
     async function getUserAsync() {
-      const user = await getUser(supabase);
+      const user = await getUser(createClient());
       console.debug("User", user);
       setState((s) => ({ ...s, user, userLoading: 1 }));
     }

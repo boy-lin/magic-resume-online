@@ -67,10 +67,10 @@ const ForgotPwdPage = () => {
             <Logo size={48} />
           </Link>
           <div>
-            <h1 className="text-base/6 font-medium">找回密码</h1>
-            <p className="text-sm/5 text-gray-600">
-              Sign in to your account to continue.
-            </p>
+            <h1 className="text-base/6 font-medium">
+              {t("account.forgot.title")}
+            </h1>
+            <p className="text-sm/5 text-gray-600">{t("account.forgot.sub")}</p>
           </div>
         </div>
         <Form {...form}>
@@ -80,7 +80,7 @@ const ForgotPwdPage = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email address</FormLabel>
+                  <FormLabel>{t("account.field.email")}</FormLabel>
                   <FormControl>
                     <Input placeholder="example@gmail.com" {...field} />
                   </FormControl>
@@ -89,14 +89,14 @@ const ForgotPwdPage = () => {
               )}
             />
             <Button disabled={isSubmitting} className="w-full" type="submit">
-              下一步
+              {t("common.btn.next")}
             </Button>
           </form>
         </Form>
       </div>
       <div className="m-1.5 rounded-lg bg-gray-50 py-4 text-center text-sm/5 ring-1 ring-black/5">
         <Link href="/account/signin" className="font-light text-sm">
-          Sign in with email and password
+          {t("account.signWP")}
         </Link>
       </div>
     </div>

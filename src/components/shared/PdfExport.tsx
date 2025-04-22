@@ -315,7 +315,7 @@ const PdfExport = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2
+            className="flex items-center gap-2
               disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
