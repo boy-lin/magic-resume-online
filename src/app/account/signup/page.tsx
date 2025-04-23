@@ -53,6 +53,11 @@ const RegisterPage = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.debug(
+      "valuesvaluesvalues",
+      values.confirmPassword !== values.password,
+      values
+    );
     if (values.confirmPassword !== values.password) {
       return toast({
         title: t("common.msg.titleE"),
