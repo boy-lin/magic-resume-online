@@ -41,10 +41,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
     try {
       setLoading(true);
 
-      const res = await updateResumeAsync({
-        ...activeResume,
-        isNeedSync: false,
-      });
+      const res = await updateResumeAsync(activeResume);
 
       console.log("res", res);
     } finally {

@@ -1,11 +1,9 @@
 "use client";
-import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Plus, FileText, Settings, AlertCircle, Upload } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,14 +12,8 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { getConfig, getFileHandle, verifyPermission } from "@/utils/fileSystem";
 import { useResumeStore } from "@/store/useResumeStore";
-import { initialResumeState } from "@/config/initialResumeData";
-import { generateUUID } from "@/utils/uuid";
-import { getResumesByUserId } from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
 
 const ResumesList = () => {
   return <ResumeWorkbench />;
@@ -37,100 +29,15 @@ const ResumeWorkbench = () => {
     updateResumeList,
   } = useResumeStore();
   const router = useRouter();
-  const [hasConfiguredFolder, setHasConfiguredFolder] = React.useState(false);
-
-  // useEffect(() => {
-  // const syncResumesFromFiles = async () => {
-  //   try {
-  //     const handle = await getFileHandle("syncDirectory");
-  //     if (!handle) return;
-  //     const hasPermission = await verifyPermission(handle);
-  //     console.debug("hasPermission", hasPermission);
-  //     if (!hasPermission) return;
-  //     const dirHandle = handle as FileSystemDirectoryHandle;
-  //     for await (const entry of dirHandle.values()) {
-  //       if (entry.kind === "file" && entry.name.endsWith(".json")) {
-  //         try {
-  //           const file = await entry.getFile();
-  //           const content = await file.text();
-  //           const resumeData = JSON.parse(content);
-  //           console.debug("resumeData", resumeData);
-  //           updateResumeFromFile(resumeData);
-  //         } catch (error) {
-  //           console.error("Error reading resume file:", error);
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error syncing resumes from files:", error);
-  //   }
-  // };
-  // console.debug(
-  //   "Object.keys(resumes).length",
-  //   Object.keys(resumes).length,
-  //   resumes
-  // );
-  // if (Object.keys(resumes).length === 0) {
-  //   syncResumesFromFiles();
-  // }
-  // }, [resumes, updateResume]);
 
   useEffect(() => {
     updateResumeList();
-  }, []);
-
-  useEffect(() => {
-    const loadSavedConfig = async () => {
-      try {
-        const handle = await getFileHandle("syncDirectory");
-        const path = await getConfig("syncDirectoryPath");
-        if (handle && path) {
-          setHasConfiguredFolder(true);
-        }
-      } catch (error) {
-        console.error("Error loading saved config:", error);
-      }
-    };
-
-    loadSavedConfig();
   }, []);
 
   const handleCreateResume = async () => {
     const newId = await createResume(null);
     setActiveResume(newId);
   };
-
-  // const handleImportJson = () => {
-  //   const input = document.createElement("input");
-  //   input.type = "file";
-  //   input.accept = ".json";
-
-  //   input.onchange = async (e) => {
-  //     const file = (e.target as HTMLInputElement).files?.[0];
-  //     if (!file) return;
-
-  //     try {
-  //       const content = await file.text();
-  //       const config = JSON.parse(content);
-
-  //       const newResume = {
-  //         ...initialResumeState,
-  //         ...config,
-  //         id: generateUUID(),
-  //         createdAt: new Date().toISOString(),
-  //         updatedAt: new Date().toISOString(),
-  //       };
-
-  //       addResume(newResume);
-  //       toast.success(t("dashboard.resumes.importSuccess"));
-  //     } catch (error) {
-  //       console.error("Import error:", error);
-  //       toast.error(t("dashboard.resumes.importError"));
-  //     }
-  //   };
-
-  //   input.click();
-  // };
 
   console.debug("resumes:", resumes);
 

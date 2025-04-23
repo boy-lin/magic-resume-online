@@ -8,7 +8,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
 } from "@/components/ui/sheet-no-overlay";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
@@ -22,7 +22,7 @@ const templateImages: { [key: string]: any } = {
   classic,
   modern,
   "left-right": leftRight,
-  timeline
+  timeline,
 };
 
 const TemplateSheet = () => {
@@ -49,7 +49,7 @@ const TemplateSheet = () => {
           {DEFAULT_TEMPLATES.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTemplate(t.id)}
+              onClick={() => setTemplate(t.id, true)}
               className={cn(
                 "relative group rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-[1.02]",
                 t.id === currentTemplate.id
