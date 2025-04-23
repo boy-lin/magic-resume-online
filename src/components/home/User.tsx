@@ -19,36 +19,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function User() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
   const { state } = useAppContext();
   const user = state.user;
-
-  // <HoverCard openDelay={200}>
-  // <HoverCardTrigger asChild>
-  //   <Avatar className="size-8">
-  //     <AvatarImage src="/images/avatar.jpeg" alt="@shadcn" />
-  //     <AvatarFallback>CN</AvatarFallback>
-  //   </Avatar>
-  // </HoverCardTrigger>
-  /* <HoverCardContent
-      align="end"
-      className="flex flex-col gap-1 w-auto p-1"
-    >
-      <Button variant="ghost" className="text-left">
-        账号设置
-      </Button>
-      <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
-        <input type="hidden" name="pathName" value={pathName} />
-        <Button
-          type="submit"
-          variant="ghost"
-          className="text-left w-full"
-        >
-          <div className="text-left">退出</div>
-        </Button>
-      </form>
-    </HoverCardContent>
-  </HoverCard> */
+  const fullName = user.user_metadata?.full_name;
 
   if (state.userLoading === 0)
     return (
@@ -68,7 +41,7 @@ export default function User() {
           <DropdownMenuTrigger asChild>
             <Avatar className="size-8">
               <AvatarImage src="/images/avatar.jpeg" alt="avatar" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>{fullName}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
