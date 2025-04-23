@@ -2,7 +2,7 @@ import mergeWith from "lodash/mergeWith";
 import isObject from "lodash/isObject";
 import { jsonToUrlParams } from "./url";
 
-const baseURL = "http://localhost:3000",
+const baseURL = process.env.NEXT_PUBLIC_SITE_URL,
   initialConfig = {
     method: "GET",
     params: null,

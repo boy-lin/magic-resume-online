@@ -3,7 +3,7 @@
 import React from "react";
 import { useSearchParams } from "next/navigation";
 
-const page = (props) => {
+const Page = (props) => {
   const searchParams = useSearchParams();
   const title = searchParams.get("title");
   const description = searchParams.get("description");
@@ -22,4 +22,4 @@ const page = (props) => {
   );
 };
 
-export default page;
+export default Page;
