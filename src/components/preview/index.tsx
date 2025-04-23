@@ -151,7 +151,7 @@ const PreviewPanel = ({
         fontFamily: "MiSans VF, sans-serif",
       }}
     >
-      <div className="py-4 ml-4 px-4 min-h-screen flex justify-center scale-[58%] origin-top md:scale-90">
+      <div className="py-4 px-4 min-h-screen flex justify-center scale-[58%] origin-top md:scale-90">
         <div
           ref={startRef}
           className={cn(

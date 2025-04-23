@@ -31,7 +31,11 @@ interface ResumeStore {
   createResume: (templateId: string | null) => Promise<any>;
   deleteResume: (resume: ResumeData) => void;
   duplicateResume: (resumeId: string) => string;
-  updateResume: (resumeId: string, data: Partial<ResumeData>) => void;
+  updateResume: (
+    resumeId: string,
+    data: Partial<ResumeData>,
+    isNeedSync?: boolean
+  ) => void;
   setActiveResume: (resumeId: string) => void;
 
   updateResumeTitle: (title: string) => void;
@@ -160,7 +164,7 @@ export const useResumeStore = create(
         // syncResumeToFile(newResume);
       },
 
-      updateResume: (resumeId, data) => {
+      updateResume: (resumeId, data, isNeedSync = true) => {
         const resume = get().resumes[resumeId];
 
         if (!resume) return;
@@ -168,10 +172,10 @@ export const useResumeStore = create(
         const updatedResume = {
           ...resume,
           ...data,
+          isNeedSync,
         };
 
         syncResumeToFile(updatedResume, resume);
-
         set((state) => {
           return {
             resumes: {
@@ -191,7 +195,7 @@ export const useResumeStore = create(
         let res;
         if (activeResumeId) {
           res = await upsertResumeById(createClient(), resume);
-          get().updateResume(activeResumeId, resume);
+          get().updateResume(activeResumeId, resume, false);
         }
         return res;
       },
@@ -201,7 +205,7 @@ export const useResumeStore = create(
         if (activeResumeId) {
           const params = { id: activeResumeId, title };
           await upsertResumeById(createClient(), params);
-          get().updateResume(activeResumeId, params);
+          get().updateResume(activeResumeId, params, false);
         }
       },
 
@@ -250,7 +254,6 @@ export const useResumeStore = create(
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-
         set((state) => ({
           resumes: {
             ...state.resumes,
@@ -311,7 +314,6 @@ export const useResumeStore = create(
           : [...currentResume.education, education];
         get().updateResume(activeResumeId, {
           education: newEducation,
-          isNeedSync: true,
         });
       },
 
@@ -320,7 +322,6 @@ export const useResumeStore = create(
         if (activeResumeId) {
           get().updateResume(activeResumeId, {
             education: educations,
-            isNeedSync: true,
           });
         }
       },
@@ -332,7 +333,6 @@ export const useResumeStore = create(
           const updatedEducation = resume.education.filter((e) => e.id !== id);
           get().updateResume(activeResumeId, {
             education: updatedEducation,
-            isNeedSync: true,
           });
         }
       },
@@ -352,14 +352,13 @@ export const useResumeStore = create(
 
         get().updateResume(activeResumeId, {
           experience: newExperience,
-          isNeedSync: true,
         });
       },
 
       updateExperienceBatch: (experiences: Experience[]) => {
         const { activeResumeId } = get();
         if (activeResumeId) {
-          const updateData = { experience: experiences, isNeedSync: true };
+          const updateData = { experience: experiences };
           get().updateResume(activeResumeId, updateData);
         }
       },
@@ -374,7 +373,6 @@ export const useResumeStore = create(
 
         get().updateResume(activeResumeId, {
           experience: updatedExperience,
-          isNeedSync: true,
         });
       },
 
@@ -392,14 +390,13 @@ export const useResumeStore = create(
 
         get().updateResume(activeResumeId, {
           projects: newProjects,
-          isNeedSync: true,
         });
       },
 
       updateProjectsBatch: (projects: Project[]) => {
         const { activeResumeId } = get();
         if (activeResumeId) {
-          const updateData = { projects, isNeedSync: true };
+          const updateData = { projects };
           get().updateResume(activeResumeId, updateData);
         }
       },
@@ -413,16 +410,19 @@ export const useResumeStore = create(
         );
         get().updateResume(activeResumeId, {
           projects: updatedProjects,
-          isNeedSync: true,
         });
       },
 
       setDraggingProjectId: (id: string | null) => {
         const { activeResumeId } = get();
         if (activeResumeId) {
-          get().updateResume(activeResumeId, {
-            draggingProjectId: id,
-          });
+          get().updateResume(
+            activeResumeId,
+            {
+              draggingProjectId: id,
+            },
+            false
+          );
         }
       },
 
@@ -431,7 +431,6 @@ export const useResumeStore = create(
         if (activeResumeId) {
           get().updateResume(activeResumeId, {
             skillContent,
-            isNeedSync: true,
           });
         }
       },
@@ -452,7 +451,6 @@ export const useResumeStore = create(
           }));
           get().updateResume(activeResumeId, {
             menuSections: reorderedSections as MenuSection[],
-            isNeedSync: true,
           });
         }
       },
@@ -468,7 +466,6 @@ export const useResumeStore = create(
           );
           get().updateResume(activeResumeId, {
             menuSections: updatedSections,
-            isNeedSync: true,
           });
         }
       },
@@ -476,9 +473,13 @@ export const useResumeStore = create(
       setActiveSection: (sectionId) => {
         const { activeResumeId } = get();
         if (activeResumeId) {
-          get().updateResume(activeResumeId, {
-            activeSection: sectionId,
-          });
+          get().updateResume(
+            activeResumeId,
+            {
+              activeSection: sectionId,
+            },
+            false
+          );
         }
       },
 
@@ -487,7 +488,6 @@ export const useResumeStore = create(
         if (activeResumeId) {
           get().updateResume(activeResumeId, {
             menuSections: sections,
-            isNeedSync: true,
           });
         }
       },
@@ -511,7 +511,6 @@ export const useResumeStore = create(
           };
           get().updateResume(activeResumeId, {
             customData: updatedCustomData,
-            isNeedSync: true,
           });
         }
       },
@@ -526,7 +525,6 @@ export const useResumeStore = create(
           };
           get().updateResume(activeResumeId, {
             customData: updatedCustomData,
-            isNeedSync: true,
           });
         }
       },
@@ -538,7 +536,6 @@ export const useResumeStore = create(
           const { [sectionId]: _, ...rest } = currentResume.customData;
           get().updateResume(activeResumeId, {
             customData: rest,
-            isNeedSync: true,
           });
         }
       },
@@ -563,7 +560,6 @@ export const useResumeStore = create(
           };
           get().updateResume(activeResumeId, {
             customData: updatedCustomData,
-            isNeedSync: true,
           });
         }
       },
@@ -580,7 +576,6 @@ export const useResumeStore = create(
           };
           get().updateResume(activeResumeId, {
             customData: updatedCustomData,
-            isNeedSync: true,
           });
         }
       },
@@ -597,7 +592,6 @@ export const useResumeStore = create(
           };
           get().updateResume(activeResumeId, {
             customData: updatedCustomData,
-            isNeedSync: true,
           });
         }
       },
@@ -626,7 +620,7 @@ export const useResumeStore = create(
         }
       },
 
-      setTemplate: (templateId) => {
+      setTemplate: (templateId, isNeedSync = false) => {
         const { activeResumeId, resumes } = get();
         if (!activeResumeId) return;
 
@@ -647,6 +641,7 @@ export const useResumeStore = create(
             ...resumes[activeResumeId].basic,
             layout: template.basic.layout,
           },
+          isNeedSync,
         };
 
         set({
