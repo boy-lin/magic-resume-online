@@ -103,3 +103,5 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
     },
   },
 ];
+
+export const avatarUrlDefault = "/images/avatar.jpeg";

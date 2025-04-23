@@ -7,13 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
 import { ChevronRightIcon } from "lucide-react";
+import { avatarUrlDefault } from "@/config";
 
 const NextPage = () => {
   const { state } = useAppContext();
   const user = state.user || {};
+  const fullName = user.user_metadata?.full_name;
+  const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
   const router = useRouter();
   const pathname = usePathname();
-  const fullName = user.user_metadata?.full_name;
 
   return (
     <div className="self-start py-12 sm:px-6 lg:px-8">
@@ -21,7 +23,7 @@ const NextPage = () => {
         <div className="flex items-center justify-start gap-4 p-6">
           <div className="shrink-0">
             <Avatar className="size-16">
-              <AvatarImage src="/images/avatar.jpeg" alt="" />
+              <AvatarImage src={avatarUrl} alt={fullName} />
               <AvatarFallback>{fullName}</AvatarFallback>
             </Avatar>
           </div>

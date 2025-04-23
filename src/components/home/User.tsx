@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useTranslations, useLocale } from "next-intl";
 import { userInfoPath } from "@/utils/routesPath";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,13 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { avatarUrlDefault } from "@/config";
 
 export default function User() {
   const router = useRouter();
   const pathname = usePathname();
   const { state } = useAppContext();
-  const user = state.user;
+  const user = state.user || {};
   const fullName = user.user_metadata?.full_name;
+  const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
 
   if (state.userLoading === 0)
     return (
@@ -40,7 +40,7 @@ export default function User() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="size-8">
-              <AvatarImage src="/images/avatar.jpeg" alt="avatar" />
+              <AvatarImage src={avatarUrl} alt={fullName} />
               <AvatarFallback>{fullName}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
