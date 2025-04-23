@@ -60,6 +60,7 @@
     "dayjs": "^1.11.12",
     "framer-motion": "^11.11.10",
     "html2pdf.js": "^0.10.2",
+    "input-otp": "^1.4.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.379.0",
     "mark.js": "^8.11.1",
