@@ -1,0 +1,3 @@
+```
+vercel deploy --target=production
+```

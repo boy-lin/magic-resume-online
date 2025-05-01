@@ -21,6 +21,7 @@ import {
   upsertResumeById,
   getResumesByUserId,
   deleteResumeById,
+  getResumesById,
 } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
 interface ResumeStore {
@@ -70,7 +71,7 @@ interface ResumeStore {
   setThemeColor: (color: string) => void;
   setTemplate: (templateId: string) => void;
 
-  updateResumeList: () => Promise<any>;
+  getResumeList: () => Promise<any>;
 }
 
 // 同步简历到文件系统
@@ -652,7 +653,7 @@ export const useResumeStore = create(
           activeResume: updatedResume,
         });
       },
-      updateResumeList: async () => {
+      getResumeList: async () => {
         const { data } = await getResumesByUserId(createClient());
         const resumesMap = {};
         data.forEach((val) => {
@@ -679,6 +680,34 @@ export const useResumeStore = create(
             ...state.resumes,
             ...resumesMap,
           },
+        }));
+      },
+      getResumeById: async (id) => {
+        const { data: val } = await getResumesById(createClient(), id);
+        const newResume = {
+          activeSection: "basic",
+          draggingProjectId: null,
+          id: val.id,
+          title: val.title,
+          createdAt: val.created_at,
+          updatedAt: val.updated_at,
+          basic: JSON.parse(val.basic),
+          templateId: val.template_id,
+          customData: JSON.parse(val.custom_data),
+          education: JSON.parse(val.education),
+          experience: JSON.parse(val.experience),
+          globalSettings: JSON.parse(val.global_settings),
+          menuSections: JSON.parse(val.menu_sections),
+          projects: JSON.parse(val.projects),
+          skillContent: JSON.parse(val.skill_content),
+        };
+        set((state) => ({
+          resumes: {
+            ...state.resumes,
+            [val.id]: newResume,
+          },
+          activeResumeId: id,
+          activeResume: newResume,
         }));
       },
     }),

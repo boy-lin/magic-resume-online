@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import PdfExport from "../shared/PdfExport";
 import ThemeToggle from "../shared/ThemeToggle";
 import { useResumeStore } from "@/store/useResumeStore";
-import { getThemeConfig } from "@/theme/themeConfig";
+import { toast } from "@/components/toasts/use-toast";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import {
   HoverCard,
@@ -15,9 +15,8 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
-import { upsertResumeById } from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
+import ShareBtn from "./ShareBtn";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
@@ -26,14 +25,10 @@ interface EditorHeaderProps {
 export function EditorHeader({ isMobile }: EditorHeaderProps) {
   const { activeResume, updateResumeAsync, updateResumeTitle } =
     useResumeStore();
-  const { menuSections = [], isNeedSync } = activeResume || {};
-  const themeConfig = getThemeConfig();
+  const { isNeedSync } = activeResume || {};
   const { errors, selectError } = useGrammarCheck();
   const router = useRouter();
-  const t = useTranslations();
-  const visibleSections = menuSections
-    ?.filter((section) => section.enabled)
-    .sort((a, b) => a.order - b.order);
+  const t = useTranslations("common");
 
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +39,12 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
       const res = await updateResumeAsync(activeResume);
 
       console.log("res", res);
+    } catch (e) {
+      toast({
+        title: t("msg.errT"),
+        description: e.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
               router.push("/app/dashboard");
             }}
           >
-            <span className="text-lg font-semibold">{t("common.title")}</span>
+            <span className="text-lg font-semibold">{t("title")}</span>
             <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
           </motion.div>
         </div>
@@ -133,7 +134,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
             placeholder="简历名称"
           />
 
-          <ThemeToggle></ThemeToggle>
+          <ShareBtn />
           <Button
             variant="outline"
             className="py-2"
@@ -141,7 +142,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
             disabled={loading}
           >
             <RefreshCcwDot />
-            同步
+            {t("btn.sync")}
             {isNeedSync ? (
               <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>
             ) : null}
@@ -149,6 +150,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
           <div className="md:flex items-center ">
             <PdfExport />
           </div>
+          <ThemeToggle></ThemeToggle>
         </div>
       </div>
     </motion.header>
