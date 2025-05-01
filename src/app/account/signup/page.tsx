@@ -60,7 +60,7 @@ const RegisterPage = () => {
     );
     if (values.confirmPassword !== values.password) {
       return toast({
-        title: t("common.msg.titleE"),
+        title: t("common.msg.errT"),
         description: t("account.invalid.pwdUnequal"),
         variant: "destructive",
       });

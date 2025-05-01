@@ -27,9 +27,13 @@ export default async function LocaleLayout({ children }: Props) {
   const messages = await getMessages();
 
   return (
-    <Document locale={locale} bodyClassName="overflow-y-hidden">
+    <Document locale={locale} bodyClassName="">
       <NextIntlClientProvider messages={messages}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
+            <main className="m-auto max-w-[1200px] px-4 py-8">{children}</main>
+          </div>
+        </Providers>
       </NextIntlClientProvider>
     </Document>
   );

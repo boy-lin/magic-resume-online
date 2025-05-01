@@ -91,3 +91,5 @@ export function filterValEqUndefined(vals) {
   });
   return vals;
 }
+
+export const noop = <T>(_result: T) => false;

@@ -1,6 +1,5 @@
 "use client";
 import { useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
 import {
   DropdownMenu,

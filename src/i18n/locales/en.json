@@ -9,14 +9,20 @@
     "newResume": "New Resume",
     "copy": "Copy",
     "msg": {
-      "titleE": "Error Message",
+      "errT": "Error Message",
+      "successT": "Success Message",
       "progress": "Under development"
     },
     "btn": {
       "next": "Next Step",
       "signI": "Sign in",
       "signU": "Sign up",
-      "submit": "Submit"
+      "submit": "Submit",
+      "share": "Share",
+      "sync": "Sync"
+    },
+    "menu": {
+      "product": "Products"
     }
   },
   "home": {
@@ -643,7 +649,7 @@
       "email": "Email address",
       "pwd": "Password",
       "confirmPwd": "Confirm password",
-      "userName": "Full Name",
+      "fName": "Full Name",
       "avatar": "Avatar Url"
     },
     "signup": {

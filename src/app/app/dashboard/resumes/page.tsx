@@ -26,12 +26,12 @@ const ResumeWorkbench = () => {
     setActiveResume,
     deleteResume,
     createResume,
-    updateResumeList,
+    getResumeList,
   } = useResumeStore();
   const router = useRouter();
 
   useEffect(() => {
-    updateResumeList();
+    getResumeList();
   }, []);
 
   const handleCreateResume = async () => {

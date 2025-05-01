@@ -75,10 +75,13 @@ export const upsertResumeById = async (supabase: SupabaseClient, val) => {
     projects: JSON.stringify(val.projects),
     skill_content: JSON.stringify(val.skillContent),
   });
-  console.debug("paramsparamsparams", params);
   return supabase.from("resumes").upsert(params);
 };
 
 export const deleteResumeById = async (supabase: SupabaseClient, id) => {
   return supabase.from("resumes").delete().eq("id", id);
 };
+
+export const getResumesById = cache(async (supabase: SupabaseClient, id) => {
+  return supabase.from("resumes").select("*").eq("id", id).limit(1).single();
+});

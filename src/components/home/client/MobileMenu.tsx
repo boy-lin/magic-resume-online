@@ -53,7 +53,7 @@ export default function MobileMenu({
 
           <div className="flex items-center justify-center">
             <Link
-              href={`/${locale}/changelog`}
+              href={`/${locale}/docs/changelog`}
               className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
             >
               <FileText className="h-3.5 w-3.5" />

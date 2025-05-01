@@ -9,14 +9,20 @@
     "newResume": "新建简历",
     "copy": "复制",
     "msg": {
-      "titleE": "错误提示",
+      "errT": "错误提示",
+      "successT": "成功提示",
       "progress": "开发中"
     },
     "btn": {
       "next": "下一步",
       "signI": "登录",
       "signU": "注册",
-      "submit": "提交"
+      "submit": "提交",
+      "share": "分享",
+      "sync": "同步"
+    },
+    "menu": {
+      "product": "产品"
     }
   },
   "home": {
@@ -643,11 +649,10 @@
       "pwdUnequal": "2次密码不一致"
     },
     "field": {
-      "fName": "用户名",
       "email": "邮箱地址",
       "pwd": "密码",
       "confirmPwd": "确认密码",
-      "userName": "姓名",
+      "fName": "用户名",
       "avatar": "头像"
     },
     "signup": {

@@ -60,6 +60,7 @@ export default async function LocaleLayout({
       <NextIntlClientProvider messages={messages}>
         <Providers>
           <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
+            {/* {children} */}
             <LandingHeader showLanguage={true} />
             <main className="m-auto max-w-[1200px] px-4 pt-16">{children}</main>
             <Footer />

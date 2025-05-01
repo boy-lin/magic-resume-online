@@ -55,6 +55,7 @@ ListItem.displayName = "ListItem";
 
 export default function LandingHeader({ showLanguage = false }) {
   const t = useTranslations("home");
+  const tc = useTranslations("common");
   const pathname = usePathname();
   const locale = pathname.split("/")[1]; // 从路径中获取语言代码
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,7 +78,7 @@ export default function LandingHeader({ showLanguage = false }) {
                 <NavigationMenuList>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="bg-transparent">
-                      产品
+                      {tc("menu.product")}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -87,8 +88,9 @@ export default function LandingHeader({ showLanguage = false }) {
                               className="flex h-full w-full select-none flex-col justify-center rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                               href="/"
                             >
-                              <div className="mb-2 mt-4 text-lg font-medium">
-                                <Logo size={32} /> 简历编辑器
+                              <div className="flex items-center gap-2 mb-2 mt-4 text-lg leading-5 font-medium">
+                                <Logo size={32} />
+                                <div className="">{t("header.title")}</div>
                               </div>
                               <p className="text-sm leading-tight text-muted-foreground">
                                 利用 AI 技术，帮助您快速创建专业的简历,
@@ -110,7 +112,7 @@ export default function LandingHeader({ showLanguage = false }) {
                           浏览所有简历模板
                         </ListItem>
                         <ListItem
-                          href={`/${locale}/changelog`}
+                          href={`/${locale}/docs/changelog`}
                           title="更新日志"
                         >
                           新特性更新日志
@@ -134,7 +136,7 @@ export default function LandingHeader({ showLanguage = false }) {
               {/* <GitHubStars /> */}
 
               {/* <Link
-                href={`/${locale}/changelog`}
+                href={`/${locale}/docs/changelog`}
                 className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
               >
                 <FileText className="h-3.5 w-3.5" />
