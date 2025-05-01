@@ -32,5 +32,5 @@ const PageBreakLine = React.memo(({ pageNumber }: { pageNumber: number }) => {
     </div>
   );
 });
-
+PageBreakLine.displayName = "PageBreakLine";
 export default PageBreakLine;
