@@ -1,17 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import Logo from "@/components/shared/Logo";
-import { updatePassword } from "@/utils/auth-helpers/server";
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { z } from "zod";
+
+import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/toasts/use-toast";
-import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -20,16 +17,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Plus } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { updateUserInfoById } from "@/utils/supabase/queries";
 import { useAppContext } from "@/app/providers";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const Page = () => {
   const t = useTranslations();
@@ -37,6 +27,7 @@ const Page = () => {
   const { state } = useAppContext();
   const user = state.user || {};
   const supabase = createClient();
+  const router = useRouter();
 
   const formSchema = React.useMemo(
     () =>
@@ -58,8 +49,14 @@ const Page = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const res = await updateUserInfoById(supabase, user.id, values);
-      console.debug("res", res);
+      const { error } = await updateUserInfoById(supabase, user.id, values);
+      if (!error) {
+        toast({
+          title: "成功！",
+          description: "更新用户信息成功！",
+        });
+        router.back();
+      }
     } catch (e) {
     } finally {
       setIsSubmitting(false);
@@ -75,7 +72,7 @@ const Page = () => {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("account.field.userName")}</FormLabel>
+                <FormLabel>{t("account.field.fName")}</FormLabel>
                 <FormControl>
                   <Input placeholder="jack" {...field} />
                 </FormControl>
@@ -101,7 +98,7 @@ const Page = () => {
               </FormItem>
             )}
           /> */}
-          <Button disabled={isSubmitting} className="w-full" type="submit">
+          <Button loading={isSubmitting} className="w-full" type="submit">
             {t("common.btn.submit")}
           </Button>
         </form>

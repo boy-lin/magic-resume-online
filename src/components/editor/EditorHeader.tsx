@@ -14,9 +14,10 @@ import {
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-lab/button";
 import { useState } from "react";
 import ShareBtn from "./ShareBtn";
+import { Loader2 } from "lucide-react";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
@@ -141,7 +142,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
             onClick={asyncResume}
             disabled={loading}
           >
-            <RefreshCcwDot />
+            {loading ? <Loader2 className="animate-spin" /> : <RefreshCcwDot />}
             {t("btn.sync")}
             {isNeedSync ? (
               <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>

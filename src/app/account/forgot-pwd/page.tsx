@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
 import { requestPasswordUpdate } from "@/utils/auth-helpers/server";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/toasts/use-toast";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -44,13 +43,9 @@ const ForgotPwdPage = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
     setIsSubmitting(true);
     const redirectUrl = await requestPasswordUpdate(values);
     setIsSubmitting(false);
-    console.debug("redirectUrl", redirectUrl);
     router.push(redirectUrl);
   }
 
@@ -88,7 +83,7 @@ const ForgotPwdPage = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting} className="w-full" type="submit">
+            <Button loading={isSubmitting} className="w-full" type="submit">
               {t("common.btn.next")}
             </Button>
           </form>

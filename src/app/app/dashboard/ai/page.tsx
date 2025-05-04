@@ -4,14 +4,14 @@ import { useTranslations } from "next-intl";
 import { ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import DeepSeekLogo from "@/components/ai/icon/IconDeepseek";
-import IconDoubao from "@/components/ai/icon/IconDoubao";
+import DeepSeekLogo from "@/components/icon/IconDeepseek";
+import IconDoubao from "@/components/icon/IconDoubao";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ const AISettingsPage = () => {
     setDoubaoModelId,
     setDeepseekApiKey,
     selectedModel,
-    setSelectedModel
+    setSelectedModel,
   } = useAIConfigStore();
 
   const [currentModel, setCurrentModel] = useState("");
@@ -67,7 +67,7 @@ const AISettingsPage = () => {
       link: "https://platform.deepseek.com",
       color: "text-purple-500",
       bgColor: "bg-purple-50 dark:bg-purple-950/50",
-      isConfigured: !!deepseekApiKey
+      isConfigured: !!deepseekApiKey,
     },
     {
       id: "doubao",
@@ -77,8 +77,8 @@ const AISettingsPage = () => {
       link: "https://console.volcengine.com/ark",
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-950/50",
-      isConfigured: !!(doubaoApiKey && doubaoModelId)
-    }
+      isConfigured: !!(doubaoApiKey && doubaoModelId),
+    },
   ];
 
   return (
