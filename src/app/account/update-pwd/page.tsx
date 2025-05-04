@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
 import { updatePassword } from "@/utils/auth-helpers/server";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/toasts/use-toast";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
@@ -45,14 +45,13 @@ const ForgotPwdPage = () => {
     if (values.password.trim() !== values.passwordConfirm.trim()) {
       return toast({
         title: "更新密码错误",
-        description: "Passwords do not match.",
+        description: "密码不匹配。",
         variant: "destructive",
       });
     }
     setIsSubmitting(true);
     const redirectUrl = await updatePassword(values);
     setIsSubmitting(false);
-    console.debug("redirectUrl", redirectUrl);
     router.push(redirectUrl);
   }
 
@@ -65,9 +64,7 @@ const ForgotPwdPage = () => {
           </Link>
           <div>
             <h1 className="text-base/6 font-medium">重置密码</h1>
-            <p className="text-sm/5 text-gray-600">
-              Sign in to your account to continue.
-            </p>
+            <p className="text-sm/5 text-gray-600">登录您的帐户以继续。</p>
           </div>
         </div>
         <Form {...form}>
@@ -77,7 +74,7 @@ const ForgotPwdPage = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>新密码</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
@@ -90,7 +87,7 @@ const ForgotPwdPage = () => {
               name="passwordConfirm"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormLabel>确认新密码</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
@@ -98,15 +95,15 @@ const ForgotPwdPage = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting} className="w-full" type="submit">
-              Update Password
+            <Button loading={isSubmitting} className="w-full" type="submit">
+              更新密码
             </Button>
           </form>
         </Form>
       </div>
       <div className="m-1.5 rounded-lg bg-gray-50 py-4 text-center text-sm/5 ring-1 ring-black/5">
         <Link href="/account/signin" className="font-light text-sm">
-          Sign in with email and password
+          去登录页面
         </Link>
       </div>
     </div>

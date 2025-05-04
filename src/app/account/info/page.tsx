@@ -1,21 +1,17 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { useAppContext } from "@/app/providers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { handleRequest } from "@/utils/auth-helpers/client";
-import { SignOut } from "@/utils/auth-helpers/server";
 import { ChevronRightIcon } from "lucide-react";
 import { avatarUrlDefault } from "@/config";
+import ButtonSignout from "@/components/biz/account/info/button-signout";
 
 const NextPage = () => {
   const { state } = useAppContext();
   const user = state.user || {};
   const fullName = user.user_metadata?.full_name;
   const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
-  const router = useRouter();
-  const pathname = usePathname();
 
   return (
     <div className="self-start py-12 sm:px-6 lg:px-8">
@@ -47,15 +43,9 @@ const NextPage = () => {
               <span>设置个人资料</span>
               <ChevronRightIcon />
             </Link>
-            <form
-              className="w-full px-4 py-4 bg-card"
-              onSubmit={(e) => handleRequest(e, SignOut, router)}
-            >
-              <input type="hidden" name="pathName" value={pathname} />
-              <button type="submit" className="text-left w-full">
-                退出登录
-              </button>
-            </form>
+            <div className=" px-4 py-4 bg-card">
+              <ButtonSignout variant="outline" className="" />
+            </div>
           </div>
         </div>
       </div>

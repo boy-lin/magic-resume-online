@@ -2,8 +2,6 @@ import Link from "next/link";
 import { userInfoPath } from "@/utils/routesPath";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { SignOut } from "@/utils/auth-helpers/server";
-import { handleRequest } from "@/utils/auth-helpers/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppContext } from "@/app/providers";
 import {
@@ -14,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { avatarUrlDefault } from "@/config";
+import ButtonSignout from "@/components/biz/account/info/button-signout";
 
 export default function User() {
   const router = useRouter();
@@ -51,33 +50,20 @@ export default function User() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <form
-                className="w-full"
-                onSubmit={(e) => handleRequest(e, SignOut, router)}
-              >
-                <input type="hidden" name="pathName" value={pathname} />
-                <button type="submit" className="text-left w-full">
-                  退出
-                </button>
-              </form>
+              <ButtonSignout
+                variant="ghost"
+                className="px-0 py-0 justify-start leading-4 h-auto font-normal"
+              />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
         <div>
-          <Button
-            variant="ghost"
-            className="text-sm"
-            onClick={() => router.push("/account/signin")}
-          >
-            登录
+          <Button asChild variant="ghost">
+            <Link href="/account/signup">注册</Link>
           </Button>
-          <Button
-            variant="ghost"
-            className="text-sm"
-            onClick={() => router.push("/account/signup")}
-          >
-            注册
+          <Button asChild>
+            <Link href="/account/signin">登录</Link>
           </Button>
         </div>
       )}

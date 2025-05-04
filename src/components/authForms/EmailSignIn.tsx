@@ -1,17 +1,13 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { isValidEmail } from "@/utils/reg";
-import {
-  signInWithPassword,
-  redirectToPath,
-} from "@/utils/auth-helpers/server";
-import { Button } from "@/components/ui/button";
+import { signInWithPassword } from "@/utils/auth-helpers/server";
+import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/components/toasts/use-toast";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -29,7 +25,7 @@ export default function EmailSignIn() {
   const router = useRouter();
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRemember, setIRemember] = useState(false);
+  const [isRemember, setIsRemember] = useState<any>(false);
 
   const formSchema = React.useMemo(
     () =>
@@ -65,6 +61,10 @@ export default function EmailSignIn() {
   useEffect(() => {
     const email = getLocalStorageByName("userEmail");
     form.setValue("email", email);
+
+    const isRemember = getLocalStorageByName("isRemember") === "true";
+    console.debug("isRemember::", isRemember);
+    setIsRemember(isRemember);
   }, []);
 
   return (
@@ -108,7 +108,10 @@ export default function EmailSignIn() {
               name="remember-me"
               checked={isRemember}
               className="h-4 w-4 rounded"
-              onCheckedChange={(val) => setIRemember(!!val)}
+              onCheckedChange={(val) => {
+                setLocalStorageByName("isRemember", String(val));
+                setIsRemember(val);
+              }}
             />
             <label
               htmlFor="remember-me"
@@ -127,7 +130,7 @@ export default function EmailSignIn() {
             </Link>
           </div>
         </div>
-        <Button disabled={isSubmitting} className="w-full" type="submit">
+        <Button loading={isSubmitting} className="w-full" type="submit">
           {t("common.btn.signI")}
         </Button>
       </form>

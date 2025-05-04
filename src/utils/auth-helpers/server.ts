@@ -3,7 +3,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getURL, getErrorRedirect, getStatusRedirect } from "@/utils/helpers";
+import {
+  getURL,
+  getErrorRedirect,
+  getStatusRedirect,
+  getFeedbackRedirect,
+} from "@/utils/helpers";
 import { getAuthTypes } from "@/utils/auth-helpers/settings";
 import { generateRandomUsername } from "@/utils";
 import { isValidEmail } from "@/utils/reg";
@@ -19,11 +24,7 @@ export async function SignOut(formData: FormData) {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return getErrorRedirect(
-      pathName,
-      "Hmm... Something went wrong.",
-      "You could not be signed out."
-    );
+    return getErrorRedirect(pathName, "嗯...出了点问题。", "您无法退出。");
   }
 
   return "/signin";
@@ -39,8 +40,8 @@ export async function signInWithEmail(formData: FormData) {
   if (!isValidEmail(email)) {
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
-      "Invalid email address.",
-      "Please try again."
+      "电子邮件地址无效。",
+      "请重试。"
     );
   }
 
@@ -61,22 +62,21 @@ export async function signInWithEmail(formData: FormData) {
   if (error) {
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
-      "You could not be signed in.",
+      "您还没有登录。",
       error.message
     );
   } else if (data) {
     cookieStore.set("preferredSignInView", "email_signin", { path: "/" });
-    redirectPath = getStatusRedirect(
-      "/signin/email_signin",
-      "Success!",
-      "Please check your email for a magic link. You may now close this tab.",
-      true
+    redirectPath = getFeedbackRedirect(
+      "/feedback/success",
+      "成功！",
+      "请查看您的电子邮件，获取一个注册的魔术链接。您现在可以关闭此页面了。"
     );
   } else {
     redirectPath = getErrorRedirect(
       "/signin/email_signin",
-      "Hmm... Something went wrong.",
-      "You could not be signed in."
+      "嗯...出了点问题。",
+      "您还没有登录。"
     );
   }
 
@@ -100,20 +100,19 @@ export async function requestPasswordUpdate(formData) {
     redirectPath = getErrorRedirect(
       "/account/forgot-pwd",
       error.message,
-      "Please try again."
+      "请重试。"
     );
   } else if (data) {
-    redirectPath = getStatusRedirect(
-      "/account/forgot-pwd",
-      "Success!",
-      "Please check your email for a password reset link. You may now close this tab.",
-      true
+    redirectPath = getFeedbackRedirect(
+      "/feedback/success",
+      "成功！",
+      "请查看您的电子邮件，获取密码重置链接。您现在可以关闭此页面了。"
     );
   } else {
     redirectPath = getErrorRedirect(
       "/account/forgot-pwd",
-      "Hmm... Something went wrong.",
-      "Password reset email could not be sent."
+      "嗯...出了点问题。",
+      "无法发送密码重置电子邮件。"
     );
   }
 
@@ -132,19 +131,15 @@ export async function signInWithPassword(formData) {
     password,
   });
   if (error) {
-    redirectPath = getErrorRedirect(
-      singInPath,
-      "Sign in failed.",
-      error.message
-    );
+    redirectPath = getErrorRedirect(singInPath, "登录失败。", error.message);
   } else if (data.user) {
     cookieStore.set("preferredSignInView", "password_signin", { path: "/" });
-    redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
+    redirectPath = getStatusRedirect("/", "成功！", "您现在已登录。");
   } else {
     redirectPath = getErrorRedirect(
       singInPath,
-      "Hmm... Something went wrong.",
-      "You could not be signed in."
+      "嗯...出了点问题。",
+      "您还没有登录。"
     );
   }
 
@@ -173,11 +168,11 @@ export async function signUp(formData) {
   if (error) {
     redirectPath = getErrorRedirect(
       "/account/signup",
-      "Sign up failed.",
+      "注册失败。",
       error.message
     );
   } else if (data.session) {
-    redirectPath = getStatusRedirect("/", "Success!", "You are now signed in.");
+    redirectPath = getStatusRedirect("/", "成功！", "您现在已登录。");
   } else if (
     data.user &&
     data.user.identities &&
@@ -185,21 +180,20 @@ export async function signUp(formData) {
   ) {
     redirectPath = getErrorRedirect(
       "/account/signup",
-      "Sign up failed.",
+      "注册失败。",
       "There is already an account associated with this email address. Try resetting your password."
     );
   } else if (data.user) {
-    const path = "/feedback/success";
-    const title = encodeURIComponent("Success!");
-    const des = encodeURIComponent(
-      "Please check your email for a confirmation link. You may now close this tab."
+    redirectPath = getFeedbackRedirect(
+      "/feedback/success",
+      "成功！",
+      "请查看您的电子邮件，获取确认链接。您现在可以关闭此页面了。"
     );
-    redirectPath = `${path}?title=${title}&description=${des}`;
   } else {
     redirectPath = getErrorRedirect(
       "/account/signup",
-      "Hmm... Something went wrong.",
-      "You could not be signed up."
+      "嗯...出了点问题。",
+      "您可能无法注册。"
     );
   }
 
@@ -218,20 +212,16 @@ export async function updatePassword(formData) {
   if (error) {
     redirectPath = getErrorRedirect(
       "/account/update-pwd",
-      "Your password could not be updated.",
+      "您的密码无法更新。",
       error.message
     );
   } else if (data.user) {
-    redirectPath = getStatusRedirect(
-      "/",
-      "Success!",
-      "Your password has been updated."
-    );
+    redirectPath = getStatusRedirect("/", "成功！", "您的密码已更新。");
   } else {
     redirectPath = getErrorRedirect(
       "/account/update-pwd",
-      "Hmm... Something went wrong.",
-      "Your password could not be updated."
+      "嗯...出了点问题。",
+      "您的密码无法更新。"
     );
   }
 
@@ -246,15 +236,15 @@ export async function updateEmail(formData: FormData) {
   if (!isValidEmail(newEmail)) {
     return getErrorRedirect(
       "/account",
-      "Your email could not be updated.",
-      "Invalid email address."
+      "您的电子邮件无法更新。",
+      "电子邮件地址无效。"
     );
   }
 
   const supabase = createClient();
 
   const callbackUrl = getURL(
-    getStatusRedirect("/account", "Success!", `Your email has been updated.`)
+    getStatusRedirect("/account", "成功！", `Your email has been updated.`)
   );
 
   const { error } = await supabase.auth.updateUser(
@@ -267,14 +257,14 @@ export async function updateEmail(formData: FormData) {
   if (error) {
     return getErrorRedirect(
       "/account",
-      "Your email could not be updated.",
+      "您的电子邮件无法更新。",
       error.message
     );
   } else {
     return getStatusRedirect(
       "/account",
-      "Confirmation emails sent.",
-      `You will need to confirm the update by clicking the links sent to both the old and new email addresses.`
+      "确认电子邮件已发送。",
+      `您需要点击发送到新旧电子邮件地址的链接来确认更新。`
     );
   }
 }
@@ -289,22 +279,14 @@ export async function updateName(formData: FormData) {
   });
 
   if (error) {
-    return getErrorRedirect(
-      "/account",
-      "Your name could not be updated.",
-      error.message
-    );
+    return getErrorRedirect("/account", "您的姓名无法更新。", error.message);
   } else if (data.user) {
-    return getStatusRedirect(
-      "/account",
-      "Success!",
-      "Your name has been updated."
-    );
+    return getStatusRedirect("/account", "成功！", "您的姓名已更新。");
   } else {
     return getErrorRedirect(
       "/account",
-      "Hmm... Something went wrong.",
-      "Your name could not be updated."
+      "嗯...出了点问题。",
+      "您的姓名无法更新。"
     );
   }
 }

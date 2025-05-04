@@ -2,17 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
-import { isValidEmail } from "@/utils/reg";
 import { signUp } from "@/utils/auth-helpers/server";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/toasts/use-toast";
-import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -53,11 +48,6 @@ const RegisterPage = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.debug(
-      "valuesvaluesvalues",
-      values.confirmPassword !== values.password,
-      values
-    );
     if (values.confirmPassword !== values.password) {
       return toast({
         title: t("common.msg.errT"),
@@ -148,7 +138,7 @@ const RegisterPage = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={isSubmitting} className="w-full" type="submit">
+            <Button loading={isSubmitting} className="w-full" type="submit">
               {t("common.btn.signU")}
             </Button>
           </form>

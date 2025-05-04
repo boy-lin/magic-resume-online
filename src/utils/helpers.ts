@@ -134,3 +134,12 @@ export const getErrorRedirect = (
     disableButton,
     arbitraryParams
   );
+
+export const getFeedbackRedirect = (
+  path: string,
+  title: string = "成功！",
+  des: string = ""
+) =>
+  `${path}?title=${encodeURIComponent(title)}&description=${encodeURIComponent(
+    des
+  )}`;
