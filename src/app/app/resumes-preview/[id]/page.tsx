@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { Download, Printer } from "lucide-react";
 import { throttle } from "lodash";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { cn } from "@/lib/utils";
@@ -8,12 +9,28 @@ import PageBreakLine from "@/components/preview/PageBreakLine";
 import { getResumesById } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
 import { useParams } from "next/navigation";
+import { Dock, DockIcon } from "@/components/magicui/dock";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui-lab/button";
+import { usePdfExport, useHtmlPrint } from "@/hooks/pdf-export";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
   const [activeResume, setActiveResume] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
+  const t = useTranslations("previewDock");
+  const { globalSettings = {}, title } = activeResume || {};
+  const { isExporting, handleExport } = usePdfExport(activeResume);
+  const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);
 
   useEffect(() => {
     const getResumeById = async (id) => {
@@ -125,7 +142,18 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     return { pageHeightPx, pageBreakCount };
   }, [contentHeight, activeResume?.globalSettings?.pagePadding]);
 
-  if (!activeResume) return <div>空数据</div>;
+  if (!activeResume)
+    return (
+      <div className="w-full h-full">
+        <div className="flex flex-col space-y-3">
+          <Skeleton className="h-[125px] w-full rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div
@@ -167,6 +195,60 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
           </>
         )}
       </div>
+
+      <div className="hidden md:block fixed top-1/2 right-3 transform -translate-y-1/2">
+        <TooltipProvider delayDuration={0}>
+          <Dock>
+            <div className="flex flex-col gap-2">
+              <DockIcon>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      withIcon
+                      className="w-full h-full"
+                      loading={isExporting}
+                      onClick={handleExport}
+                    >
+                      <Download />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" sideOffset={10}>
+                    <p>导出PDF简历</p>
+                  </TooltipContent>
+                </Tooltip>
+              </DockIcon>
+              <DockIcon>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      withIcon
+                      variant="ghost"
+                      className="w-full h-full"
+                      onClick={handlePrint}
+                    >
+                      <Printer className="w-full h-full" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" sideOffset={10}>
+                    <p>浏览器打印简历</p>
+                  </TooltipContent>
+                </Tooltip>
+              </DockIcon>
+            </div>
+          </Dock>
+        </TooltipProvider>
+      </div>
+      <iframe
+        ref={printFrameRef}
+        style={{
+          position: "absolute",
+          width: "210mm",
+          height: "297mm",
+          visibility: "hidden",
+          zIndex: -1,
+        }}
+        title="Print Frame"
+      />
     </div>
   );
 };
