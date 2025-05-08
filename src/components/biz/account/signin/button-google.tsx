@@ -17,6 +17,7 @@ const ButtonGoogle = () => {
         try {
           setLoading(true);
           signInWithOAuth("google");
+          localStorage.clear();
         } catch {
           setLoading(false);
         }

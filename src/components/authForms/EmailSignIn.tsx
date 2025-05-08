@@ -54,6 +54,7 @@ export default function EmailSignIn() {
 
     setIsSubmitting(true);
     const redirectUrl = await signInWithPassword(values);
+    localStorage.clear();
     setIsSubmitting(false);
     router.push(redirectUrl);
   }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui-lab/button";
 import { useRouter, usePathname } from "next/navigation";
 import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
+import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 
 const ButtonSignout = ({ className, variant }) => {
   const t = useTranslations();
@@ -19,6 +20,7 @@ const ButtonSignout = ({ className, variant }) => {
       onSubmit={async (e) => {
         try {
           setLoading(true);
+          localStorage.clear();
           await handleRequest(e, SignOut, router);
         } finally {
           setLoading(false);
