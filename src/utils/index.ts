@@ -56,7 +56,7 @@ export const openAIRequest = async (prompt: string) => {
   return data.choices[0].message.content.trim();
 };
 
-export function generateRandomString() {
+export function generateRandomString(): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";

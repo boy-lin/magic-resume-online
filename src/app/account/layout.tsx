@@ -1,7 +1,6 @@
-import { ReactNode, Suspense } from "react";
-import { Metadata } from "next";
+import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 import Document from "@/components/Document";
 import { Providers } from "@/app/providers";
 import bgPng from "@/assets/images/docs@tinypng.png";
@@ -14,18 +13,8 @@ type Props = {
   };
 };
 
-export async function generateMetadata({
-  params: { locale },
-}: Props): Promise<Metadata> {
-  const t = await getTranslations({ locale, namespace: "common" });
-  return {
-    title: t("title") + " - " + t("dashboard"),
-  };
-}
-
 export default async function LocaleLayout({ children }: Props) {
   const locale = await getLocale();
-
   const messages = await getMessages();
   console.debug("account LocaleLayout");
   return (

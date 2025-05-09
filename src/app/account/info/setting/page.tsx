@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/toasts/use-toast";
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { createClient } from "@/utils/supabase/client";
 import { updateUserInfoById } from "@/utils/supabase/queries";
-import { useAppContext } from "@/app/providers";
+import { useAppContext } from "@/hooks/app";
 
 const Page = () => {
   const t = useTranslations();
@@ -41,7 +40,7 @@ const Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
+      fullName: user.user_metadata?.full_name,
       avatarUrl: "/images/avatar.jpeg",
     },
   });
@@ -74,7 +73,7 @@ const Page = () => {
               <FormItem>
                 <FormLabel>{t("account.field.fName")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="jack" {...field} />
+                  <Input placeholder="用户名" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
