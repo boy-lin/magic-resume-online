@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { useAppContext } from "@/app/providers";
+import { useAppContext } from "@/hooks/app";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRightIcon } from "lucide-react";
 import { avatarUrlDefault } from "@/config";

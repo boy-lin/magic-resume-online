@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { userInfoPath } from "@/utils/routesPath";
-import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAppContext } from "@/app/providers";
+import { useAppContext } from "@/hooks/app";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,11 +14,10 @@ import { avatarUrlDefault } from "@/config";
 import ButtonSignout from "@/components/biz/account/info/button-signout";
 
 export default function User() {
-  const router = useRouter();
-  const pathname = usePathname();
   const { state } = useAppContext();
   const user = state.user || {};
-  const fullName = user.user_metadata?.full_name;
+  const fullName = user.user_metadata?.full_name || "";
+  const fName = fullName.substr(0, 2).toUpperCase();
   const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
 
   if (state.userLoading === 0)
@@ -40,7 +38,7 @@ export default function User() {
           <DropdownMenuTrigger asChild>
             <Avatar className="size-8">
               <AvatarImage src={avatarUrl} alt={fullName} />
-              <AvatarFallback>{fullName}</AvatarFallback>
+              <AvatarFallback>{fName}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

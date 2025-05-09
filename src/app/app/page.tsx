@@ -10,11 +10,11 @@ type Props = {
 };
 
 export async function generateMetadata({
-  params: { locale }
+  params: { locale },
 }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "common" });
   return {
-    title: t("title")
+    title: t("title"),
   };
 }
 export default async function LocaleLayout({ children }: Props) {

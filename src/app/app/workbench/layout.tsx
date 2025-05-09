@@ -26,6 +26,7 @@ export default async function LocaleLayout({ children }: Props) {
 
   const messages = await getMessages();
 
+  console.log("workbench LocaleLayout", locale);
   return (
     <Document locale={locale} bodyClassName="overflow-y-hidden">
       <NextIntlClientProvider messages={messages}>

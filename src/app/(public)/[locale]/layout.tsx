@@ -22,39 +22,19 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params: { locale },
-}: Props): Promise<Metadata> {
-  const t = await getTranslations({ locale, namespace: "common" });
-  const baseUrl = "https://magicv.art";
-
-  return {
-    title: t("title") + " - " + t("subtitle"),
-    description: t("description"),
-    alternates: {
-      canonical: `${baseUrl}/${locale}`,
-    },
-    openGraph: {
-      title: t("title"),
-      description: t("description"),
-      locale: locale,
-      alternateLocale: locale === "en" ? ["zh"] : ["en"],
-    },
-  };
-}
-
 export default async function LocaleLayout({
   children,
   params: { locale },
 }: Props) {
   setRequestLocale(locale);
 
-  console.log("LocaleLayout", locale);
-
   if (!locales.includes(locale as any)) {
     notFound();
   }
   const messages = await getMessages();
+
+  console.log("default LocaleLayout", locale);
+
   return (
     <Document locale={locale}>
       <NextIntlClientProvider messages={messages}>

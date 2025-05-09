@@ -12,7 +12,6 @@ import { Share, Link2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "@/components/toasts/use-toast";
 import { isSupportClipboardWrite, textToBlob } from "@/utils/copy";
-import { useAppContext } from "@/app/providers";
 import { useLocale } from "next-intl";
 import { useResumeStore } from "@/store/useResumeStore";
 
