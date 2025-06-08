@@ -1,12 +1,9 @@
-import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
-import { useResumeStore } from "@/store/useResumeStore";
 import { usePdfExport } from "@/hooks/pdf-export";
 import { Button } from "@/components/ui-lab/button";
 
-export default function DownloadBtn() {
-  const t = useTranslations("common");
-  const { activeResume } = useResumeStore();
+export default function DownloadBtn({ activeResume }) {
+  // const t = useTranslations("common");
   const { isExporting, handleExport } = usePdfExport(activeResume);
 
   return (
