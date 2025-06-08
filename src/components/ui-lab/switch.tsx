@@ -9,7 +9,6 @@ import { Loader2 } from "lucide-react";
 export interface SwitchProps
   extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
   loading?: boolean;
-  withIcon?: boolean;
 }
 
 const Switch = React.forwardRef<

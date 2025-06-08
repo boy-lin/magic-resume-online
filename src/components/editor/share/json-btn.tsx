@@ -39,13 +39,12 @@ export default function PrintBtn() {
 
   return (
     <Button
-      withIcon
       variant="ghost"
       className="flex flex-col items-center gap-1 h-auto"
       onClick={handleJsonExport}
       loading={isLoading}
     >
-      <FileJson className="w-5 h-5" />
+      <FileJson className="w-5 h-5" role="icon" />
       <span className="text-xs">Json</span>
     </Button>
   );

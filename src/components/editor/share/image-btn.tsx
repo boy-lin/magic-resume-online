@@ -41,7 +41,6 @@ export default function ImageBtn() {
 
   return (
     <Button
-      withIcon
       variant="ghost"
       className="flex flex-col items-center gap-1 h-auto"
       onClick={handleJsonExport}

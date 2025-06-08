@@ -7,11 +7,10 @@ import {
 
 export interface ButtonProps extends UiButtonProps {
   loading?: boolean;
-  withIcon?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ loading, withIcon, ...props }, ref) => {
+  ({ loading, ...props }, ref) => {
     if (loading) {
       props.disabled = true;
       const children = React.Children.toArray(props.children);

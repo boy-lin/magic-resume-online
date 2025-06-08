@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import ProjectItem from "./ProjectItem";
 import { Project } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
+import { useState } from "react";
 
 const ProjectPanel = () => {
   const t = useTranslations("workbench.projectPanel");
   const { activeResume, updateProjects, updateProjectsBatch } =
     useResumeStore();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   const { projects = [] } = activeResume || {};
   const handleCreateProject = () => {
     const newProject: Project = {
@@ -41,7 +44,12 @@ const ProjectPanel = () => {
         className="space-y-3"
       >
         {projects.map((project) => (
-          <ProjectItem key={project.id} project={project}></ProjectItem>
+          <ProjectItem
+            key={project.id}
+            project={project}
+            expandedId={expandedId}
+            setExpandedId={setExpandedId}
+          ></ProjectItem>
         ))}
 
         <Button onClick={handleCreateProject} className="w-full">
