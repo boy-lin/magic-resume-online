@@ -1,13 +1,27 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { throttle } from "lodash";
+import { toast } from "sonner";
+import { useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { useRequest } from "ahooks";
+import SkeletonCard from "@/components/ui-lab/skeleton-card";
+import DownloadBtn from "@/components/editor/share/download-btn";
+import PrintBtn from "@/components/editor/share/print-btn";
+import ImageBtn from "@/components/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { cn } from "@/lib/utils";
 import ResumeTemplateComponent from "@/components/templates";
 import PageBreakLine from "@/components/preview/PageBreakLine";
-import { getResumesById } from "@/utils/supabase/queries";
+import { getResumeById } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
-import { useParams } from "next/navigation";
 import { Button } from "@/components/ui-lab/button";
 import {
   Card,
@@ -18,21 +32,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useRequest } from "ahooks";
-import SkeletonCard from "@/components/ui-lab/skeleton-card";
-import DownloadBtn from "@/components/editor/share/download-btn";
-import PrintBtn from "@/components/editor/share/print-btn";
-import ImageBtn from "@/components/editor/share/image-btn";
 
 interface PreviewPanelProps {}
 
@@ -41,38 +40,23 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
 
   const [activeResume, setActiveResume] = useState(null);
   const [password, setPassword] = useState("");
-  const { run, runAsync, loading } = useRequest(
-    async (id) => {
-      const { data: val } = await getResumesById(createClient(), id);
+
+  const { loading } = useRequest(
+    async () => {
+      const data = await getResumeById(createClient(), params.id);
       const newResume = {
         activeSection: "basic",
         draggingProjectId: null,
-        id: val.id,
-        title: val.title,
-        createdAt: val.created_at,
-        updatedAt: val.updated_at,
-        basic: JSON.parse(val.basic),
-        templateId: val.template_id,
-        customData: JSON.parse(val.custom_data),
-        education: JSON.parse(val.education),
-        experience: JSON.parse(val.experience),
-        globalSettings: JSON.parse(val.global_settings),
-        menuSections: JSON.parse(val.menu_sections),
-        projects: JSON.parse(val.projects),
-        skillContent: JSON.parse(val.skill_content),
-        isPublic: val.is_public,
-        publicPassword: val.public_password,
+        ...data,
       };
       setActiveResume(newResume);
     },
-    { manual: true }
+    {
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }
   );
-
-  useEffect(() => {
-    if (!params.id) return;
-    // getResumeById(params.id);
-    runAsync(params.id);
-  }, [params.id]);
 
   const template = useMemo(() => {
     return (
@@ -152,7 +136,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
 
     const pageCount = Math.max(1, Math.ceil(contentHeight / pageHeightPx));
     const pageBreakCount = Math.max(0, pageCount - 1);
-
     return { pageHeightPx, pageBreakCount };
   }, [contentHeight, activeResume?.globalSettings?.pagePadding]);
 
@@ -240,6 +223,8 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     );
   }
 
+  console.log("pageHeightPx, pageBreakCount", pageHeightPx, pageBreakCount);
+
   return (
     <div className="">
       <div className="fixed ml-2 left-1/2 translate-x-[105mm]">
@@ -255,7 +240,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
         style={{
           padding: `${activeResume.globalSettings?.pagePadding}px`,
         }}
-        className="bg-white shadow-lg box-content w-[210mm] min-w-[210mm] min-h-[297mm]"
+        className="bg-white shadow-lg box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
       >
         <ResumeTemplateComponent data={activeResume} template={template} />
         {contentHeight > 0 && (

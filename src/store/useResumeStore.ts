@@ -21,7 +21,7 @@ import {
   upsertResumeById,
   getResumesByUserId,
   deleteResumeById,
-  getResumesById,
+  getResumeById,
 } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
 interface ResumeStore {
@@ -70,8 +70,8 @@ interface ResumeStore {
   updateGlobalSettings: (settings: Partial<GlobalSettings>) => void;
   setThemeColor: (color: string) => void;
   setTemplate: (templateId: string) => void;
-
   getResumeList: () => Promise<any>;
+  getResumeFullById: (id: string) => Promise<any>;
 }
 
 // 同步简历到文件系统
@@ -656,25 +656,12 @@ export const useResumeStore = create(
       getResumeList: async () => {
         const { data } = await getResumesByUserId(createClient());
         const resumesMap = {};
-        data.forEach((val) => {
-          resumesMap[val.id] = {
-            activeSection: "basic",
-            draggingProjectId: null,
-            id: val.id,
-            title: val.title,
-            createdAt: val.created_at,
-            updatedAt: val.updated_at,
-            basic: JSON.parse(val.basic),
-            templateId: val.template_id,
-            customData: JSON.parse(val.custom_data),
-            education: JSON.parse(val.education),
-            experience: JSON.parse(val.experience),
-            globalSettings: JSON.parse(val.global_settings),
-            menuSections: JSON.parse(val.menu_sections),
-            projects: JSON.parse(val.projects),
-            skillContent: JSON.parse(val.skill_content),
-            isPublic: val.is_public,
-            publicPassword: val.public_password,
+        data.forEach((it) => {
+          resumesMap[it.id] = {
+            id: it.id,
+            title: it.title,
+            createdAt: it.created_at,
+            templateId: it.template_id,
           };
         });
         set((state) => ({
@@ -684,29 +671,21 @@ export const useResumeStore = create(
           },
         }));
       },
-      getResumeById: async (id) => {
-        const { data: val } = await getResumesById(createClient(), id);
+      getResumeFullById: async (id) => {
+        console.log("activeResumeId", id);
+        const data = await getResumeById(createClient(), id);
         const newResume = {
           activeSection: "basic",
           draggingProjectId: null,
-          id: val.id,
-          title: val.title,
-          createdAt: val.created_at,
-          updatedAt: val.updated_at,
-          basic: JSON.parse(val.basic),
-          templateId: val.template_id,
-          customData: JSON.parse(val.custom_data),
-          education: JSON.parse(val.education),
-          experience: JSON.parse(val.experience),
-          globalSettings: JSON.parse(val.global_settings),
-          menuSections: JSON.parse(val.menu_sections),
-          projects: JSON.parse(val.projects),
-          skillContent: JSON.parse(val.skill_content),
+          ...data,
         };
+
+        console.log("activeResumeId", id, newResume);
+
         set((state) => ({
           resumes: {
             ...state.resumes,
-            [val.id]: newResume,
+            [data.id]: newResume,
           },
           activeResumeId: id,
           activeResume: newResume,

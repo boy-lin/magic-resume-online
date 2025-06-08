@@ -11,9 +11,9 @@ const PageBreakLine = React.memo(({ pageNumber }: { pageNumber: number }) => {
 
   const pagePaddingMM = globalSettings.pagePadding / MM_TO_PX;
 
-  const CONTENT_HEIGHT_MM = A4_HEIGHT_MM + pagePaddingMM;
+  const CONTENT_HEIGHT_MM = A4_HEIGHT_MM + pagePaddingMM * 2;
   const pageHeight = CONTENT_HEIGHT_MM * MM_TO_PX;
-
+  console.log("pageHeight", pageHeight, pageNumber);
   return (
     <div
       className="absolute left-0 right-0 pointer-events-none page-break-line"
