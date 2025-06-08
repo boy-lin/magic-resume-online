@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { signInWithOAuth } from "@/utils/auth-helpers/client";
 import { Button } from "@/components/ui/button";
 import IconGoogle from "@/components/icon/google";
+import { clearLocalStorage } from "@/utils/storage";
 
 const ButtonGoogle = () => {
   const t = useTranslations();
@@ -17,7 +18,7 @@ const ButtonGoogle = () => {
         try {
           setLoading(true);
           signInWithOAuth("google");
-          localStorage.clear();
+          clearLocalStorage();
         } catch {
           setLoading(false);
         }

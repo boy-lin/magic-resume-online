@@ -2,7 +2,7 @@
 import React, { startTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Plus, FileText, Loader2 } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRequest } from "ahooks";
 import {
@@ -21,13 +21,19 @@ import { TransitionBottomToTop } from "@/components/transition/bottom-to-top";
 import { TransitionB2TScale } from "@/components/transition/b2t-scale";
 import { TransitionSpringScale } from "@/components/transition/spring-scale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const ResumeWorkbench = () => {
   const t = useTranslations();
-  const { resumes, setActiveResume, deleteResume, getResumeList } =
-    useResumeStore();
   const router = useRouter();
-  const { data, error, loading } = useRequest(getResumeList, {});
+  const { deleteResume } = useResumeStore();
+  const resumes = useResumeStore().resumes;
+  const getResumeList = useResumeStore().getResumeList;
+  const { error, loading } = useRequest(getResumeList, {
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const handleCreateResume = async () => {
     // 选择模板
@@ -136,7 +142,6 @@ const ResumeWorkbench = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 startTransition(() => {
-                                  setActiveResume(id);
                                   router.push(`/app/workbench/${id}`);
                                 });
                               }}

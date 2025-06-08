@@ -24,9 +24,9 @@ function User() {
   const fName = fullName.substr(0, 2).toUpperCase();
   const avatarUrl = user?.user_metadata?.avatar_url || avatarUrlDefault;
 
-  console.log("aa User state", user, userLoading);
+  // console.log("aaa3", user, userLoading);
 
-  if (userLoading === 0)
+  if (userLoading < 2)
     return (
       <div className="flex items-center space-x-2">
         {/* <div className="space-y-1">

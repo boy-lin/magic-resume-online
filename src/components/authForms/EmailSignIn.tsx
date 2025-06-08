@@ -8,7 +8,11 @@ import { signInWithPassword } from "@/utils/auth-helpers/server";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
+import {
+  setLocalStorageByName,
+  getLocalStorageByName,
+  clearLocalStorage,
+} from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { isRememberKey, userEmailKey } from "@/config/key";
 
 export default function EmailSignIn() {
   const router = useRouter();
@@ -46,25 +51,24 @@ export default function EmailSignIn() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (isRemember) {
-      setLocalStorageByName("userEmail", values.email);
-    } else {
-      localStorage.removeItem("userEmail");
-    }
-
     setIsSubmitting(true);
     const redirectUrl = await signInWithPassword(values);
-    localStorage.clear();
+    clearLocalStorage();
+    if (isRemember) {
+      setLocalStorageByName(userEmailKey, values.email);
+    } else {
+      localStorage.removeItem(userEmailKey);
+    }
     setIsSubmitting(false);
     router.push(redirectUrl);
   }
 
   useEffect(() => {
-    const email = getLocalStorageByName("userEmail");
+    const email = getLocalStorageByName(userEmailKey);
     form.setValue("email", email);
 
-    const isRemember = getLocalStorageByName("isRemember") === "true";
-    console.debug("isRemember::", isRemember);
+    const isRemember = getLocalStorageByName(isRememberKey) === "true";
+    // console.debug("isRemember::", isRemember);
     setIsRemember(isRemember);
   }, []);
 
@@ -110,7 +114,7 @@ export default function EmailSignIn() {
               checked={isRemember}
               className="h-4 w-4 rounded"
               onCheckedChange={(val) => {
-                setLocalStorageByName("isRemember", String(val));
+                setLocalStorageByName(isRememberKey, String(val));
                 setIsRemember(val);
               }}
             />

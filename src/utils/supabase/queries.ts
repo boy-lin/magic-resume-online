@@ -56,7 +56,10 @@ export const updateUserInfoById = async (
 
 export const getResumesByUserId = cache(async (supabase: SupabaseClient) => {
   const user = await getUser(supabase);
-  return supabase.from("resumes").select("*").eq("user_id", user.id);
+  return supabase
+    .from("resumes")
+    .select("id, title, created_at, template_id")
+    .eq("user_id", user.id);
 });
 
 export const upsertResumeById = async (supabase: SupabaseClient, val) => {
@@ -82,8 +85,33 @@ export const deleteResumeById = async (supabase: SupabaseClient, id) => {
   return supabase.from("resumes").delete().eq("id", id);
 };
 
-export const getResumesById = cache(async (supabase: SupabaseClient, id) => {
-  return supabase.from("resumes").select("*").eq("id", id).limit(1).single();
+export const getResumeById = cache(async (supabase: SupabaseClient, id) => {
+  const { data: val, error } = await supabase
+    .from("resumes")
+    .select("*")
+    .eq("id", id)
+    .limit(1)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: val.id,
+    title: val.title,
+    createdAt: val.created_at,
+    updatedAt: val.updated_at,
+    basic: JSON.parse(val.basic),
+    templateId: val.template_id,
+    customData: JSON.parse(val.custom_data),
+    education: JSON.parse(val.education),
+    experience: JSON.parse(val.experience),
+    globalSettings: JSON.parse(val.global_settings),
+    menuSections: JSON.parse(val.menu_sections),
+    projects: JSON.parse(val.projects),
+    skillContent: JSON.parse(val.skill_content),
+    isPublic: val.is_public,
+    publicPassword: val.public_password,
+  };
 });
 
 export const publicResumeById = async (

@@ -114,7 +114,7 @@ const ShareBtn = () => {
 
   useEffect(() => {
     if (!activeResume) return;
-    // console.log("activeResume", activeResume);
+    console.log("aa2 activeResume", activeResume);
     setOpenPublic(activeResume.isPublic);
     if (activeResume.publicPassword) {
       setOpenPassword(true);
