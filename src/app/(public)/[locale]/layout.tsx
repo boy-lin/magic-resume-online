@@ -1,12 +1,7 @@
 import { ReactNode } from "react";
-import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import {
-  getMessages,
-  getTranslations,
-  setRequestLocale,
-} from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import Document from "@/components/Document";
 import { locales } from "@/i18n/config";
 import { Providers } from "@/app/providers";
@@ -33,7 +28,7 @@ export default async function LocaleLayout({
   }
   const messages = await getMessages();
 
-  console.log("default LocaleLayout", locale);
+  console.log("aa LocaleLayout", locale);
 
   return (
     <Document locale={locale}>
@@ -41,7 +36,7 @@ export default async function LocaleLayout({
         <Providers>
           <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
             {/* {children} */}
-            <LandingHeader showLanguage={true} />
+            <LandingHeader />
             <main className="m-auto max-w-[1200px] px-4 pt-16">{children}</main>
             <Footer />
           </div>

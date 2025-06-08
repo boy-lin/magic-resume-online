@@ -15,9 +15,9 @@ type Props = {
 export default function Document({ children, locale, bodyClassName }: Props) {
   return (
     <html className={inter.className} lang={locale} suppressHydrationWarning>
-      <Head>
+      {/* <Head>
         <link rel="icon" href="/favicon.ico?v=2" />
-      </Head>
+      </Head> */}
       <body className={bodyClassName}>{children}</body>
     </html>
   );

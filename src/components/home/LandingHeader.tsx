@@ -26,6 +26,9 @@ import ScrollHeader from "./client/ScrollHeader";
 import MobileMenu from "./client/MobileMenu";
 import GoDashboard from "./GoDashboard";
 import User from "./User";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { useAppStore } from "@/store/useApp";
+import { useAppContext } from "@/hooks/app";
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -53,13 +56,14 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = "ListItem";
 
-export default function LandingHeader({ showLanguage = false }) {
+export default function LandingHeader() {
+  const user = useAppStore((state) => state.user);
   const t = useTranslations("home");
   const tc = useTranslations("common");
   const pathname = usePathname();
   const locale = pathname.split("/")[1]; // 从路径中获取语言代码
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  // console.debug("aa LandingHeader render user", user);
   return (
     <>
       <ScrollHeader>
@@ -120,12 +124,43 @@ export default function LandingHeader({ showLanguage = false }) {
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="bg-transparent">
+                      企业服务
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 p-6 md:w-[220px]">
+                        <li className="row-span-3">
+                          <AlertTitle>功能未开启</AlertTitle>
+                          <AlertDescription>敬请期待</AlertDescription>
+                        </li>
+                        {/* <ListItem
+                          href="/app/dashboard/resumes"
+                          title="我的简历"
+                        >
+                          查看我的简历
+                        </ListItem>
+                        <ListItem
+                          href="/app/dashboard/templates"
+                          title="浏览模板"
+                        >
+                          浏览所有简历模板
+                        </ListItem>
+                        <ListItem
+                          href={`/${locale}/docs/changelog`}
+                          title="更新日志"
+                        >
+                          新特性更新日志
+                        </ListItem> */}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
 
             <div className="hidden md:flex items-center gap-4">
-              {showLanguage ? <LanguageSwitch /> : null}
+              <LanguageSwitch />
               <ThemeToggle>
                 <div className="w-8 h-8 relative cursor-pointer rounded-md hover:bg-accent/50 flex items-center justify-center">
                   <Sun className="h-[1.2rem] w-[1.2rem] absolute inset-0 m-auto rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

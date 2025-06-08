@@ -20,20 +20,40 @@ import {
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui-lab/button";
 import { usePdfExport, useHtmlPrint } from "@/hooks/pdf-export";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useRequest } from "ahooks";
+import SkeletonCard from "@/components/ui-lab/skeleton-card";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
-  const [activeResume, setActiveResume] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
-  const t = useTranslations("previewDock");
+
+  const [activeResume, setActiveResume] = useState(null);
+  const [password, setPassword] = useState("");
   const { globalSettings = {}, title } = activeResume || {};
   const { isExporting, handleExport } = usePdfExport(activeResume);
   const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);
-
-  useEffect(() => {
-    const getResumeById = async (id) => {
+  const { run, runAsync, loading } = useRequest(
+    async (id) => {
       const { data: val } = await getResumesById(createClient(), id);
       const newResume = {
         activeSection: "basic",
@@ -51,13 +71,18 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
         menuSections: JSON.parse(val.menu_sections),
         projects: JSON.parse(val.projects),
         skillContent: JSON.parse(val.skill_content),
+        isPublic: val.is_public,
+        publicPassword: val.public_password,
       };
       setActiveResume(newResume);
-    };
+    },
+    { manual: true }
+  );
 
+  useEffect(() => {
     if (!params.id) return;
-
-    getResumeById(params.id);
+    // getResumeById(params.id);
+    runAsync(params.id);
   }, [params.id]);
 
   const template = useMemo(() => {
@@ -142,18 +167,90 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     return { pageHeightPx, pageBreakCount };
   }, [contentHeight, activeResume?.globalSettings?.pagePadding]);
 
-  if (!activeResume)
+  const formSchema = React.useMemo(
+    () =>
+      z.object({
+        password: z.string().min(5, { message: "密码错误" }),
+      }),
+    []
+  );
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("values", values);
+    setPassword(values.password);
+  }
+
+  if (loading) return <SkeletonCard />;
+
+  if (!activeResume || !activeResume.isPublic) {
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full p-4">
         <div className="flex flex-col space-y-3">
-          <Skeleton className="h-[125px] w-full rounded-xl" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-4/5" />
-            <Skeleton className="h-4 w-4/5" />
+          <div className="flex flex-col space-y-3 justify-center items-center">
+            <div className="text-2xl font-bold">无法查看</div>
+            <div className="text-sm text-gray-500">该简历未公开或已删除</div>
           </div>
         </div>
       </div>
     );
+  }
+
+  if (
+    activeResume.isPublic &&
+    activeResume.publicPassword &&
+    password !== activeResume.publicPassword
+  ) {
+    return (
+      <div className="w-full h-full p-4">
+        <div className="flex flex-col space-y-3 justify-center items-center">
+          <Card className="w-full max-w-sm">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <CardHeader>
+                  <CardTitle>请输入密码</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col gap-6">
+                    <div className="grid gap-2">
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>密码</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="请输入密码"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex-col gap-2">
+                  <Button type="submit" className="w-full">
+                    查看简历
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -205,7 +302,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
                   <TooltipTrigger asChild>
                     <Button
                       withIcon
-                      className="w-full h-full"
+                      className="w-full h-full p-4"
                       loading={isExporting}
                       onClick={handleExport}
                     >
@@ -223,10 +320,10 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
                     <Button
                       withIcon
                       variant="ghost"
-                      className="w-full h-full"
+                      className="w-full h-full p-4"
                       onClick={handlePrint}
                     >
-                      <Printer className="w-full h-full" />
+                      <Printer className="w-full h-full p-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="left" sideOffset={10}>

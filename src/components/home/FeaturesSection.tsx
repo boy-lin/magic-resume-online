@@ -26,7 +26,7 @@ const features = [
     ],
   },
   {
-    badge: "安全",
+    badge: "在线分享",
     badgeColor: "bg-green-500",
     title: "features.storage.title",
     description: "features.storage.description",
@@ -34,7 +34,7 @@ const features = [
       {
         title: "features.storage.item1",
         description: "features.storage.item1_description",
-        image: "/features/svg/local-storage.svg",
+        image: "/features/online-share.jpg",
       },
       {
         title: "features.storage.item2",
@@ -293,7 +293,7 @@ export default function FeaturesSection() {
             </div>
           </div>
 
-          {/* <div className="flex flex-col md:flex-row-reverse gap-8 md:gap-16 items-center">
+          <div className="flex flex-col md:flex-row-reverse gap-8 md:gap-16 items-center">
             <div className="w-full md:w-[400px] space-y-6">
               <div className="flex flex-col items-center md:items-start gap-2">
                 <span className="text-xs font-semibold text-white px-2 py-1 rounded-full bg-green-500">
@@ -391,7 +391,7 @@ export default function FeaturesSection() {
                 </div>
               </AnimatedFeature>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
 

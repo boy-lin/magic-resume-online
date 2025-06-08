@@ -14,7 +14,7 @@ import { Link, usePathname } from "@/i18n/routing.public";
 export default function LanguageSwitch() {
   const locale = useLocale();
   const pathname = usePathname();
-
+  console.log("aa LanguageSwitch", pathname);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

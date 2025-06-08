@@ -7,7 +7,7 @@ import Logo from "@/components/shared/Logo";
 import { updatePassword } from "@/utils/auth-helpers/server";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/toasts/use-toast";
+import { toast } from "sonner";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -43,10 +43,8 @@ const ForgotPwdPage = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (values.password.trim() !== values.passwordConfirm.trim()) {
-      return toast({
-        title: "更新密码错误",
-        description: "密码不匹配。",
-        variant: "destructive",
+      return toast.error("更新密码错误", {
+        description: "密码不匹配",
       });
     }
     setIsSubmitting(true);

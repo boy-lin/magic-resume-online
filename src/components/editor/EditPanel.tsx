@@ -52,10 +52,10 @@ export function EditPanel() {
         "bg-gray-50 border-gray-100"
       )}
     >
-      <div className="p-4">
+      <div className="p-2">
         <motion.div
           className={cn(
-            "mb-4 p-4 rounded-lg border",
+            "mb-2 p-4 rounded-lg border",
             "dark:bg-neutral-900/50 dark:border-neutral-800",
             "bg-white border-gray-100"
           )}

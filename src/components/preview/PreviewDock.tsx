@@ -11,6 +11,7 @@ import {
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +34,6 @@ interface PreviewDockProps {
   editPanelCollapsed: boolean;
   toggleSidePanel: () => void;
   toggleEditPanel: () => void;
-  resumeContentRef: React.RefObject<HTMLDivElement>;
 }
 
 const PreviewDock = ({
@@ -41,7 +41,6 @@ const PreviewDock = ({
   editPanelCollapsed,
   toggleSidePanel,
   toggleEditPanel,
-  resumeContentRef,
 }: PreviewDockProps) => {
   const router = useRouter();
   const t = useTranslations("previewDock");
@@ -55,7 +54,11 @@ const PreviewDock = ({
   } = useAIConfigStore();
 
   const handleGrammarCheck = useCallback(async () => {
-    if (!resumeContentRef.current) return;
+    const previewDom = document.querySelector("#resume-preview") as HTMLElement;
+    if (!previewDom) {
+      console.error("preview resume not found");
+      return;
+    }
     const config = AI_MODEL_CONFIGS[selectedModel];
     const isConfigured =
       selectedModel === "doubao"
@@ -65,28 +68,30 @@ const PreviewDock = ({
         : deepseekApiKey;
 
     if (!isConfigured) {
+      const res = toast.error(t("grammarCheck.configurePrompt"));
       toast.error(
-        <>
-          <span>{t("grammarCheck.configurePrompt")}</span>
-          <Button
-            className="p-0 h-auto text-white"
-            onClick={() => router.push("/app/dashboard/ai")}
-          >
-            {t("grammarCheck.configureButton")}
-          </Button>
-        </>
+        "error"
+        // <>
+        //   <span>{t("grammarCheck.configurePrompt")}</span>
+        //   <Button
+        //     className="p-0 h-auto text-white"
+        //     onClick={() => router.push("/app/dashboard/ai")}
+        //   >
+        //     {t("grammarCheck.configureButton")}
+        //   </Button>
+        // </>
       );
       return;
     }
 
     try {
-      const text = resumeContentRef.current.innerText;
+      const text = previewDom.innerText;
+      console.log("text", text);
       await checkGrammar(text);
     } catch (error) {
       toast.error(t("grammarCheck.errorToast"));
     }
   }, [
-    resumeContentRef,
     selectedModel,
     doubaoApiKey,
     doubaoModelId,
@@ -108,11 +113,12 @@ const PreviewDock = ({
     }
   }, [activeResumeId, duplicateResume, router, t]);
 
+  // return createPortal()
   return (
-    <div className="hidden md:block fixed top-1/2 right-3 transform -translate-y-1/2">
+    <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 ">
       <TooltipProvider delayDuration={0}>
         <Dock>
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
             <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -125,7 +131,7 @@ const PreviewDock = ({
                     <TemplateSheet />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   <p>{t("switchTemplate")}</p>
                 </TooltipContent>
               </Tooltip>
@@ -147,7 +153,7 @@ const PreviewDock = ({
                     />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   <p>
                     {isChecking
                       ? t("grammarCheck.checking")
@@ -169,7 +175,7 @@ const PreviewDock = ({
                     <Copy className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   <p>{t("copyResume.tooltip")}</p>
                 </TooltipContent>
               </Tooltip>
@@ -183,19 +189,14 @@ const PreviewDock = ({
                     className={cn(
                       "flex h-[30px] w-[30px] items-center justify-center rounded-sm transition-all",
                       "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
-                      "active:scale-95",
-                      !sidePanelCollapsed && [
-                        "bg-primary text-primary-foreground",
-                        "hover:bg-primary/90 dark:hover:bg-primary/90",
-                        "shadow-sm",
-                      ]
+                      "active:scale-95"
                     )}
                   >
                     {sidePanelCollapsed && <PanelRightClose size={20} />}
                     {!sidePanelCollapsed && <PanelRightOpen size={20} />}
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   <p>
                     {sidePanelCollapsed
                       ? t("sidePanel.expand")
@@ -212,18 +213,13 @@ const PreviewDock = ({
                     className={cn(
                       "flex h-[30px] w-[30px] items-center justify-center rounded-sm transition-all",
                       "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
-                      "active:scale-95",
-                      !editPanelCollapsed && [
-                        "bg-primary text-primary-foreground",
-                        "hover:bg-primary/90 dark:hover:bg-primary/90",
-                        "shadow-sm",
-                      ]
+                      "active:scale-95"
                     )}
                   >
                     <Edit2 size={20} />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   {editPanelCollapsed
                     ? t("editPanel.expand")
                     : t("editPanel.collapse")}
@@ -245,7 +241,7 @@ const PreviewDock = ({
                     <Home className="h-4 w-4" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="left" sideOffset={10}>
+                <TooltipContent side="top" sideOffset={10}>
                   <p>{t("backToDashboard")}</p>
                 </TooltipContent>
               </Tooltip>

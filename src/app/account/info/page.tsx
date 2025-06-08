@@ -6,10 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRightIcon } from "lucide-react";
 import { avatarUrlDefault } from "@/config";
 import ButtonSignout from "@/components/biz/account/info/button-signout";
+import { useAppStore } from "@/store/useApp";
 
 const NextPage = () => {
-  const { state } = useAppContext();
-  const user = state.user || {};
+  const user = useAppStore((state) => state.user) || {};
   const fullName = user.user_metadata?.full_name;
   const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
 

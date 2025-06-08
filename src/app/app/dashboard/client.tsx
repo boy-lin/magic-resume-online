@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Cog, FileText, SwatchBook, Settings, Bot } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -59,7 +59,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [collapsible, setCollapsible] = useState<"offcanvas" | "icon" | "none">(
     "icon"
   );
@@ -71,13 +71,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
 
   const handleItemClick = (item: MenuItem) => {
-    if (item.items) {
-      // 如果有子菜单，展开/折叠子菜单
-      // 这里可以添加子菜单展开/折叠的逻辑
-    } else {
-      // 如果没有子菜单，直接导航
-      router.push(item.url || item.href || "/");
-    }
+    startTransition(() => {
+      if (item.items) {
+        // 如果有子菜单，展开/折叠子菜单
+        // 这里可以添加子菜单展开/折叠的逻辑
+      } else {
+        // 如果没有子菜单，直接导航
+        router.push(item.url || item.href || "/");
+      }
+    });
   };
 
   const isItemActive = (item: MenuItem) => {

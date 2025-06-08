@@ -1,13 +1,11 @@
-"use client";
+import { useRequest } from "ahooks";
 import { useTranslations } from "next-intl";
 import { AlertCircle, RefreshCcwDot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import PdfExport from "../shared/PdfExport";
-import ThemeToggle from "../shared/ThemeToggle";
+import ThemeToggle from "../../shared/ThemeToggle";
 import { useResumeStore } from "@/store/useResumeStore";
-import { toast } from "@/components/toasts/use-toast";
+import { toast } from "sonner";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import {
   HoverCard,
@@ -15,41 +13,32 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui-lab/button";
-import { useState } from "react";
-import ShareBtn from "./ShareBtn";
-import { Loader2 } from "lucide-react";
+import ShareBtn from "../ShareBtn";
+import Name from "./name";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
 }
 
 export function EditorHeader({ isMobile }: EditorHeaderProps) {
-  const { activeResume, updateResumeAsync, updateResumeTitle } =
-    useResumeStore();
-  const { isNeedSync } = activeResume || {};
-  const { errors, selectError } = useGrammarCheck();
+  const { activeResume, updateResumeAsync } = useResumeStore();
   const router = useRouter();
   const t = useTranslations("common");
 
-  const [loading, setLoading] = useState(false);
-
-  const asyncResume = async () => {
-    try {
-      setLoading(true);
-
-      const res = await updateResumeAsync(activeResume);
-
-      console.log("res", res);
-    } catch (e) {
-      toast({
-        title: t("msg.errT"),
-        description: e.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+  const { isNeedSync } = activeResume || {};
+  const { errors, selectError } = useGrammarCheck();
+  const { loading, run: asyncResume } = useRequest(
+    () => updateResumeAsync(activeResume),
+    {
+      manual: true,
+      onError: (error) => {
+        toast.error(t("message.error"), {
+          description: error.message,
+        });
+      },
     }
-  };
+  );
+
   return (
     <motion.header
       className={`h-16 border-b sticky top-0 z-10`}
@@ -67,7 +56,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
             }}
           >
             <span className="text-lg font-semibold">{t("title")}</span>
-            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+            {/* <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" /> */}
           </motion.div>
         </div>
 
@@ -86,7 +75,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium">语法检查结果</h4>
                   <div className="space-y-1">
-                    {errors.map((error, index) => (
+                    {errors.map((error: any, index: number) => (
                       <div key={index} className="text-sm space-y-1">
                         <div className="flex items-start gap-2">
                           <AlertCircle className="w-4 h-4 mt-0.5 text-red-500 shrink-0" />
@@ -126,31 +115,22 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
               </HoverCardContent>
             </HoverCard>
           )}
-          <Input
-            defaultValue={activeResume?.title || ""}
-            onBlur={(e) => {
-              updateResumeTitle(e.target.value || "未命名简历");
-            }}
-            className="w-60  text-sm hidden md:block"
-            placeholder="简历名称"
-          />
 
+          <Name />
           <ShareBtn />
           <Button
+            withIcon
             variant="outline"
-            className="py-2"
+            className="py-2 text-foreground"
             onClick={asyncResume}
-            disabled={loading}
+            loading={loading}
           >
-            {loading ? <Loader2 className="animate-spin" /> : <RefreshCcwDot />}
+            <RefreshCcwDot />
             {t("btn.sync")}
             {isNeedSync ? (
               <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>
             ) : null}
           </Button>
-          <div className="md:flex items-center ">
-            <PdfExport />
-          </div>
           <ThemeToggle></ThemeToggle>
         </div>
       </div>

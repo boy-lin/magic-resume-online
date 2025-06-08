@@ -56,16 +56,25 @@ export const openAIRequest = async (prompt: string) => {
   return data.choices[0].message.content.trim();
 };
 
-export function generateRandomString(): string {
+/**
+ * @description 生成随机字符串
+ * @param length 字符串长度
+ * @returns 随机字符串
+ */
+export function generateRandomString(length: number = 6): string {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
 
+/**
+ * @description 生成随机用户名
+ * @returns 随机用户名
+ */
 export function generateRandomUsername() {
   const nouns = [
     "Panda",
@@ -85,6 +94,11 @@ export function generateRandomUsername() {
   return randomNoun + generateRandomString();
 }
 
+/**
+ * @description 过滤值为undefined的键值对
+ * @param vals 键值对
+ * @returns 过滤后的键值对
+ */
 export function filterValEqUndefined(vals) {
   Object.entries(vals).forEach(([k, v]) => {
     if (v === undefined) delete vals[k];

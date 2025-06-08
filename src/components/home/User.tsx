@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { userInfoPath } from "@/utils/routesPath";
 import { Button } from "@/components/ui/button";
@@ -12,15 +13,20 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { avatarUrlDefault } from "@/config";
 import ButtonSignout from "@/components/biz/account/info/button-signout";
+import { useAppStore } from "@/store/useApp";
+import { memo } from "react";
 
-export default function User() {
-  const { state } = useAppContext();
-  const user = state.user || {};
-  const fullName = user.user_metadata?.full_name || "";
+function User() {
+  const user = useAppStore((state) => state.user) || {};
+  const userLoading = useAppStore((state) => state.userLoading);
+
+  const fullName = user?.user_metadata?.full_name || "";
   const fName = fullName.substr(0, 2).toUpperCase();
-  const avatarUrl = user.user_metadata?.avatar_url || avatarUrlDefault;
+  const avatarUrl = user?.user_metadata?.avatar_url || avatarUrlDefault;
 
-  if (state.userLoading === 0)
+  console.log("aa User state", user, userLoading);
+
+  if (userLoading === 0)
     return (
       <div className="flex items-center space-x-2">
         {/* <div className="space-y-1">
@@ -47,10 +53,10 @@ export default function User() {
                 账号设置
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="px-0 py-0">
               <ButtonSignout
-                variant="ghost"
-                className="px-0 py-0 justify-start leading-4 h-auto font-normal"
+                variant="destructive"
+                className="justify-start leading-4 h-auto font-normal"
               />
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -68,3 +74,5 @@ export default function User() {
     </div>
   );
 }
+
+export default memo(User);
