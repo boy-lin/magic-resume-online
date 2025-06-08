@@ -217,10 +217,10 @@ const ShareBtn = () => {
           </Button>
         </div>
         <div className="flex justify-between gap-2 pt-4">
-          <DownloadBtn />
-          <PrintBtn />
-          <JsonBtn />
-          <ImageBtn />
+          <DownloadBtn activeResume={activeResume} />
+          <PrintBtn activeResume={activeResume} />
+          <JsonBtn activeResume={activeResume} />
+          <ImageBtn activeResume={activeResume} />
         </div>
       </PopoverContent>
     </Popover>

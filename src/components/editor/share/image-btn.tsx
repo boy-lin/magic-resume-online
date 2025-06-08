@@ -3,14 +3,12 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Image as ImageIcon } from "lucide-react";
 
-import { useResumeStore } from "@/store/useResumeStore";
 import { Button } from "@/components/ui-lab/button";
 
-export default function ImageBtn() {
+export default function ImageBtn({ activeResume }) {
   const t = useTranslations("common");
   const [isLoading, setIsLoading] = useState(false);
-  const { activeResume } = useResumeStore();
-  const { globalSettings = {}, title } = activeResume || {};
+  const { title } = activeResume || {};
 
   const handleJsonExport = async () => {
     try {

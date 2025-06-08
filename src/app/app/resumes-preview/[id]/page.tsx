@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { Download, Printer } from "lucide-react";
 import { throttle } from "lodash";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { cn } from "@/lib/utils";
@@ -9,17 +8,7 @@ import PageBreakLine from "@/components/preview/PageBreakLine";
 import { getResumesById } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
 import { useParams } from "next/navigation";
-import { Dock, DockIcon } from "@/components/magicui/dock";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui-lab/button";
-import { usePdfExport, useHtmlPrint } from "@/hooks/pdf-export";
 import {
   Card,
   CardContent,
@@ -41,6 +30,9 @@ import {
 } from "@/components/ui/form";
 import { useRequest } from "ahooks";
 import SkeletonCard from "@/components/ui-lab/skeleton-card";
+import DownloadBtn from "@/components/editor/share/download-btn";
+import PrintBtn from "@/components/editor/share/print-btn";
+import ImageBtn from "@/components/editor/share/image-btn";
 
 interface PreviewPanelProps {}
 
@@ -49,9 +41,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
 
   const [activeResume, setActiveResume] = useState(null);
   const [password, setPassword] = useState("");
-  const { globalSettings = {}, title } = activeResume || {};
-  const { isExporting, handleExport } = usePdfExport(activeResume);
-  const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);
   const { run, runAsync, loading } = useRequest(
     async (id) => {
       const { data: val } = await getResumesById(createClient(), id);
@@ -187,7 +176,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     setPassword(values.password);
   }
 
-  if (loading) return <SkeletonCard />;
+  if (loading || !activeResume) return <SkeletonCard />;
 
   if (!activeResume || !activeResume.isPublic) {
     return (
@@ -214,7 +203,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <CardHeader>
-                  <CardTitle>请输入密码</CardTitle>
+                  <CardTitle>查看密码</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-6">
@@ -224,7 +213,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>密码</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
@@ -253,14 +241,21 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   }
 
   return (
-    <div className={cn("bg-white", "shadow-lg", "relative mx-auto")}>
+    <div className="">
+      <div className="fixed ml-2 left-1/2 translate-x-[105mm]">
+        <div className="sticky top-8 flex flex-col gap-2 transform translate-x-[50%]">
+          <DownloadBtn activeResume={activeResume} />
+          <PrintBtn activeResume={activeResume} />
+          <ImageBtn activeResume={activeResume} />
+        </div>
+      </div>
       <div
         ref={resumeContentRef}
         id="resume-preview"
         style={{
           padding: `${activeResume.globalSettings?.pagePadding}px`,
         }}
-        className="box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
+        className="bg-white shadow-lg box-content w-[210mm] min-w-[210mm] min-h-[297mm]"
       >
         <ResumeTemplateComponent data={activeResume} template={template} />
         {contentHeight > 0 && (
@@ -285,58 +280,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
           </>
         )}
       </div>
-
-      <div className="hidden md:block fixed top-1/2 right-3 transform -translate-y-1/2">
-        <TooltipProvider delayDuration={0}>
-          <Dock>
-            <div className="flex flex-col gap-2">
-              <DockIcon>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      className="w-full h-full p-4"
-                      loading={isExporting}
-                      onClick={handleExport}
-                    >
-                      <Download role="icon" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="left" sideOffset={10}>
-                    <p>导出PDF简历</p>
-                  </TooltipContent>
-                </Tooltip>
-              </DockIcon>
-              <DockIcon>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full h-full p-4"
-                      onClick={handlePrint}
-                    >
-                      <Printer className="w-full h-full p-4" role="icon" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="left" sideOffset={10}>
-                    <p>浏览器打印简历</p>
-                  </TooltipContent>
-                </Tooltip>
-              </DockIcon>
-            </div>
-          </Dock>
-        </TooltipProvider>
-      </div>
-      <iframe
-        ref={printFrameRef}
-        style={{
-          position: "absolute",
-          width: "210mm",
-          height: "297mm",
-          visibility: "hidden",
-          zIndex: -1,
-        }}
-        title="Print Frame"
-      />
     </div>
   );
 };

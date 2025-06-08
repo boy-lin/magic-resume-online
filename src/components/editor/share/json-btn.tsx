@@ -3,13 +3,11 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { FileJson } from "lucide-react";
 
-import { useResumeStore } from "@/store/useResumeStore";
 import { Button } from "@/components/ui-lab/button";
 
-export default function PrintBtn() {
+export default function JsonBtn({ activeResume }) {
   const t = useTranslations("pdfExport");
   const [isLoading, setIsLoading] = useState(false);
-  const { activeResume } = useResumeStore();
   const { title } = activeResume || {};
 
   const handleJsonExport = () => {

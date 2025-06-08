@@ -4,14 +4,13 @@ import { useResumeStore } from "@/store/useResumeStore";
 import { useHtmlPrint } from "@/hooks/pdf-export";
 import { Button } from "@/components/ui-lab/button";
 
-export default function PrintBtn() {
-  const t = useTranslations("common");
-  const activeResume = useResumeStore((state) => state.activeResume);
+export default function PrintBtn({ activeResume }) {
+  // const t = useTranslations("common");
   const { globalSettings = {} } = activeResume || {};
   const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);
 
   return (
-    <div>
+    <>
       <Button
         variant="ghost"
         className="flex flex-col items-center gap-1 h-auto"
@@ -31,6 +30,6 @@ export default function PrintBtn() {
         }}
         title="Print Frame"
       />
-    </div>
+    </>
   );
 }
