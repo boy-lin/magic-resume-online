@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Edit2, Menu, PanelLeft, Minimize2 } from "lucide-react";
-import { EditorHeader } from "@/components/editor/EditorHeader";
+import { useState, useEffect, memo, useRef } from "react";
+import { Eye, Edit2, PanelLeft, Minimize2 } from "lucide-react";
+
+import InfiniteViewer from "react-infinite-viewer";
+import { EditorHeader } from "@/components/editor/header";
 import { SidePanel } from "@/components/editor/SidePanel";
 import { EditPanel } from "@/components/editor/EditPanel";
 import PreviewPanel from "@/components/preview";
@@ -20,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PreviewDock from "@/components/preview/PreviewDock";
 
 const LAYOUT_CONFIG = {
   DEFAULT: [20, 32, 48],
@@ -158,6 +160,7 @@ export default function Home() {
   const [editPanelCollapsed, setEditPanelCollapsed] = useState(false);
   const [previewPanelCollapsed, setPreviewPanelCollapsed] = useState(false);
   const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
+  const viewerRef = useRef<any>(null);
 
   const toggleSidePanel = () => {
     setSidePanelCollapsed(!sidePanelCollapsed);
@@ -236,13 +239,13 @@ export default function Home() {
     >
       <EditorHeader />
       {/* 桌面端布局 */}
-      <div className="hidden md:block h-[calc(100vh-64px)] w-full overflow-x-auto">
+      <div className="hidden md:block h-[calc(100vh-64px)] w-full">
         <ResizablePanelGroup
           key={panelSizes?.join("-")}
           direction="horizontal"
           className={cn(
             "h-full",
-            "md:min-w-[1600px]",
+            "md:min-w-[1200px]",
             "border border-gray-200 bg-white",
             "dark:border-neutral-800 dark:bg-neutral-900/50"
           )}
@@ -267,43 +270,63 @@ export default function Home() {
             </>
           )}
 
-          {/* 编辑面板 */}
-          {!editPanelCollapsed && (
+          {/* 预览面板 */}
+          {!previewPanelCollapsed && (
             <>
               <ResizablePanel
-                id="edit-panel"
-                order={2}
-                minSize={32}
-                defaultSize={panelSizes?.[1]}
-                className={cn(
-                  "dark:bg-neutral-900 dark:border-r dark:border-neutral-800"
-                )}
+                id="preview-panel"
+                order={3}
+                collapsible={false}
+                defaultSize={panelSizes?.[2]}
+                minSize={48}
+                className="bg-gray-100 relative"
               >
-                <div className="h-full">
-                  <EditPanel />
-                </div>
+                <InfiniteViewer
+                  ref={viewerRef}
+                  className="h-full"
+                  useAutoZoom
+                  useMouseDrag
+                  displayHorizontalScroll
+                  displayVerticalScroll
+                  useOverflowScroll
+                  zoomRange={[0.5, 2]}
+                  zoomStep={0.1}
+                  zoomOnMouseWheel
+                  zoomOnPinch
+                  zoomOnScroll
+                >
+                  <PreviewPanel
+                    sidePanelCollapsed={sidePanelCollapsed}
+                    editPanelCollapsed={editPanelCollapsed}
+                    previewPanelCollapsed={previewPanelCollapsed}
+                    toggleSidePanel={toggleSidePanel}
+                    toggleEditPanel={toggleEditPanel}
+                  />
+                </InfiniteViewer>
+                <PreviewDock
+                  sidePanelCollapsed={sidePanelCollapsed}
+                  editPanelCollapsed={editPanelCollapsed}
+                  toggleSidePanel={toggleSidePanel}
+                  toggleEditPanel={toggleEditPanel}
+                />
               </ResizablePanel>
               <DragHandle />
             </>
           )}
-          {/* 预览面板 */}
-          {!previewPanelCollapsed && (
+
+          {/* 编辑面板 */}
+          {!editPanelCollapsed && (
             <ResizablePanel
-              id="preview-panel"
-              order={3}
-              collapsible={false}
-              defaultSize={panelSizes?.[2]}
-              minSize={48}
-              className="bg-gray-100"
+              id="edit-panel"
+              order={2}
+              minSize={32}
+              defaultSize={panelSizes?.[1]}
+              className={cn(
+                "dark:bg-neutral-900 dark:border-r dark:border-neutral-800"
+              )}
             >
-              <div className="h-full overflow-y-auto">
-                <PreviewPanel
-                  sidePanelCollapsed={sidePanelCollapsed}
-                  editPanelCollapsed={editPanelCollapsed}
-                  previewPanelCollapsed={previewPanelCollapsed}
-                  toggleSidePanel={toggleSidePanel}
-                  toggleEditPanel={toggleEditPanel}
-                />
+              <div className="h-full">
+                <EditPanel />
               </div>
             </ResizablePanel>
           )}

@@ -1,36 +1,18 @@
-import { ReactNode, Suspense } from "react";
-import { Metadata } from "next";
+import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
-import Document from "@/components/Document";
 import { Providers } from "@/app/providers";
 import bgPng from "@/assets/images/docs@tinypng.png";
 import bgAvif from "@/assets/images/docs@30.avif";
 
 type Props = {
   children: ReactNode;
-  params: {
-    locale: string;
-  };
 };
 
-export async function generateMetadata({
-  params: { locale },
-}: Props): Promise<Metadata> {
-  const t = await getTranslations({ locale, namespace: "common" });
-  return {
-    title: t("title") + " - " + t("dashboard"),
-  };
-}
-
-export default async function LocaleLayout({ children }: Props) {
-  const locale = await getLocale();
-
-  const messages = await getMessages();
-  console.debug("account LocaleLayout");
+export default function LocaleLayout({ children }: Props) {
+  console.debug("aa DemoLayout render");
   return (
-    <Document locale={locale} bodyClassName="text-letter antialiased">
-      <NextIntlClientProvider messages={messages}>
+    <html lang="en">
+      <body>
         <Providers>
           <div className="bg-paper">
             <div className="absolute z-0 top-0 inset-x-0 flex justify-center overflow-hidden pointer-events-none">
@@ -51,7 +33,7 @@ export default async function LocaleLayout({ children }: Props) {
             </div>
           </div>
         </Providers>
-      </NextIntlClientProvider>
-    </Document>
+      </body>
+    </html>
   );
 }

@@ -1,9 +1,8 @@
-import React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "../ui/skeleton";
 
-export default function Loading() {
+export function SkeletonCard() {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full p-4">
       <div className="flex flex-col space-y-3">
         <Skeleton className="h-[125px] w-full rounded-xl" />
         <div className="space-y-2">
@@ -14,3 +13,5 @@ export default function Loading() {
     </div>
   );
 }
+
+export default SkeletonCard;

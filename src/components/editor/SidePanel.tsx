@@ -136,7 +136,7 @@ export function SidePanel() {
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
     >
-      <div className="p-4 space-y-4">
+      <div className="p-2 space-y-2">
         <SettingCard icon={Layout} title={t("layout.title")}>
           <LayoutSetting
             menuSections={menuSections}

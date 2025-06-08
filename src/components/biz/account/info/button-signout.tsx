@@ -16,7 +16,7 @@ const ButtonSignout = ({ className, variant }) => {
 
   return (
     <form
-      className="w-full"
+      className="w-full px-2 py-1.5"
       onSubmit={async (e) => {
         try {
           setLoading(true);
@@ -33,10 +33,6 @@ const ButtonSignout = ({ className, variant }) => {
         className={cn(className, "w-full")}
         variant={variant}
         loading={loading}
-        onClick={(e) => {
-          e.stopPropagation();
-          // e.preventDefault();
-        }}
       >
         退出登录
       </Button>

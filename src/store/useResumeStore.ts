@@ -673,6 +673,8 @@ export const useResumeStore = create(
             menuSections: JSON.parse(val.menu_sections),
             projects: JSON.parse(val.projects),
             skillContent: JSON.parse(val.skill_content),
+            isPublic: val.is_public,
+            publicPassword: val.public_password,
           };
         });
         set((state) => ({

@@ -7,7 +7,7 @@ import Logo from "@/components/shared/Logo";
 import { signUp } from "@/utils/auth-helpers/server";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/toasts/use-toast";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -49,10 +49,8 @@ const RegisterPage = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (values.confirmPassword !== values.password) {
-      return toast({
-        title: t("common.msg.errT"),
+      return toast.error(t("common.message.error"), {
         description: t("account.invalid.pwdUnequal"),
-        variant: "destructive",
       });
     }
 

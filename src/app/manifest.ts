@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Resume Builder",
-    short_name: "Resume Builder",
+    name: "ResumeX",
+    short_name: "ResumeX",
     description: "A Progressive Web App built with Next.js",
     start_url: "/",
     display: "standalone",

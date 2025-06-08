@@ -204,14 +204,6 @@ const PreviewPanel = ({
           </div>
         </div>
       </div>
-
-      <PreviewDock
-        sidePanelCollapsed={sidePanelCollapsed}
-        editPanelCollapsed={editPanelCollapsed}
-        toggleSidePanel={toggleSidePanel}
-        toggleEditPanel={toggleEditPanel}
-        resumeContentRef={resumeContentRef}
-      />
     </div>
   );
 };

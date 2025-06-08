@@ -186,6 +186,8 @@ export interface ResumeData {
   menuSections: MenuSection[];
   globalSettings: GlobalSettings;
   isNeedSync?: boolean;
+  isPublic?: boolean;
+  publicPassword?: string;
 }
 
 export interface ResumeStore {

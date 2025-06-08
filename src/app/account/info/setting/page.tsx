@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/toasts/use-toast";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -19,12 +19,12 @@ import {
 import { createClient } from "@/utils/supabase/client";
 import { updateUserInfoById } from "@/utils/supabase/queries";
 import { useAppContext } from "@/hooks/app";
+import { useAppStore } from "@/store/useApp";
 
 const Page = () => {
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { state } = useAppContext();
-  const user = state.user || {};
+  const user = useAppStore((state) => state.user) || {};
   const supabase = createClient();
   const router = useRouter();
 
@@ -50,9 +50,8 @@ const Page = () => {
     try {
       const { error } = await updateUserInfoById(supabase, user.id, values);
       if (!error) {
-        toast({
-          title: "成功！",
-          description: "更新用户信息成功！",
+        toast.success("success", {
+          description: "update user info success",
         });
         router.back();
       }

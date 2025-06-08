@@ -85,3 +85,22 @@ export const deleteResumeById = async (supabase: SupabaseClient, id) => {
 export const getResumesById = cache(async (supabase: SupabaseClient, id) => {
   return supabase.from("resumes").select("*").eq("id", id).limit(1).single();
 });
+
+export const publicResumeById = async (
+  supabase: SupabaseClient,
+  id,
+  isPublic
+) => {
+  return supabase.from("resumes").update({ is_public: isPublic }).eq("id", id);
+};
+
+export const setPublicResumeById = async (
+  supabase: SupabaseClient,
+  id,
+  publicPassword
+) => {
+  return supabase
+    .from("resumes")
+    .update({ public_password: publicPassword })
+    .eq("id", id);
+};
