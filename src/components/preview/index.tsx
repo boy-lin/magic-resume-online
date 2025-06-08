@@ -122,12 +122,7 @@ const PreviewPanel = ({
       <div className="py-4 px-4 min-h-screen flex justify-center scale-[58%] origin-top md:scale-90">
         <div
           ref={startRef}
-          className={cn(
-            "w-[210mm] min-w-[210mm] min-h-[297mm]",
-            "bg-white",
-            "shadow-lg",
-            "relative mx-auto"
-          )}
+          className={cn("bg-white", "shadow-lg", "relative mx-auto")}
         >
           <div
             ref={resumeContentRef}
@@ -135,7 +130,7 @@ const PreviewPanel = ({
             style={{
               padding: `${activeResume.globalSettings?.pagePadding}px`,
             }}
-            className="relative"
+            className="box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
           >
             <style jsx global>{`
               .grammar-error {

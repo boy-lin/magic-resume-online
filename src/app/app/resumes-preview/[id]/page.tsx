@@ -253,21 +253,14 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   }
 
   return (
-    <div
-      className={cn(
-        "w-[210mm] min-w-[210mm] min-h-[297mm]",
-        "bg-white",
-        "shadow-lg",
-        "relative mx-auto"
-      )}
-    >
+    <div className={cn("bg-white", "shadow-lg", "relative mx-auto")}>
       <div
         ref={resumeContentRef}
         id="resume-preview"
         style={{
           padding: `${activeResume.globalSettings?.pagePadding}px`,
         }}
-        className="relative"
+        className="box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
       >
         <ResumeTemplateComponent data={activeResume} template={template} />
         {contentHeight > 0 && (
@@ -301,12 +294,11 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      withIcon
                       className="w-full h-full p-4"
                       loading={isExporting}
                       onClick={handleExport}
                     >
-                      <Download />
+                      <Download role="icon" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="left" sideOffset={10}>
@@ -318,12 +310,11 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      withIcon
                       variant="ghost"
                       className="w-full h-full p-4"
                       onClick={handlePrint}
                     >
-                      <Printer className="w-full h-full p-4" />
+                      <Printer className="w-full h-full p-4" role="icon" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="left" sideOffset={10}>

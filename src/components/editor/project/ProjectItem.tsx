@@ -83,11 +83,18 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({ project, onSave }) => {
   );
 };
 
-const ProjectItem = ({ project }: { project: Project }) => {
+const ProjectItem = ({
+  project,
+  expandedId,
+  setExpandedId,
+}: {
+  project: Project;
+  expandedId: string | null;
+  setExpandedId: (id: string | null) => void;
+}) => {
   const { updateProjects, deleteProject, setDraggingProjectId } =
     useResumeStore();
   const dragControls = useDragControls();
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 

@@ -70,9 +70,16 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
   );
 };
 
-const ExperienceItem = ({ experience }: { experience: Experience }) => {
+const ExperienceItem = ({
+  experience,
+  expandedId,
+  setExpandedId,
+}: {
+  experience: Experience;
+  expandedId: string | null;
+  setExpandedId: (id: string | null) => void;
+}) => {
   const dragControls = useDragControls();
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const { updateExperience, deleteExperience } = useResumeStore();
   const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

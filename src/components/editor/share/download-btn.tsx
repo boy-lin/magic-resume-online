@@ -11,13 +11,12 @@ export default function DownloadBtn() {
 
   return (
     <Button
-      withIcon
       variant="ghost"
       className="flex flex-col items-center gap-1 h-auto"
       onClick={handleExport}
       loading={isExporting}
     >
-      <Download className="w-5 h-5" />
+      <Download className="w-5 h-5" role="icon" />
       <span className="text-xs">下载</span>
     </Button>
   );

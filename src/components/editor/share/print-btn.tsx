@@ -13,12 +13,11 @@ export default function PrintBtn() {
   return (
     <div>
       <Button
-        withIcon
         variant="ghost"
         className="flex flex-col items-center gap-1 h-auto"
         onClick={handlePrint}
       >
-        <Printer className="w-5 h-5" />
+        <Printer className="w-5 h-5" role="icon" />
         <span className="text-xs">打印</span>
       </Button>
       <iframe

@@ -8,9 +8,11 @@ import ExperienceItem from "./ExperienceItem";
 import { Experience } from "@/types/resume";
 import { useResumeStore } from "@/store/useResumeStore";
 import { generateUUID } from "@/utils/uuid";
+import { useState } from "react";
 
 const ExperiencePanel = () => {
   const t = useTranslations("workbench.experiencePanel");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const { activeResume, updateExperience, updateExperienceBatch } =
     useResumeStore();
   const { experience = [] } = activeResume || {};
@@ -42,7 +44,12 @@ const ExperiencePanel = () => {
         className="space-y-3"
       >
         {experience.map((item) => (
-          <ExperienceItem key={item.id} experience={item}></ExperienceItem>
+          <ExperienceItem
+            key={item.id}
+            experience={item}
+            expandedId={expandedId}
+            setExpandedId={setExpandedId}
+          />
         ))}
 
         <Button onClick={handleCreateProject} className="w-full">

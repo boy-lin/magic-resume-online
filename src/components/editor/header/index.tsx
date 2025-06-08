@@ -119,13 +119,12 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
           <Name />
           <ShareBtn />
           <Button
-            withIcon
             variant="outline"
             className="py-2 text-foreground"
             onClick={asyncResume}
             loading={loading}
           >
-            <RefreshCcwDot />
+            <RefreshCcwDot role="icon" />
             {t("btn.sync")}
             {isNeedSync ? (
               <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>
