@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, X } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -24,6 +24,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useResumeStore } from "@/store/useResumeStore";
 import { cn } from "@/lib/utils";
+import { useRequest } from "ahooks";
 
 const DEFAULT_AVATAR = "/avatar.png";
 
@@ -88,36 +89,51 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     };
   }, [isOpen, initialConfig, photo]);
 
-  const handleFile = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      alert(t("upload.sizeLimit"));
-      return;
-    }
+  const { run: uploadImage, loading: uploadLoading } = useRequest(
+    async (file: File) => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(t("upload.sizeLimit"));
+        return;
+      }
 
-    if (!file.type.startsWith("image/")) {
-      alert(t("upload.typeLimit"));
-      return;
-    }
+      if (!file.type.startsWith("image/")) {
+        toast.error(t("upload.typeLimit"));
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setPreviewUrl(result);
-      setImageUrl(result);
-      const blob = new Blob([result], { type: "image/png" });
-      const blobUrl = URL.createObjectURL(blob);
-      localStorage.setItem("photo", blobUrl);
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("name", file.name);
+
+      const res = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      }).then((res) => res.json());
+
+      if (res.code !== 0) {
+        toast.error(res.message);
+        return;
+      }
+
+      setPreviewUrl(res.data);
+      setImageUrl(res.data);
+      localStorage.setItem("photo", res.data);
       updateBasicInfo({
-        photo: result,
+        photo: res.data,
       });
-    };
-    reader.readAsDataURL(file);
-  };
+    },
+    {
+      manual: true,
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }
+  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      handleFile(file);
+      uploadImage(file);
     }
   };
 
@@ -187,7 +203,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) {
-      handleFile(file);
+      uploadImage(file);
     }
   };
 
@@ -307,6 +323,11 @@ const PhotoConfigDrawer: React.FC<Props> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
+            {uploadLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-opacity-50">
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </div>
+            )}
             {previewUrl && previewUrl !== "" ? (
               <div className="relative h-full group">
                 <img
@@ -360,6 +381,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
             <div className="space-y-3">
               <h3 className="text-sm font-medium">{t("upload.title")}</h3>
               <Textarea
+                disabled={uploadLoading}
                 value={imageUrl}
                 onChange={(e) => handleUrlChange(e.target.value)}
                 placeholder={t("upload.urlPlaceholder")}

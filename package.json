@@ -18,6 +18,8 @@
     "test": "npx supabase migration new resumes_update"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.832.0",
+    "@aws-sdk/lib-storage": "^3.832.0",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
