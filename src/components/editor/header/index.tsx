@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui-lab/button";
 import ShareBtn from "../ShareBtn";
 import Name from "./name";
+import { useEffect, useRef } from "react";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
@@ -24,7 +25,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
   const { activeResume, updateResumeAsync } = useResumeStore();
   const router = useRouter();
   const t = useTranslations("common");
-
+  const timer = useRef<NodeJS.Timeout | null>(null);
   const { isNeedSync } = activeResume || {};
   const { errors, selectError } = useGrammarCheck();
   const { loading, run: asyncResume } = useRequest(
@@ -38,6 +39,37 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
       },
     }
   );
+
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+      return "确定离开此页面吗？您的更改可能不会保存。";
+    };
+
+    if (isNeedSync) {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      timer.current = setTimeout(() => {
+        asyncResume();
+      }, 1000 * 30);
+      // 监听页面卸载事件
+      window.addEventListener("beforeunload", handler);
+    } else {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      window.removeEventListener("beforeunload", handler);
+    }
+
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      window.removeEventListener("beforeunload", handler);
+    };
+  }, [isNeedSync]);
 
   return (
     <motion.header
