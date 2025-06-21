@@ -28,7 +28,7 @@ interface ResumeStore {
   resumes: Record<string, ResumeData>;
   activeResumeId: string | null;
   activeResume: ResumeData | null;
-
+  resumeView: Record<string, any>;
   createResume: (templateId: string | null) => Promise<any>;
   deleteResume: (resume: ResumeData) => void;
   duplicateResume: (resumeId: string) => string;
@@ -69,9 +69,11 @@ interface ResumeStore {
   removeCustomItem: (sectionId: string, itemId: string) => void;
   updateGlobalSettings: (settings: Partial<GlobalSettings>) => void;
   setThemeColor: (color: string) => void;
-  setTemplate: (templateId: string) => void;
+  setTemplate: (templateId: string, isNeedSync?: boolean) => void;
   getResumeList: () => Promise<any>;
   getResumeFullById: (id: string) => Promise<any>;
+  getViewScale: () => [number];
+  setResumeView: Function;
 }
 
 // 同步简历到文件系统
@@ -124,6 +126,9 @@ export const useResumeStore = create(
       resumes: {},
       activeResumeId: null,
       activeResume: null,
+      resumeView: {
+        zoomX: 1,
+      },
 
       createResume: async (templateId = null) => {
         const locale =
@@ -163,6 +168,7 @@ export const useResumeStore = create(
           activeResume: newResume,
         }));
         // syncResumeToFile(newResume);
+        return id;
       },
 
       updateResume: (resumeId, data, isNeedSync = true) => {
@@ -672,16 +678,12 @@ export const useResumeStore = create(
         }));
       },
       getResumeFullById: async (id) => {
-        console.log("activeResumeId", id);
         const data = await getResumeById(createClient(), id);
         const newResume = {
           activeSection: "basic",
           draggingProjectId: null,
           ...data,
         };
-
-        console.log("activeResumeId", id, newResume);
-
         set((state) => ({
           resumes: {
             ...state.resumes,
@@ -690,6 +692,20 @@ export const useResumeStore = create(
           activeResumeId: id,
           activeResume: newResume,
         }));
+      },
+
+      setResumeView: (val) => {
+        console.log("setResumeView", val);
+        set((state) => ({
+          resumeView: {
+            ...state.resumeView,
+            ...val,
+          },
+        }));
+      },
+      getViewScale: () => {
+        const zoomX = get().resumeView.zoomX;
+        return [zoomX * 100];
       },
     }),
     {

@@ -114,7 +114,7 @@ const ShareBtn = () => {
 
   useEffect(() => {
     if (!activeResume) return;
-    console.log("aa2 activeResume", activeResume);
+    // console.log("aa2 activeResume", activeResume);
     setOpenPublic(activeResume.isPublic);
     if (activeResume.publicPassword) {
       setOpenPassword(true);
@@ -133,7 +133,7 @@ const ShareBtn = () => {
       <PopoverContent align="end" className="w-120">
         {/* <div className="px-2 py-1.5 text-sm">权限：获得此链接的任何人</div> */}
         <div className="flex items-center gap-2 text-lg font-semibold mb-2">
-          分享简历
+          向其他人分享你的简历
         </div>
         <div className="space-y-6 min-w-[328px]">
           {/* 访问级别 */}

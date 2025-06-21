@@ -205,7 +205,7 @@
     "sidePanel": {
       "layout": {
         "title": "布局",
-        "addCustomSection": "添加自定义模块"
+        "addCustomSection": "自定义"
       },
       "theme": {
         "title": "主题色",

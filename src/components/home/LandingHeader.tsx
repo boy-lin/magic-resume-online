@@ -73,8 +73,8 @@ export default function LandingHeader() {
               className="flex items-center gap-2 cursor-pointer"
               onClick={() => (window.location.href = `/${locale}/`)}
             >
-              <Logo size={32} />
-              <span className="font-bold text-[24px]">{t("header.title")}</span>
+              <Logo size={32} className="text-primary" />
+              <span className="font-bold text-2xl">{t("header.title")}</span>
             </div>
 
             <div className="flex-1 flex items-center justify-start pl-8">
@@ -85,7 +85,7 @@ export default function LandingHeader() {
                       {tc("menu.product")}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                      <ul className="grid gap-3 p-6 md:w-[300px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
                         <li className="row-span-3">
                           <NavigationMenuLink asChild>
                             <a
@@ -129,12 +129,12 @@ export default function LandingHeader() {
                       企业服务
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 md:w-[220px]">
+                      {/* <ul className="grid gap-3 p-6 md:w-[220px]">
                         <li className="row-span-3">
                           <AlertTitle>功能未开启</AlertTitle>
                           <AlertDescription>敬请期待</AlertDescription>
                         </li>
-                        {/* <ListItem
+                        <ListItem
                           href="/app/dashboard/resumes"
                           title="我的简历"
                         >
@@ -151,8 +151,8 @@ export default function LandingHeader() {
                           title="更新日志"
                         >
                           新特性更新日志
-                        </ListItem> */}
-                      </ul>
+                        </ListItem>
+                      </ul> */}
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                 </NavigationMenuList>

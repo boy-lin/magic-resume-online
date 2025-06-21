@@ -10,20 +10,9 @@ import PreviewDock from "./PreviewDock";
 
 import PageBreakLine from "@/components/preview/PageBreakLine";
 
-interface PreviewPanelProps {
-  sidePanelCollapsed: boolean;
-  editPanelCollapsed: boolean;
-  previewPanelCollapsed: boolean;
-  toggleSidePanel: () => void;
-  toggleEditPanel: () => void;
-}
+interface PreviewPanelProps {}
 
-const PreviewPanel = ({
-  sidePanelCollapsed,
-  editPanelCollapsed,
-  toggleSidePanel,
-  toggleEditPanel,
-}: PreviewPanelProps) => {
+const PreviewPanel = ({}: PreviewPanelProps) => {
   const { activeResume } = useResumeStore();
   const template = useMemo(() => {
     return (
@@ -114,7 +103,7 @@ const PreviewPanel = ({
   return (
     <div
       ref={previewRef}
-      className="relative w-full h-full  bg-gray-100"
+      className="relative w-full h-full bg-gray-100"
       style={{
         fontFamily: "MiSans VF, sans-serif",
       }}
@@ -130,7 +119,7 @@ const PreviewPanel = ({
             style={{
               padding: `${activeResume.globalSettings?.pagePadding}px`,
             }}
-            className="box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
+            className="bg-white box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
           >
             <style jsx global>{`
               .grammar-error {

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
+
 import Document from "@/components/Document";
 import { Providers } from "@/app/providers";
 
@@ -23,10 +24,9 @@ export async function generateMetadata({
 
 export default async function LocaleLayout({ children }: Props) {
   const locale = await getLocale();
-
   const messages = await getMessages();
 
-  console.log("workbench LocaleLayout", locale);
+  // console.log("workbench LocaleLayout", locale);
   return (
     <Document locale={locale} bodyClassName="overflow-y-hidden">
       <NextIntlClientProvider messages={messages}>

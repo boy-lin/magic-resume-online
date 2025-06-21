@@ -26,22 +26,14 @@ import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
 import { useResumeStore } from "@/store/useResumeStore";
+import { Slider } from "@/components/ui/slider";
+import { useDebounceFn, useThrottleFn } from "ahooks";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
-interface PreviewDockProps {
-  sidePanelCollapsed: boolean;
-  editPanelCollapsed: boolean;
-  toggleSidePanel: () => void;
-  toggleEditPanel: () => void;
-}
+interface PreviewDockProps {}
 
-const PreviewDock = ({
-  sidePanelCollapsed,
-  editPanelCollapsed,
-  toggleSidePanel,
-  toggleEditPanel,
-}: PreviewDockProps) => {
+const PreviewDock = ({ viewerRef }) => {
   const router = useRouter();
   const t = useTranslations("previewDock");
   const { checkGrammar, isChecking } = useGrammarCheck();
@@ -100,7 +92,8 @@ const PreviewDock = ({
     t,
   ]);
 
-  const { duplicateResume, activeResumeId } = useResumeStore();
+  const { duplicateResume, activeResumeId, setResumeView } = useResumeStore();
+  const viewScale = useResumeStore((state) => state.getViewScale());
 
   const handleCopyResume = useCallback(() => {
     if (!activeResumeId) return;
@@ -113,29 +106,20 @@ const PreviewDock = ({
     }
   }, [activeResumeId, duplicateResume, router, t]);
 
-  // return createPortal()
+  const { run: handleZoomChange } = useThrottleFn(
+    (val) => {
+      if (viewerRef.current) {
+        viewerRef.current.setZoom(val[0] / 100);
+      }
+    },
+    { wait: 100 }
+  );
+
   return (
-    <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 ">
+    <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 ">
       <TooltipProvider delayDuration={0}>
         <Dock>
           <div className="flex gap-2">
-            <DockIcon>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className={cn(
-                      "flex cursor-pointer h-7 w-7 items-center justify-center rounded-lg",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50"
-                    )}
-                  >
-                    <TemplateSheet />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={10}>
-                  <p>{t("switchTemplate")}</p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
             <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -180,54 +164,8 @@ const PreviewDock = ({
                 </TooltipContent>
               </Tooltip>
             </DockIcon>
-            <div className="w-full h-[1px] bg-gray-200" />
-            <DockIcon>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={toggleSidePanel}
-                    className={cn(
-                      "flex h-[30px] w-[30px] items-center justify-center rounded-sm transition-all",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
-                      "active:scale-95"
-                    )}
-                  >
-                    {sidePanelCollapsed && <PanelRightClose size={20} />}
-                    {!sidePanelCollapsed && <PanelRightOpen size={20} />}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={10}>
-                  <p>
-                    {sidePanelCollapsed
-                      ? t("sidePanel.expand")
-                      : t("sidePanel.collapse")}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-            <DockIcon>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={toggleEditPanel}
-                    className={cn(
-                      "flex h-[30px] w-[30px] items-center justify-center rounded-sm transition-all",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
-                      "active:scale-95"
-                    )}
-                  >
-                    <Edit2 size={20} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={10}>
-                  {editPanelCollapsed
-                    ? t("editPanel.expand")
-                    : t("editPanel.collapse")}
-                </TooltipContent>
-              </Tooltip>
-            </DockIcon>
-            <div className="w-full h-[1px] bg-gray-200" />
 
+            <div className="w-full h-[1px] bg-gray-200" />
             <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -246,6 +184,17 @@ const PreviewDock = ({
                 </TooltipContent>
               </Tooltip>
             </DockIcon>
+            <div className="w-full h-[1px] bg-gray-200" />
+            <div className="flex items-center">
+              <Slider
+                value={viewScale}
+                max={200}
+                min={50}
+                step={1}
+                onValueChange={handleZoomChange}
+                className="w-[100px] h-2"
+              />
+            </div>
           </div>
         </Dock>
       </TooltipProvider>

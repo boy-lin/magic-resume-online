@@ -31,7 +31,7 @@ const ExperiencePanel = () => {
   return (
     <div
       className={cn(
-        "space-y-4 px-4 py-4 rounded-lg",
+        "space-y-4 p-2 rounded-lg",
         "bg-white dark:bg-neutral-900/30"
       )}
     >

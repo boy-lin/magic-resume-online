@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Settings2, Image, EyeOff, Eye } from "lucide-react";
+import { Settings2, Image as ImageIcon, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import PhotoConfigDrawer from "./PhotoConfigDrawer";
@@ -38,9 +38,24 @@ const PhotoSelector: React.FC<Props> = ({ className }) => {
   return (
     <div className={cn("relative", className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Image className="w-4 h-4" />
-          <span className="text-sm font-medium">{t("basicPanel.avatar")}</span>
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setShowConfig(true)}
+        >
+          {basic.photo ? (
+            <img
+              src={basic.photo}
+              alt="Selected"
+              className="w-[48px] h-[48px] object-cover rounded"
+            />
+          ) : (
+            <div>
+              <ImageIcon className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {t("basicPanel.avatar")}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex gap-4">
           <Button
@@ -72,16 +87,6 @@ const PhotoSelector: React.FC<Props> = ({ className }) => {
             )}
           </Button>
         </div>
-      </div>
-
-      <div className="mt-2 relative overflow-hidden">
-        {basic.photo && (
-          <img
-            src={basic.photo}
-            alt="Selected"
-            className="w-[48px] h-[48px] object-cover rounded"
-          />
-        )}
       </div>
 
       <PhotoConfigDrawer

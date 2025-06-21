@@ -17,7 +17,7 @@ const ThemeToggle = ({ children }: { children?: React.ReactNode }) => {
   const [mounted, setMounted] = React.useState(false);
   const options = React.useMemo(() => ["Light", "Dark", "System"], []);
 
-  console.log(`aa ThemeToggle theme`, theme);
+  // console.log(`aa ThemeToggle theme`, theme);
 
   // 确保组件挂载后再渲染
   React.useEffect(() => {

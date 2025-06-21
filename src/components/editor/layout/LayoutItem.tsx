@@ -22,7 +22,7 @@ const LayoutItem = ({
   setActiveSection,
   toggleSectionVisibility,
   updateMenuSections,
-  menuSections
+  menuSections,
 }: LayoutItemProps) => {
   const dragControls = useDragControls();
 
@@ -106,7 +106,7 @@ const LayoutItem = ({
             {item.icon}
           </span>
           <span className="text-sm flex-1">{item.title}</span>
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={(e) => {
@@ -124,9 +124,9 @@ const LayoutItem = ({
             ) : (
               <EyeOff className="w-4 h-4" />
             )}
-          </motion.button>
+          </motion.button> */}
 
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={(e) => {
@@ -147,7 +147,7 @@ const LayoutItem = ({
             )}
           >
             <Trash2 className="w-4 h-4 text-red-400" />
-          </motion.button>
+          </motion.button> */}
         </div>
       </div>
     </Reorder.Item>

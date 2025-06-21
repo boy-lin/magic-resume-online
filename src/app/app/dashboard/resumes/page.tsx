@@ -29,6 +29,7 @@ const ResumeWorkbench = () => {
   const { deleteResume } = useResumeStore();
   const resumes = useResumeStore().resumes;
   const getResumeList = useResumeStore().getResumeList;
+
   const { error, loading } = useRequest(getResumeList, {
     onError: (error) => {
       toast.error(error.message);
