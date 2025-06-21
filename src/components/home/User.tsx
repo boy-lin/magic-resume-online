@@ -15,6 +15,7 @@ import { avatarUrlDefault } from "@/config";
 import ButtonSignout from "@/components/biz/account/info/button-signout";
 import { useAppStore } from "@/store/useApp";
 import { memo } from "react";
+import { SettingsIcon } from "lucide-react";
 
 function User() {
   const user = useAppStore((state) => state.user) || {};
@@ -47,17 +48,17 @@ function User() {
               <AvatarFallback>{fName}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Link className="w-full" href={userInfoPath}>
-                账号设置
-              </Link>
+          <DropdownMenuContent align="end" className="p-2 flex flex-col gap-2">
+            <DropdownMenuItem className="px-0 py-0">
+              <Button asChild variant="ghost">
+                <Link className="w-full" href={userInfoPath}>
+                  <SettingsIcon className="w-4 h-4" />
+                  账号设置
+                </Link>
+              </Button>
             </DropdownMenuItem>
             <DropdownMenuItem className="px-0 py-0">
-              <ButtonSignout
-                variant="destructive"
-                className="justify-start leading-4 h-auto font-normal"
-              />
+              <ButtonSignout className="justify-start leading-4 h-auto font-normal" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

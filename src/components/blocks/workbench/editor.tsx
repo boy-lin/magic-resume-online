@@ -3,7 +3,7 @@ import { Eye, Edit2, PanelLeft, Minimize2 } from "lucide-react";
 
 import InfiniteViewer from "react-infinite-viewer";
 import { EditorHeader } from "@/components/editor/header";
-import { SidePanel } from "@/components/editor/SidePanel";
+import { SidePanel } from "./SidePanel";
 import { EditPanel } from "@/components/editor/EditPanel";
 import PreviewPanel from "@/components/preview";
 import {
@@ -20,10 +20,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PreviewDock from "@/components/preview/PreviewDock";
-import { useRequest } from "ahooks";
 import { useResumeStore } from "@/store/useResumeStore";
-import SkeletonCard from "@/components/ui-lab/skeleton-card";
-import { useParams } from "next/navigation";
+import { viewZoomRange } from "@/constants/view";
 
 const LAYOUT_CONFIG = {
   DEFAULT: [20, 32, 48],
@@ -158,70 +156,45 @@ const LayoutControls = memo(
 LayoutControls.displayName = "LayoutControls";
 
 export default function Editor() {
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useState(false);
   const [editPanelCollapsed, setEditPanelCollapsed] = useState(false);
   const [previewPanelCollapsed, setPreviewPanelCollapsed] = useState(false);
   const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
   const viewerRef = useRef<any>(null);
+  const [editPanelShow, setEditPanelShow] = useState(true);
+  const { setActiveSection, setResumeView } = useResumeStore();
+  const activeSection = useResumeStore((s) => s.activeResume?.activeSection);
 
-  useEffect(() => {
-    if (viewerRef.current) {
-      viewerRef.current.scrollCenter();
+  const toggleEditPanel = (section: any) => {
+    setActiveSection(section.id);
+    if (activeSection === section.id) {
+      setEditPanelCollapsed(!editPanelCollapsed);
     }
-  }, []);
-
-  const toggleSidePanel = () => {
-    setSidePanelCollapsed(!sidePanelCollapsed);
-  };
-
-  const toggleEditPanel = () => {
-    setEditPanelCollapsed(!editPanelCollapsed);
-  };
-
-  const togglePreviewPanel = () => {
-    setPreviewPanelCollapsed(!previewPanelCollapsed);
+    if (editPanelCollapsed) {
+      // setEditPanelShow(false);
+    } else {
+      setEditPanelShow(true);
+    }
   };
 
   const updateLayout = (sizes: number[]) => {
+    console.log("updateLayout", sizes);
     setPanelSizes(sizes);
   };
 
   useEffect(() => {
     let newSizes = [];
-
-    // 侧边栏尺寸
-    newSizes.push(sidePanelCollapsed ? 0 : 20);
-
     // 编辑区尺寸
     if (editPanelCollapsed) {
       newSizes.push(0);
     } else {
-      if (sidePanelCollapsed) {
-        newSizes.push(50);
-      } else {
-        if (previewPanelCollapsed) {
-          newSizes.push(80);
-        } else {
-          newSizes.push(32);
-        }
-      }
+      newSizes.push(100);
     }
-
     // 预览区尺寸
-    if (previewPanelCollapsed) {
-      newSizes.push(0);
+    if (editPanelCollapsed) {
+      newSizes.push(100);
     } else {
-      if (editPanelCollapsed && sidePanelCollapsed) {
-        newSizes.push(100);
-      } else {
-        if (editPanelCollapsed) {
-          newSizes.push(80);
-        } else {
-          newSizes.push(48);
-        }
-      }
+      newSizes.push(0);
     }
-
     // 确保总和为 100
     const total = newSizes.reduce((a, b) => a + b, 0);
     if (total < 100) {
@@ -229,13 +202,29 @@ export default function Editor() {
         .map((size, index) => ({ size, index }))
         .filter(({ size }) => size > 0)
         .pop()?.index;
-
       if (lastNonZeroIndex !== undefined) {
         newSizes[lastNonZeroIndex] += 100 - total;
       }
     }
     updateLayout([...newSizes]);
-  }, [sidePanelCollapsed, editPanelCollapsed, previewPanelCollapsed]);
+
+    // if (viewerRef.current) {
+    //   viewerRef.current.scrollCenter();
+    //   console.log("viewerRef.current", viewerRef.current);
+    //   console.log("viewerRef.getContainer", {
+    //     dom: viewerRef.current.getContainer(),
+    //   });
+    //   console.log("viewerRef.getViewport", {
+    //     dom: viewerRef.current.getViewport(),
+    //   });
+    // }
+  }, [editPanelCollapsed, previewPanelCollapsed]);
+
+  useEffect(() => {
+    if (viewerRef.current) {
+      viewerRef.current.scrollCenter();
+    }
+  }, [viewerRef.current]);
 
   return (
     <main
@@ -247,110 +236,102 @@ export default function Editor() {
     >
       <EditorHeader />
       {/* 桌面端布局 */}
-      <div className="hidden md:block h-[calc(100vh-64px)] w-full">
+      <div className="flex h-[calc(100vh-64px)] w-full">
+        {/* 侧边栏面板 */}
+        <div className="h-full flex-grow-0">
+          <SidePanel
+            toggleEditPanel={toggleEditPanel}
+            onItemPointerEnter={(section) => {
+              if (!editPanelCollapsed) return;
+              setEditPanelShow(true);
+              setActiveSection(section.id);
+            }}
+            onItemPointerLeave={(section) => {
+              if (!editPanelCollapsed) return;
+              // setEditPanelShow(false);
+              // setActiveSection(section.id);
+            }}
+          />
+        </div>
+
         <ResizablePanelGroup
-          key={panelSizes?.join("-")}
           direction="horizontal"
           className={cn(
             "h-full",
-            "md:min-w-[1200px]",
-            "border border-gray-200 bg-white",
+            "w-auto",
+            "border-0 border-gray-20",
             "dark:border-neutral-800 dark:bg-neutral-900/50"
           )}
         >
-          {/* 侧边栏面板 */}
-          {!sidePanelCollapsed && (
-            <>
-              <ResizablePanel
-                id="side-panel"
-                // order={1}
-                defaultSize={panelSizes?.[0]}
-                minSize={20}
-                className={cn(
-                  "dark:bg-neutral-900 dark:border-r dark:border-neutral-800"
-                )}
-              >
-                <div className="h-full overflow-y-auto">
-                  <SidePanel />
-                </div>
-              </ResizablePanel>
-              <DragHandle />
-            </>
-          )}
+          {/* 编辑面板 */}
+          <ResizablePanel
+            id="edit-panel"
+            order={1}
+            defaultSize={panelSizes?.[0]}
+            className={cn(
+              "w-[500px] max-w-[600px] min-w-[400px] h-full",
+              {
+                "fixed left-[80px] p-2 h-auto top-16 bottom-0 z-10":
+                  editPanelCollapsed,
+              },
+              { hidden: !editPanelShow }
+            )}
+          >
+            <EditPanel
+              setEditPanelShow={setEditPanelShow}
+              editPanelCollapsed={editPanelCollapsed}
+            />
+          </ResizablePanel>
+          {!editPanelCollapsed && <DragHandle />}
 
           {/* 预览面板 */}
-          {!previewPanelCollapsed && (
-            <>
-              <ResizablePanel
-                id="preview-panel"
-                // order={3}
-                // collapsible={false}
-                defaultSize={panelSizes?.[2]}
-                minSize={48}
-                className="bg-gray-100 relative"
-              >
-                <InfiniteViewer
-                  ref={viewerRef}
-                  className="h-full"
-                  useAutoZoom
-                  useMouseDrag
-                  displayHorizontalScroll
-                  displayVerticalScroll
-                  useOverflowScroll
-                  zoomRange={[0.5, 2]}
-                  zoomStep={0.1}
-                  zoomOnMouseWheel
-                  zoomOnPinch
-                  zoomOnScroll
-                >
-                  <PreviewPanel
-                    sidePanelCollapsed={sidePanelCollapsed}
-                    editPanelCollapsed={editPanelCollapsed}
-                    previewPanelCollapsed={previewPanelCollapsed}
-                    toggleSidePanel={toggleSidePanel}
-                    toggleEditPanel={toggleEditPanel}
-                  />
-                </InfiniteViewer>
-                <PreviewDock
-                  sidePanelCollapsed={sidePanelCollapsed}
-                  editPanelCollapsed={editPanelCollapsed}
-                  toggleSidePanel={toggleSidePanel}
-                  toggleEditPanel={toggleEditPanel}
-                />
-              </ResizablePanel>
-              <DragHandle />
-            </>
-          )}
-
-          {/* 编辑面板 */}
-          {!editPanelCollapsed && (
-            <ResizablePanel
-              id="edit-panel"
-              // order={2}
-              minSize={20}
-              defaultSize={panelSizes?.[1]}
-              className={cn(
-                "dark:bg-neutral-900 dark:border-r dark:border-neutral-800"
-              )}
+          <ResizablePanel
+            order={2}
+            // collapsible={false}
+            defaultSize={panelSizes?.[1]}
+            minSize={48}
+            className="bg-gray-100 relative border-0"
+          >
+            <InfiniteViewer
+              ref={viewerRef}
+              className="h-full"
+              useAutoZoom
+              useMouseDrag
+              displayHorizontalScroll
+              displayVerticalScroll
+              useOverflowScroll
+              zoomRange={viewZoomRange}
+              zoomStep={0.1}
+              zoomOnMouseWheel
+              zoomOnPinch
+              zoomOnScroll
+              // zoomBy={(e) => {
+              //   console.log("zoomBy", e);
+              // }}
+              // onPinch={(e) => {
+              //   console.log("InfiniteViewer", e);
+              // }}
+              onScroll={(e) => {
+                setResumeView({
+                  zoomX: e.zoomX,
+                });
+                // console.log("onScroll", e);
+              }}
+              // onDrag={(e) => {
+              //   console.log("onDrag", e);
+              // }}
             >
-              <div className="h-full">
-                <EditPanel />
-              </div>
-            </ResizablePanel>
-          )}
+              <PreviewPanel />
+            </InfiniteViewer>
+            <PreviewDock viewerRef={viewerRef} />
+          </ResizablePanel>
         </ResizablePanelGroup>
       </div>
 
       {/* 移动端布局 */}
       <div className="md:hidden h-[calc(100vh-64px)] w-full md:min-w-[1600px]">
-        <div className="h-full overflow-y-auto">
-          <PreviewPanel
-            sidePanelCollapsed={true}
-            editPanelCollapsed={true}
-            previewPanelCollapsed={false}
-            toggleSidePanel={toggleSidePanel}
-            toggleEditPanel={toggleEditPanel}
-          />
+        <div className="h-full overflow-y-auto bg-gray-100">
+          <PreviewPanel />
         </div>
       </div>
     </main>

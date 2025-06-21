@@ -164,7 +164,7 @@ export const THEME_COLORS = [
 export interface MenuSection {
   id: string;
   title: string;
-  icon: string;
+  icon?: string;
   enabled: boolean;
   order: number;
 }

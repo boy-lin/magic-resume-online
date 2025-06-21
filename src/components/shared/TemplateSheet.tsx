@@ -13,10 +13,10 @@ import {
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useResumeStore } from "@/store/useResumeStore";
-import classic from "@/assets/images/template-cover/classic.png";
-import modern from "@/assets/images/template-cover/modern.png";
-import leftRight from "@/assets/images/template-cover/left-right.png";
-import timeline from "@/assets/images/template-cover/timeline.png";
+import classic from "@/assets/images/template-cover/classic.jpg";
+import modern from "@/assets/images/template-cover/modern.jpg";
+import leftRight from "@/assets/images/template-cover/left-right.jpg";
+import timeline from "@/assets/images/template-cover/timeline.jpg";
 
 const templateImages: { [key: string]: any } = {
   classic,

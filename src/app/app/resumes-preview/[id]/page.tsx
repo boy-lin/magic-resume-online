@@ -223,7 +223,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     );
   }
 
-  console.log("pageHeightPx, pageBreakCount", pageHeightPx, pageBreakCount);
+  // console.log("pageHeightPx, pageBreakCount", pageHeightPx, pageBreakCount);
 
   return (
     <div className="">

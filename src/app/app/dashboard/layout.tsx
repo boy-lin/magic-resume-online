@@ -1,9 +1,12 @@
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
+
 import Document from "@/components/Document";
 import { Providers } from "@/app/providers";
-import Client from "./client";
+
+import SidebarLeft from "./sidebar-left";
+
 type Props = {
   children: ReactNode;
   params: {
@@ -13,14 +16,13 @@ type Props = {
 
 export default async function LocaleLayout({ children }: Props) {
   const locale = await getLocale();
-
   const messages = await getMessages();
-  console.log("dashboard LocaleLayout", locale);
+  // console.log("dashboard LocaleLayout", locale);
   return (
     <Document locale={locale}>
       <NextIntlClientProvider messages={messages}>
         <Providers>
-          <Client>{children}</Client>
+          <SidebarLeft>{children}</SidebarLeft>
         </Providers>
       </NextIntlClientProvider>
     </Document>

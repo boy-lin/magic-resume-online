@@ -15,6 +15,7 @@ import { DEFAULT_FIELD_ORDER } from "@/config";
 import { useResumeStore } from "@/store/useResumeStore";
 import { BasicFieldType, CustomFieldType } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
+import { TransitionOpacity } from "@/components/transition/opacity";
 interface CustomFieldProps {
   field: CustomFieldType;
   onUpdate: (field: CustomFieldType) => void;
@@ -22,9 +23,9 @@ interface CustomFieldProps {
 }
 
 const itemAnimations = {
-  initial: { opacity: 0, y: 0 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 0 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
   transition: { type: "spring", stiffness: 500, damping: 50, mass: 1 },
 };
 
@@ -251,7 +252,7 @@ const BasicPanel: React.FC = () => {
         <motion.div
           {...itemAnimations}
           className={cn(
-            "flex items-center gap-4 p-4 pr-3",
+            "flex items-center gap-2 p-2",
             "bg-white dark:bg-neutral-900",
             "rounded-lg ",
             "transition-all duration-200",
@@ -344,149 +345,119 @@ const BasicPanel: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h2 className="text-lg font-medium">{t("layout")}</h2>
-          <div className=" bg-white dark:bg-neutral-900 rounded-lg">
-            <AlignSelector
-              value={basic?.layout || "left"}
-              onChange={(value) =>
+    <div className="space-y-4 p-2">
+      <div className="space-y-2">
+        <h2 className="text-lg font-medium">{t("layout")}</h2>
+        <div className=" bg-white dark:bg-neutral-900 rounded-lg">
+          <AlignSelector
+            value={basic?.layout || "left"}
+            onChange={(value) =>
+              updateBasicInfo({
+                ...basic,
+                layout: value,
+              })
+            }
+          />
+        </div>
+      </div>
+      <TransitionOpacity className="space-y-2">
+        <h2 className="text-lg font-medium">{t("title")}</h2>
+        <div className="bg-white dark:bg-neutral-900 rounded-xl p-3 border border-neutral-100 dark:border-neutral-700">
+          <PhotoUpload />
+        </div>
+      </TransitionOpacity>
+      <TransitionOpacity className="space-y-2">
+        <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
+          {t("basicField")}
+        </h3>
+        <Reorder.Group
+          axis="y"
+          as="div"
+          values={basicFields}
+          onReorder={handleBasicReorder}
+          className="space-y-2"
+        >
+          {basicFields.map((field) => renderBasicField(field))}
+        </Reorder.Group>
+      </TransitionOpacity>
+      <TransitionOpacity className="space-y-2">
+        <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
+          {t("customField")}
+        </h3>
+        <Reorder.Group
+          axis="y"
+          as="div"
+          values={customFields}
+          onReorder={handleCustomFieldsReorder}
+          className="space-y-2"
+        >
+          {Array.isArray(customFields) &&
+            customFields.map((field) => (
+              <CustomField
+                key={field.id}
+                field={field}
+                onUpdate={updateCustomField}
+                onDelete={deleteCustomField}
+              />
+            ))}
+        </Reorder.Group>
+        <div>
+          <Button onClick={addCustomField} className="w-full mt-4">
+            <PlusCircle className="w-4 h-4 mr-2" />
+            {t("customFields.addButton")}
+          </Button>
+        </div>
+      </TransitionOpacity>
+      <TransitionOpacity className="space-y-2">
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
+              {t("githubContributions")}
+            </h3>
+
+            <Switch
+              checked={basic?.githubContributionsVisible}
+              onCheckedChange={(checked) =>
                 updateBasicInfo({
                   ...basic,
-                  layout: value,
+                  githubContributionsVisible: checked,
                 })
               }
             />
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">{t("title")}</h2>
-          </div>
-
-          <div className="space-y-4">
-            <motion.div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 0 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-neutral-900 rounded-xl p-3 border border-neutral-100 dark:border-neutral-700"
-              >
-                <PhotoUpload />
-              </motion.div>
-
-              <motion.div className="space-y-6">
-                <motion.div className="space-y-3">
-                  <motion.h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
-                    {t("basicField")}
-                  </motion.h3>
-                  <AnimatePresence mode="popLayout">
-                    <Reorder.Group
-                      axis="y"
-                      as="div"
-                      values={basicFields}
-                      onReorder={handleBasicReorder}
-                      className="space-y-3"
-                    >
-                      {basicFields.map((field) => renderBasicField(field))}
-                    </Reorder.Group>
-                  </AnimatePresence>
-                </motion.div>
-
-                <motion.div className="space-y-3">
-                  <motion.h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
-                    {t("customField")}
-                  </motion.h3>
-                  <AnimatePresence mode="popLayout">
-                    <Reorder.Group
-                      axis="y"
-                      as="div"
-                      values={customFields}
-                      onReorder={handleCustomFieldsReorder}
-                      className="space-y-3"
-                    >
-                      {Array.isArray(customFields) &&
-                        customFields.map((field) => (
-                          <CustomField
-                            key={field.id}
-                            field={field}
-                            onUpdate={updateCustomField}
-                            onDelete={deleteCustomField}
-                          />
-                        ))}
-                    </Reorder.Group>
-                  </AnimatePresence>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <Button onClick={addCustomField} className="w-full mt-4">
-                      <PlusCircle className="w-4 h-4 mr-2" />
-                      {t("customFields.addButton")}
-                    </Button>
-                  </motion.div>
-                </motion.div>
-                <motion.div className="space-y-3">
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <motion.h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
-                        {t("githubContributions")}
-                      </motion.h3>
-
-                      <Switch
-                        checked={basic?.githubContributionsVisible}
-                        onCheckedChange={(checked) =>
-                          updateBasicInfo({
-                            ...basic,
-                            githubContributionsVisible: checked,
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className="mt-4">
-                      <div className="flex items-center ml-3 space-x-2">
-                        <div className=" w-[110px]">Access Token</div>
-                        <Input
-                          placeholder="请输入github access token"
-                          className="flex-1"
-                          value={basic?.githubKey}
-                          onChange={(e) =>
-                            updateBasicInfo({
-                              ...basic,
-                              githubKey: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                      <div className="flex items-center ml-3 mt-4 space-x-2">
-                        <div className="w-[110px]">UseName</div>
-                        <Input
-                          className="flex-1"
-                          placeholder="请输入github username"
-                          value={basic?.githubUseName}
-                          onChange={(e) =>
-                            updateBasicInfo({
-                              ...basic,
-                              githubUseName: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
+          <div className="mt-4">
+            <div className="flex items-center ml-3 space-x-2">
+              <div className=" w-[110px]">Access Token</div>
+              <Input
+                placeholder="请输入github access token"
+                className="flex-1"
+                value={basic?.githubKey}
+                onChange={(e) =>
+                  updateBasicInfo({
+                    ...basic,
+                    githubKey: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="flex items-center ml-3 mt-4 space-x-2">
+              <div className="w-[110px]">UseName</div>
+              <Input
+                className="flex-1"
+                placeholder="请输入github username"
+                value={basic?.githubUseName}
+                onChange={(e) =>
+                  updateBasicInfo({
+                    ...basic,
+                    githubUseName: e.target.value,
+                  })
+                }
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </TransitionOpacity>
     </div>
   );
 };

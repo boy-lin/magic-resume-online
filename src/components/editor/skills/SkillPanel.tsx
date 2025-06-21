@@ -11,14 +11,7 @@ const SkillPanel = () => {
   };
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border p-4",
-        "bg-white",
-        "dark:bg-neutral-900/30",
-        "border-gray-100 dark:border-neutral-800"
-      )}
-    >
+    <div className={cn("rounded-lg p-2", "bg-white", "dark:bg-neutral-900/30")}>
       <Field
         value={skillContent}
         onChange={handleChange}

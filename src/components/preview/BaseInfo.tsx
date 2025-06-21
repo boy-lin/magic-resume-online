@@ -10,6 +10,7 @@ import {
 } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import { useResumeStore } from "@/store/useResumeStore";
+import Base64 from "@/components/photo/base64";
 
 interface BaseInfoProps {
   basic: BasicInfo | undefined;
@@ -129,10 +130,13 @@ const BaseInfo = ({
           overflow: "hidden",
         }}
       >
-        <img
-          src={basic.photo}
-          alt={`${basic.name}'s photo`}
-          className="w-full h-full object-cover"
+        <Base64
+          imageAttributes={{
+            src: basic.photo,
+            alt: `${basic.name}'s photo`,
+            className: "w-full h-full object-cover",
+          }}
+          className="w-full h-full"
         />
       </div>
     </motion.div>
@@ -140,7 +144,7 @@ const BaseInfo = ({
 
   // 基础样式
   const baseContainerClass =
-    "hover:cursor-pointer hover:bg-gray-100 rounded-md transition-all duration-300 ease-in-out hover:shadow-md";
+    "hover:cursor-pointer hover:bg-gray-100 rounded-md transition-all ease-in-out hover:shadow-md";
   const baseFieldsClass = "";
   const baseFieldItemClass =
     "flex items-center whitespace-nowrap overflow-hidden text-baseFont";

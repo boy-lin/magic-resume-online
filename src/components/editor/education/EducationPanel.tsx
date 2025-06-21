@@ -10,16 +10,16 @@ import { Education } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
 
 const EducationPanel = () => {
-  const t = useTranslations('workbench.educationPanel');
+  const t = useTranslations("workbench.educationPanel");
   const { activeResume, updateEducation, updateEducationBatch } =
     useResumeStore();
   const { education = [] } = activeResume || {};
   const handleCreateProject = () => {
     const newEducation: Education = {
       id: generateUUID(),
-      school: t('defaultProject.school'),
-      major: t('defaultProject.major'),
-      degree: t('defaultProject.degree'),
+      school: t("defaultProject.school"),
+      major: t("defaultProject.major"),
+      degree: t("defaultProject.degree"),
       startDate: "2015-09-01",
       endDate: "2019-06-30",
       description: "",
@@ -31,7 +31,7 @@ const EducationPanel = () => {
   return (
     <div
       className={cn(
-        "space-y-4 px-4 py-4 rounded-lg",
+        "space-y-4 p-2 rounded-lg",
         "dark:bg-neutral-900/30",
         "bg-white"
       )}
@@ -53,7 +53,7 @@ const EducationPanel = () => {
 
         <Button onClick={handleCreateProject} className="w-full">
           <PlusCircle className="w-4 h-4 mr-2" />
-          {t('addButton')}
+          {t("addButton")}
         </Button>
       </Reorder.Group>
     </div>

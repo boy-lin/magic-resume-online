@@ -71,7 +71,7 @@ const AlignSelector: React.FC<AlignSelectorProps> = ({ value, onChange }) => {
   ];
 
   return (
-    <div className="inline-flex p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+    <div className="inline-flex gap-1 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
       {layouts.map((layout) => (
         <button
           key={layout.value}

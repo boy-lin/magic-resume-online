@@ -1,5 +1,6 @@
 import { DEFAULT_FIELD_ORDER } from ".";
-import { GlobalSettings, DEFAULT_CONFIG, ResumeData } from "../types/resume";
+import { GlobalSettings, DEFAULT_CONFIG } from "../types/resume";
+import { DEFAULT_AVATAR } from "@/constants";
 const initialGlobalSettings: GlobalSettings = {
   baseFontSize: 16,
   pagePadding: 32,
@@ -16,12 +17,12 @@ const initialGlobalSettings: GlobalSettings = {
 export const initialResumeState = {
   title: "新建简历",
   basic: {
-    name: "魔方",
+    name: "ResumeX",
     title: "高级前端工程师",
     employementStatus: "离职",
     email: "zhangsan@example.com",
-    phone: "13800138000",
-    location: "北京市朝阳区",
+    phone: "13333333333",
+    location: "上海",
     birthDate: "1995-01",
     fieldOrder: DEFAULT_FIELD_ORDER,
     icons: {
@@ -40,7 +41,7 @@ export const initialResumeState = {
         icon: "Globe",
       },
     ],
-    photo: "/avatar.png",
+    photo: DEFAULT_AVATAR,
     githubKey: "",
     githubUseName: "",
     githubContributionsVisible: false,
@@ -188,7 +189,7 @@ export const initialResumeStateEn = {
     },
     photoConfig: DEFAULT_CONFIG,
     customFields: [],
-    photo: "/avatar.png",
+    photo: DEFAULT_AVATAR,
     githubKey: "",
     githubUseName: "",
     githubContributionsVisible: false,

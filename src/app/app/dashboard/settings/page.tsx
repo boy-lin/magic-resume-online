@@ -8,14 +8,14 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   getFileHandle,
   getConfig,
   storeFileHandle,
   storeConfig,
-  verifyPermission
+  verifyPermission,
 } from "@/utils/fileSystem";
 
 const SettingsPage = () => {
@@ -26,20 +26,19 @@ const SettingsPage = () => {
 
   useEffect(() => {
     const loadSavedConfig = async () => {
-      try {
-        const handle = await getFileHandle("syncDirectory");
-        const path = await getConfig("syncDirectoryPath");
-
-        if (handle && path) {
-          const hasPermission = await verifyPermission(handle);
-          if (hasPermission) {
-            setDirectoryHandle(handle as FileSystemDirectoryHandle);
-            setFolderPath(path);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading saved config:", error);
-      }
+      // try {
+      //   const handle = await getFileHandle("syncDirectory");
+      //   const path = await getConfig("syncDirectoryPath");
+      //   if (handle && path) {
+      //     const hasPermission = await verifyPermission(handle);
+      //     if (hasPermission) {
+      //       setDirectoryHandle(handle as FileSystemDirectoryHandle);
+      //       setFolderPath(path);
+      //     }
+      //   }
+      // } catch (error) {
+      //   console.error("Error loading saved config:", error);
+      // }
     };
 
     loadSavedConfig();

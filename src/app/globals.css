@@ -280,3 +280,8 @@
   list-style-type: decimal;
   padding: 0 1.2rem;
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0px;
+  height: 0;
+}

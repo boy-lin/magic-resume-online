@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRequest } from "ahooks";
 import { useParams } from "next/navigation";
 
@@ -8,13 +7,18 @@ import { useResumeStore } from "@/store/useResumeStore";
 import SkeletonCard from "@/components/ui-lab/skeleton-card";
 
 import Editor from "./editor";
+import { toast } from "sonner";
 
 export function Workbench() {
   const { getResumeFullById } = useResumeStore();
   const activeResumeId = useResumeStore().activeResumeId;
   const paramId = String(useParams().id);
 
-  const { error, loading } = useRequest(() => getResumeFullById(paramId), {});
+  const { error, loading } = useRequest(() => getResumeFullById(paramId), {
+    onError: (e) => {
+      toast.error(e.message);
+    },
+  });
 
   if (loading || !activeResumeId) {
     return <SkeletonCard />;

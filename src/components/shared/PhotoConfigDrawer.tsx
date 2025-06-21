@@ -13,6 +13,7 @@ import {
   DrawerClose,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,9 +26,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useResumeStore } from "@/store/useResumeStore";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
-
-const DEFAULT_AVATAR = "/avatar.png";
-
+import { DEFAULT_AVATAR } from "@/constants";
+console.log("DEFAULT_AVATAR", DEFAULT_AVATAR);
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -287,255 +287,263 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     onPhotoChange(previewUrl, config);
     onClose();
   };
-  return (
-    <Drawer
-      direction={isMobile ? "bottom" : "left"}
-      modal={false}
-      open={isOpen}
-      dismissible={false}
-      onOpenChange={(open) => !open && onClose()}
-    >
-      <DrawerContent
-        ref={drawerContentRef}
+
+  const renderContent = () => (
+    <div className="mx-auto overflow-y-auto">
+      <DrawerHeader>
+        <DrawerTitle className="text-center">{t("title")}</DrawerTitle>
+        <DrawerDescription></DrawerDescription>
+      </DrawerHeader>
+      <div
         className={cn(
-          "dark:bg-neutral-900 dark:text-white bg-white",
-          "md:fixed md:border-none md:flex md:bottom-0 md:left-0 md:right-0 md:h-[93%] md:max-w-[360px] md:mx-[-1px] md:z-10 md:outline-none shadow shadow-blue-500/40"
+          "relative overflow-hidden border-2 transition-all mx-auto",
+          isDragging ? "border-blue-500 border-solid" : "border-dashed",
+          "dark:border-neutral-700 dark:hover:border-neutral-600 border-neutral-300 hover:border-neutral-400"
         )}
+        style={{
+          width: `${config.width}px`,
+          height: `${config.height}px`,
+          borderRadius: getBorderRadiusValue(config),
+          maxWidth: "100%",
+        }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
-        <div className="mx-auto w-full max-w-md overflow-y-auto">
-          <DrawerHeader>
-            <DrawerTitle className="text-center">{t("title")}</DrawerTitle>
-            <DrawerDescription></DrawerDescription>
-          </DrawerHeader>
-          <div
-            className={cn(
-              "relative overflow-hidden border-2 transition-all mx-auto",
-              isDragging ? "border-blue-500 border-solid" : "border-dashed",
-              "dark:border-neutral-700 dark:hover:border-neutral-600 border-neutral-300 hover:border-neutral-400"
-            )}
-            style={{
-              width: `${config.width}px`,
-              height: `${config.height}px`,
-              borderRadius: getBorderRadiusValue(config),
-              maxWidth: "100%",
-            }}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+        {uploadLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-50">
+            <Loader2 className="w-4 h-4 animate-spin" />
+          </div>
+        )}
+        {previewUrl && previewUrl !== "" ? (
+          <div className="relative h-full group">
+            <img
+              src={previewUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+            <div
+              className={cn(
+                "absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity",
+                "group-hover:opacity-100"
+              )}
+            >
+              <Button
+                onClick={handleRemovePhoto}
+                className="p-1.5 rounded-full bg-white/10 hover:bg-white/20"
+              >
+                <X className="w-4 h-4 text-white" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            onClick={() => inputRef.current?.click()}
+            variant="ghost"
+            className="w-full h-full flex flex-col items-center justify-center p-0"
           >
-            {uploadLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-opacity-50">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-            )}
-            {previewUrl && previewUrl !== "" ? (
-              <div className="relative h-full group">
-                <img
-                  src={previewUrl}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
+            <Upload
+              className={cn(
+                "w-6 h-6 mb-2",
+                "dark:text-neutral-400 text-neutral-500"
+              )}
+            />
+          </Button>
+        )}
+        <motion.input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </div>
+      <div className="p-6 space-y-6">
+        <span className="text-sm">{t("upload.dragHint")}</span>
+        <span className="ml-2 text-xs text-neutral-500 mt-1">
+          ({t("upload.sizeLimit")})
+        </span>
+      </div>
+      <div className="p-6 space-y-6">
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium">{t("upload.title")}</h3>
+          <Textarea
+            disabled={uploadLoading}
+            value={imageUrl}
+            onChange={(e) => handleUrlChange(e.target.value)}
+            placeholder={t("upload.urlPlaceholder")}
+            className={cn("h-9", "dark:bg-neutral-800 dark:border-neutral-700")}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">{t("config.size")}</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative">
+                <Input
+                  value={config.width}
+                  onChange={(e) => handleInputChange(e, "width")}
+                  onBlur={(e) => handleInputBlur(e, "width")}
+                  className={cn(
+                    "h-9 pr-7",
+                    "dark:bg-neutral-800 dark:border-neutral-700"
+                  )}
+                  min={24}
+                  max={200}
+                  placeholder={t("config.widthPlaceholder")}
                 />
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity",
-                    "group-hover:opacity-100"
-                  )}
-                >
-                  <Button
-                    onClick={handleRemovePhoto}
-                    className="p-1.5 rounded-full bg-white/10 hover:bg-white/20"
-                  >
-                    <X className="w-4 h-4 text-white" />
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Button
-                onClick={() => inputRef.current?.click()}
-                variant="ghost"
-                className="w-full h-full flex flex-col items-center justify-center p-0"
-              >
-                <Upload
-                  className={cn(
-                    "w-6 h-6 mb-2",
+                    "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
                     "dark:text-neutral-400 text-neutral-500"
                   )}
-                />
-              </Button>
-            )}
-            <motion.input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
-          <div className="p-6 space-y-6">
-            <span className="text-sm">{t("upload.dragHint")}</span>
-            <span className="ml-2 text-xs text-neutral-500 mt-1">
-              ({t("upload.sizeLimit")})
-            </span>
-          </div>
-          <div className="p-6 space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">{t("upload.title")}</h3>
-              <Textarea
-                disabled={uploadLoading}
-                value={imageUrl}
-                onChange={(e) => handleUrlChange(e.target.value)}
-                placeholder={t("upload.urlPlaceholder")}
-                className={cn(
-                  "h-9",
-                  "dark:bg-neutral-800 dark:border-neutral-700"
-                )}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium">{t("config.size")}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="relative">
-                    <Input
-                      value={config.width}
-                      onChange={(e) => handleInputChange(e, "width")}
-                      onBlur={(e) => handleInputBlur(e, "width")}
-                      className={cn(
-                        "h-9 pr-7",
-                        "dark:bg-neutral-800 dark:border-neutral-700"
-                      )}
-                      min={24}
-                      max={200}
-                      placeholder={t("config.widthPlaceholder")}
-                    />
-                    <div
-                      className={cn(
-                        "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
-                        "dark:text-neutral-400 text-neutral-500"
-                      )}
-                    >
-                      W
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      value={config.height}
-                      onChange={(e) => handleInputChange(e, "height")}
-                      onBlur={(e) => handleInputBlur(e, "height")}
-                      className={cn(
-                        "h-9 pr-7",
-                        "dark:bg-neutral-800 dark:border-neutral-700"
-                      )}
-                      min={24}
-                      max={200}
-                      placeholder={t("config.heightPlaceholder")}
-                    />
-                    <div
-                      className={cn(
-                        "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
-                        "dark:text-neutral-400 text-neutral-500"
-                      )}
-                    >
-                      H
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium">
-                  {t("config.aspectRatio")}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {(["1:1", "4:3", "3:4", "16:9", "custom"] as const).map(
-                    (ratio) => (
-                      <Button
-                        key={ratio}
-                        size="sm"
-                        variant={
-                          config.aspectRatio === ratio ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          if (ratio !== "custom") {
-                            const height = Math.round(
-                              config.width * getRatioMultiplier(ratio)
-                            );
-                            handleConfigChange({ aspectRatio: ratio, height });
-                          } else {
-                            handleConfigChange({ aspectRatio: ratio });
-                          }
-                        }}
-                      >
-                        {ratio === "custom" ? t("config.ratios.custom") : ratio}
-                      </Button>
-                    )
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium">
-                  {t("config.border-radius")}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {(["none", "medium", "full", "custom"] as const).map(
-                    (radius) => (
-                      <Button
-                        key={radius}
-                        size="sm"
-                        variant={
-                          config.borderRadius === radius ? "default" : "outline"
-                        }
-                        onClick={() =>
-                          handleConfigChange({ borderRadius: radius })
-                        }
-                      >
-                        {radius === "none"
-                          ? t("config.borderRadius.none")
-                          : radius === "medium"
-                          ? t("config.borderRadius.medium")
-                          : radius === "full"
-                          ? t("config.borderRadius.full")
-                          : t("config.borderRadius.custom")}
-                      </Button>
-                    )
-                  )}
-                  {config.borderRadius === "custom" && (
-                    <Input
-                      type="number"
-                      value={config.customBorderRadius}
-                      onChange={(e) =>
-                        handleInputChange(e, "customBorderRadius")
-                      }
-                      onBlur={(e) => handleInputBlur(e, "customBorderRadius")}
-                      className={cn("h-9 mt-2", "dark:bg-neutral-800")}
-                      min={0}
-                      max={Math.min(config.width, config.height) / 2}
-                      placeholder={t("config.borderRadius.customPlaceholder")}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <DrawerFooter>
-            <div className="flex gap-2">
-              <DrawerClose asChild>
-                <Button
-                  className="w-full"
-                  onClick={handleSave}
-                  variant="destructive"
                 >
-                  {t("actions.close")}
-                </Button>
-              </DrawerClose>
+                  W
+                </div>
+              </div>
+              <div className="relative">
+                <Input
+                  value={config.height}
+                  onChange={(e) => handleInputChange(e, "height")}
+                  onBlur={(e) => handleInputBlur(e, "height")}
+                  className={cn(
+                    "h-9 pr-7",
+                    "dark:bg-neutral-800 dark:border-neutral-700"
+                  )}
+                  min={24}
+                  max={200}
+                  placeholder={t("config.heightPlaceholder")}
+                />
+                <div
+                  className={cn(
+                    "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
+                    "dark:text-neutral-400 text-neutral-500"
+                  )}
+                >
+                  H
+                </div>
+              </div>
             </div>
-          </DrawerFooter>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">{t("config.aspectRatio")}</h3>
+            <div className="flex flex-wrap gap-2">
+              {(["1:1", "4:3", "3:4", "16:9", "custom"] as const).map(
+                (ratio) => (
+                  <Button
+                    key={ratio}
+                    size="sm"
+                    variant={
+                      config.aspectRatio === ratio ? "default" : "outline"
+                    }
+                    onClick={() => {
+                      if (ratio !== "custom") {
+                        const height = Math.round(
+                          config.width * getRatioMultiplier(ratio)
+                        );
+                        handleConfigChange({ aspectRatio: ratio, height });
+                      } else {
+                        handleConfigChange({ aspectRatio: ratio });
+                      }
+                    }}
+                  >
+                    {ratio === "custom" ? t("config.ratios.custom") : ratio}
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">{t("config.border-radius")}</h3>
+            <div className="flex flex-wrap gap-2">
+              {(["none", "medium", "full", "custom"] as const).map((radius) => (
+                <Button
+                  key={radius}
+                  size="sm"
+                  variant={
+                    config.borderRadius === radius ? "default" : "outline"
+                  }
+                  onClick={() => handleConfigChange({ borderRadius: radius })}
+                >
+                  {radius === "none"
+                    ? t("config.borderRadius.none")
+                    : radius === "medium"
+                    ? t("config.borderRadius.medium")
+                    : radius === "full"
+                    ? t("config.borderRadius.full")
+                    : t("config.borderRadius.custom")}
+                </Button>
+              ))}
+              {config.borderRadius === "custom" && (
+                <Input
+                  type="number"
+                  value={config.customBorderRadius}
+                  onChange={(e) => handleInputChange(e, "customBorderRadius")}
+                  onBlur={(e) => handleInputBlur(e, "customBorderRadius")}
+                  className={cn("h-9 mt-2", "dark:bg-neutral-800")}
+                  min={0}
+                  max={Math.min(config.width, config.height) / 2}
+                  placeholder={t("config.borderRadius.customPlaceholder")}
+                />
+              )}
+            </div>
+          </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+
+      <DrawerFooter>
+        <div className="flex gap-2">
+          <DrawerClose asChild>
+            <Button
+              className="w-full"
+              onClick={handleSave}
+              variant="destructive"
+            >
+              {t("actions.close")}
+            </Button>
+          </DrawerClose>
+        </div>
+      </DrawerFooter>
+    </div>
+  );
+
+  if (isMobile)
+    return (
+      <Drawer
+        direction="bottom"
+        modal={false}
+        open={isOpen}
+        dismissible={false}
+        onOpenChange={(open) => !open && onClose()}
+      >
+        <DrawerContent
+          ref={drawerContentRef}
+          className={cn(
+            "w-auto",
+            "dark:bg-neutral-900 dark:text-white",
+            "md:border-none md:flex md:bottom-0 md:h-[93%] md:mx-[-1px] md:z-10 md:outline-none shadow shadow-blue-500/40"
+          )}
+        >
+          {renderContent()}
+        </DrawerContent>
+      </Drawer>
+    );
+  return (
+    <Dialog
+      modal={true}
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+    >
+      <DialogContent
+        ref={drawerContentRef}
+        className={cn("dark:bg-neutral-900 dark:text-white")}
+      >
+        {renderContent()}
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Image as ImageIcon } from "lucide-react";
-
 import { Button } from "@/components/ui-lab/button";
 
 export default function ImageBtn({ activeResume }) {
@@ -20,7 +19,9 @@ export default function ImageBtn({ activeResume }) {
       const domToImage = await import(
         /* webpackChunkName: "dom-to-image" */ "dom-to-image"
       );
-      const blob = await domToImage.toBlob(previewDom);
+      const blob = await domToImage.toBlob(previewDom, {
+        backgroundColor: "transparent",
+      });
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

@@ -152,14 +152,17 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
           <ShareBtn />
           <Button
             variant="outline"
-            className="py-2 text-foreground"
+            className="py-2 text-foreground relative"
             onClick={asyncResume}
             loading={loading}
           >
             <RefreshCcwDot role="icon" />
             {t("btn.sync")}
             {isNeedSync ? (
-              <i className="w-2 h-2 rounded-full bg-rose-800 animate-pulse"></i>
+              <span className="absolute flex size-3 top-[2px] right-[2px]">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-800 opacity-75"></span>
+                <span className="relative inline-flex size-3 rounded-full bg-rose-800"></span>
+              </span>
             ) : null}
           </Button>
           <ThemeToggle></ThemeToggle>

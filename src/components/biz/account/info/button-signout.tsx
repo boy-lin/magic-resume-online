@@ -1,43 +1,52 @@
 "use client";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui-lab/button";
 import { useRouter, usePathname } from "next/navigation";
 import { handleRequest } from "@/utils/auth-helpers/client";
 import { SignOut } from "@/utils/auth-helpers/server";
-import {
-  setLocalStorageByName,
-  getLocalStorageByName,
-  clearLocalStorage,
-} from "@/utils/storage";
+import { clearLocalStorage } from "@/utils/storage";
+import { LogOutIcon } from "lucide-react";
+import { useRequest } from "ahooks";
+import { toast } from "sonner";
 
-const ButtonSignout = ({ className, variant }) => {
+const ButtonSignout = ({ className }) => {
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { loading, runAsync } = useRequest(
+    (e, router) => {
+      return handleRequest(e, SignOut, router);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        clearLocalStorage();
+      },
+      onError: (e) => {
+        toast.error(e.message);
+      },
+    }
+  );
 
   return (
     <form
-      className="w-full px-2 py-1.5"
+      className="w-full"
       onSubmit={async (e) => {
-        try {
-          setLoading(true);
-          await handleRequest(e, SignOut, router);
-          clearLocalStorage();
-        } finally {
-          setLoading(false);
-        }
+        e.preventDefault();
+        e.stopPropagation();
+        await runAsync(e, router);
       }}
     >
       <input type="hidden" name="pathName" value={pathname} />
       <Button
         type="submit"
         className={cn(className, "w-full")}
-        variant={variant}
+        variant="destructive"
         loading={loading}
+        onClick={(e) => e.stopPropagation()}
       >
+        <LogOutIcon className="w-4 h-4" role="icon" />
         退出登录
       </Button>
     </form>
