@@ -70,55 +70,17 @@ interface ResumeStore {
   updateGlobalSettings: (settings: Partial<GlobalSettings>) => void;
   setThemeColor: (color: string) => void;
   setTemplate: (templateId: string, isNeedSync?: boolean) => void;
-  getResumeList: () => Promise<any>;
+  getResumeList: ({
+    current,
+    pageSize,
+  }: {
+    current: number;
+    pageSize: number;
+  }) => Promise<any>;
   getResumeFullById: (id: string) => Promise<any>;
   getViewScale: () => [number];
   setResumeView: Function;
 }
-
-// 同步简历到文件系统
-const syncResumeToFile = async (
-  resumeData: ResumeData,
-  prevResume?: ResumeData
-) => {
-  try {
-    const handle = await getFileHandle("syncDirectory");
-    if (!handle) {
-      console.warn("No directory handle found");
-      return;
-    }
-
-    const hasPermission = await verifyPermission(handle);
-    if (!hasPermission) {
-      console.warn("No permission to write to directory");
-      return;
-    }
-
-    const dirHandle = handle as FileSystemDirectoryHandle;
-
-    if (
-      prevResume &&
-      prevResume.id === resumeData.id &&
-      prevResume.title !== resumeData.title
-    ) {
-      try {
-        await dirHandle.removeEntry(`${prevResume.title}.json`);
-      } catch (error) {
-        console.warn("Error deleting old file:", error);
-      }
-    }
-
-    const fileName = `${resumeData.title}.json`;
-    const fileHandle = await dirHandle.getFileHandle(fileName, {
-      create: true,
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(JSON.stringify(resumeData, null, 2));
-    await writable.close();
-  } catch (error) {
-    console.error("Error syncing resume to file:", error);
-  }
-};
 
 export const useResumeStore = create(
   persist<ResumeStore>(
@@ -167,7 +129,6 @@ export const useResumeStore = create(
           activeResumeId: id,
           activeResume: newResume,
         }));
-        // syncResumeToFile(newResume);
         return id;
       },
 
@@ -182,7 +143,6 @@ export const useResumeStore = create(
           isNeedSync,
         };
 
-        syncResumeToFile(updatedResume, resume);
         set((state) => {
           return {
             resumes: {
@@ -300,8 +260,6 @@ export const useResumeStore = create(
             },
             activeResume: updatedResume,
           };
-
-          // syncResumeToFile(updatedResume, state.activeResume);
 
           return newState;
         });
@@ -659,8 +617,8 @@ export const useResumeStore = create(
           activeResume: updatedResume,
         });
       },
-      getResumeList: async () => {
-        const { data } = await getResumesByUserId(createClient());
+      getResumeList: async (page) => {
+        const { data } = await getResumesByUserId(createClient(), page);
         const resumesMap = {};
         data.forEach((it) => {
           resumesMap[it.id] = {

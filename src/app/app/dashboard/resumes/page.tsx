@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Plus, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRequest } from "ahooks";
+import { usePagination, useRequest } from "ahooks";
 import {
   Card,
   CardContent,
@@ -22,17 +22,18 @@ import { TransitionB2TScale } from "@/components/transition/b2t-scale";
 import { TransitionSpringScale } from "@/components/transition/spring-scale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import PaginationLab from "@/components/ui-lab/pagination";
 
 const ResumeWorkbench = () => {
   const t = useTranslations();
   const router = useRouter();
-  const { deleteResume } = useResumeStore();
+  const { deleteResume, getResumeList } = useResumeStore();
   const resumes = useResumeStore().resumes;
-  const getResumeList = useResumeStore().getResumeList;
 
-  const { error, loading } = useRequest(getResumeList, {
-    onError: (error) => {
-      toast.error(error.message);
+  const { error, loading, pagination, mutate } = usePagination(getResumeList, {
+    defaultPageSize: 10,
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 
@@ -40,6 +41,7 @@ const ResumeWorkbench = () => {
     // 选择模板
     router.push("/app/dashboard/templates");
   };
+  const resumeList = Object.entries(resumes);
 
   return (
     <TransitionOpacity className="flex-1 space-y-6">
@@ -67,7 +69,7 @@ const ResumeWorkbench = () => {
 
       <TransitionBottomToTop className="flex-1 w-full p-3 sm:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -96,80 +98,92 @@ const ResumeWorkbench = () => {
                 </CardDescription>
               </CardContent>
             </Card>
-          </motion.div>
-
+          </motion.div> */}
           <AnimatePresence>
-            {loading
-              ? new Array(3)
-                  .fill(1)
-                  .map((v, i) => (
-                    <Skeleton key={i} className="rounded-lg h-[260px]" />
-                  ))
-              : Object.entries(resumes).map(([id, resume], index) => (
-                  <TransitionB2TScale key={id} index={index}>
-                    <Card
-                      className={cn(
-                        "group border transition-all duration-200 h-[260px] flex flex-col",
-                        "hover:border-gray-400 hover:bg-gray-50",
-                        "dark:hover:border-primary dark:hover:bg-primary/10"
-                      )}
-                    >
-                      <CardContent className="relative flex-1 pt-6 text-center flex flex-col items-center">
-                        <motion.div
-                          className="mb-4 p-4 rounded-full bg-gray-100 dark:bg-primary/10"
-                          whileHover={{ rotate: 90 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <FileText className="h-8 w-8 text-gray-600 dark:text-primary" />
-                        </motion.div>
-                        <CardTitle className="text-xl line-clamp-1 text-gray-900 dark:text-gray-100">
-                          {resume.title || "未命名简历"}
-                        </CardTitle>
-                        <CardDescription className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                          {t("dashboard.resumes.created")}
-                          <span className="ml-2">
-                            {new Date(resume.createdAt).toLocaleDateString()}
-                            {/* {dayjs(resume.createdAt, "MM-DD-YYYY")} */}
-                          </span>
-                        </CardDescription>
-                      </CardContent>
-                      <CardFooter className="pt-0 pb-4 px-4">
-                        <div className="grid grid-cols-2 gap-2 w-full">
-                          <TransitionSpringScale>
-                            <Button
-                              variant="outline"
-                              className="w-full text-sm hover:bg-gray-100 dark:border-primary/50 dark:hover:bg-primary/10"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                startTransition(() => {
-                                  router.push(`/app/workbench/${id}`);
-                                });
-                              }}
-                            >
-                              {t("common.edit")}
-                            </Button>
-                          </TransitionSpringScale>
-                          <TransitionSpringScale>
-                            <Button
-                              variant="outline"
-                              className="w-full text-sm text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-500 dark:hover:bg-red-950/50 dark:hover:text-red-400"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteResume(resume);
-                              }}
-                            >
-                              {t("common.delete")}
-                            </Button>
-                          </TransitionSpringScale>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  </TransitionB2TScale>
-                ))}
+            {loading ? (
+              new Array(3)
+                .fill(1)
+                .map((v, i) => (
+                  <Skeleton key={i} className="rounded-lg h-[260px]" />
+                ))
+            ) : resumeList.length > 0 ? (
+              resumeList.map(([id, resume], index) => (
+                <TransitionB2TScale key={id} index={index}>
+                  <Card
+                    className={cn(
+                      "group border transition-all duration-200 h-[260px] flex flex-col",
+                      "hover:border-gray-400 hover:bg-gray-50",
+                      "dark:hover:border-primary dark:hover:bg-primary/10"
+                    )}
+                  >
+                    <CardContent className="relative flex-1 pt-6 text-center flex flex-col items-center">
+                      <motion.div
+                        className="mb-4 p-4 rounded-full bg-gray-100 dark:bg-primary/10"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <FileText className="h-8 w-8 text-gray-600 dark:text-primary" />
+                      </motion.div>
+                      <CardTitle className="text-xl line-clamp-1 text-gray-900 dark:text-gray-100">
+                        {resume.title || "未命名简历"}
+                      </CardTitle>
+                      <CardDescription className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        {t("dashboard.resumes.created")}
+                        <span className="ml-2">
+                          {new Date(resume.createdAt).toLocaleDateString()}
+                          {/* {dayjs(resume.createdAt, "MM-DD-YYYY")} */}
+                        </span>
+                      </CardDescription>
+                    </CardContent>
+                    <CardFooter className="pt-0 pb-4 px-4">
+                      <div className="grid grid-cols-2 gap-2 w-full">
+                        <TransitionSpringScale>
+                          <Button
+                            variant="outline"
+                            className="w-full text-sm hover:bg-gray-100 dark:border-primary/50 dark:hover:bg-primary/10"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startTransition(() => {
+                                router.push(`/app/workbench/${id}`);
+                              });
+                            }}
+                          >
+                            {t("common.edit")}
+                          </Button>
+                        </TransitionSpringScale>
+                        <TransitionSpringScale>
+                          <Button
+                            variant="outline"
+                            className="w-full text-sm text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-500 dark:hover:bg-red-950/50 dark:hover:text-red-400"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteResume(resume);
+                            }}
+                          >
+                            {t("common.delete")}
+                          </Button>
+                        </TransitionSpringScale>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </TransitionB2TScale>
+              ))
+            ) : (
+              <Card className="border h-[260px] flex items-center justify-center">
+                <CardContent className="text-center">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {t("dashboard.resumes.noResumes")}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </AnimatePresence>
         </div>
+      </TransitionBottomToTop>
+      <TransitionBottomToTop>
+        <PaginationLab {...pagination} />
       </TransitionBottomToTop>
     </TransitionOpacity>
   );

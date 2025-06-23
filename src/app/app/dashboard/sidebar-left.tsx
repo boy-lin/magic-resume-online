@@ -45,11 +45,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       url: "/app/dashboard/templates",
       icon: SwatchBook,
     },
-    {
-      title: t("sidebar.settings"),
-      url: "/app/dashboard/settings",
-      icon: Settings,
-    },
+    // {
+    //   title: t("sidebar.settings"),
+    //   url: "/app/dashboard/settings",
+    //   icon: Settings,
+    // },
     {
       title: t("sidebar.ai"),
       url: "/app/dashboard/ai",

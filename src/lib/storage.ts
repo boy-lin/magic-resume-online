@@ -25,7 +25,13 @@ export class Storage {
     const endpoint = config?.endpoint || process.env.STORAGE_ENDPOINT;
 
     if (!accessKeyId || !secretAccessKey || !endpoint) {
-      throw new Error("Storage configuration is missing");
+      const msg = `Storage configuration is missing: ${JSON.stringify({
+        accessKeyId,
+        secretAccessKey,
+        endpoint,
+      })}`;
+      console.error(msg);
+      throw new Error(msg);
     }
 
     this.s3 = new S3Client({
@@ -87,8 +93,8 @@ export class Storage {
       bucket: res.Bucket,
       key: res.Key,
       filename: res.Key?.split("/").pop(),
-      url: process.env.STORAGE_DOMAIN
-        ? `${process.env.STORAGE_DOMAIN}/${res.Key}`
+      url: process.env.NEXT_PUBLIC_STORAGE_DOMAIN
+        ? `${process.env.NEXT_PUBLIC_STORAGE_DOMAIN}/${res.Key}`
         : res.Location,
     };
   }

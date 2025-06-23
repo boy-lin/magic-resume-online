@@ -12,6 +12,8 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[70vh] flex items-center justify-center pt-16 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-blue-500/5 to-purple-500/5 rounded-2xl blur-xl" />
+
       <ScrollBackground />
       <div className="m-auto max-w-[1200px] px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -58,15 +60,12 @@ export default function HeroSection() {
 
           <AnimatedFeature delay={0.2}>
             <div className="relative h-[300px] lg:h-[400px] flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-blue-500/5 to-purple-500/5 rounded-2xl blur-xl" />
-              <div className="relative w-full h-full overflow-hidden">
-                <Image
+              <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
+                <img
                   src="/features/screenshot.gif"
                   alt="Resume Editor"
-                  fill
                   className="object-contain object-center -translate-x-[2px]"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
+                  sizes="(max-width: 768px)"
                   style={{ borderRadius: "1rem" }}
                 />
               </div>

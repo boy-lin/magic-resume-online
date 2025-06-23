@@ -170,7 +170,7 @@ export default function Editor() {
       setEditPanelCollapsed(!editPanelCollapsed);
     }
     if (editPanelCollapsed) {
-      // setEditPanelShow(false);
+      setEditPanelShow(false);
     } else {
       setEditPanelShow(true);
     }
