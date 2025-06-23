@@ -280,7 +280,7 @@ export default function FeaturesSection() {
                       src={features[0].items[activeFeatures[0]].image}
                       alt={t(features[0].items[activeFeatures[0]].title)}
                       fill
-                      className="object-contain z-1 transition-transform duration-300 ease-in-out"
+                      className="object-cover z-1 transition-transform duration-300 ease-in-out"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
@@ -380,7 +380,7 @@ export default function FeaturesSection() {
                       src={features[1].items[activeFeatures[1]].image}
                       alt={t(features[1].items[activeFeatures[1]].title)}
                       fill
-                      className="object-contain z-1 transition-transform duration-300 ease-in-out"
+                      className="object-cover z-1 transition-transform duration-300 ease-in-out"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>

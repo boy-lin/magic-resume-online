@@ -8,6 +8,7 @@ import SkeletonCard from "@/components/ui-lab/skeleton-card";
 
 import Editor from "./editor";
 import { toast } from "sonner";
+import ShowError from "@/components/error/show";
 
 export function Workbench() {
   const { getResumeFullById } = useResumeStore();
@@ -19,6 +20,8 @@ export function Workbench() {
       toast.error(e.message);
     },
   });
+
+  if (error) return <ShowError error={error} />;
 
   if (loading || !activeResumeId) {
     return <SkeletonCard />;

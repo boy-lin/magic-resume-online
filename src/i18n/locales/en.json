@@ -14,15 +14,22 @@
       "progress": "Under development"
     },
     "btn": {
-      "next": "Next Step",
       "signI": "Sign in",
       "signU": "Sign up",
       "submit": "Submit",
       "share": "Share",
-      "sync": "Sync"
+      "sync": "Sync",
+      "next": "Next",
+      "prev": "Previous"
     },
     "menu": {
       "product": "Products"
+    },
+    "pagination": {
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of"
     }
   },
   "home": {
@@ -126,7 +133,8 @@
         "title": "Attention",
         "description": "It is recommended to configure a resume backup folder in the settings to prevent your data from being lost when the browser cache is cleared",
         "goToSettings": "Go to Settings"
-      }
+      },
+      "noResumes": "No resumes found"
     },
     "settings": {
       "title": "Settings",

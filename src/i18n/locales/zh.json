@@ -14,15 +14,22 @@
       "progress": "开发中"
     },
     "btn": {
-      "next": "下一步",
       "signI": "登录",
       "signU": "注册",
       "submit": "提交",
       "share": "分享",
-      "sync": "同步"
+      "sync": "同步",
+      "next": "下一步",
+      "prev": "上一步"
     },
     "menu": {
       "product": "产品"
+    },
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "页",
+      "of": "共"
     }
   },
   "home": {
@@ -56,14 +63,13 @@
         "item2_description": "自动检测并修正语法和拼写错误"
       },
       "storage": {
-        "badge": "在线分享",
-        "title": "公开简历",
-        "description": "方便你在各种平台分享给HR等招聘方人员查看，对方可以在线导出需要的文件，支持加密",
-        "item1": "在线查看",
+        "badge": "加密查看",
+        "title": "分享简历",
+        "description": "方便你在各种平台分享给HR等招聘方人员查看，对方可以在线导出需要的文件，支持加密查看",
+        "item1": "网页查看",
         "item1_description": "你可以通过网页在多个设备上同步管理简历，避免导出拷贝备份的麻烦",
         "item2": "多种导出格式",
-        "item2_description": "支持PDF和JSON格式导出",
-        "item3": "支持数据导出备份"
+        "item2_description": "支持PDF、图片、JSON格式导出，或者直接打印"
       },
       "preview": {
         "badge": "实时预览",
@@ -127,7 +133,8 @@
         "title": "注意",
         "description": "建议在设置里中配置简历备份文件夹，防止您的数据可能会在浏览器清除缓存后丢失",
         "goToSettings": "前往设置"
-      }
+      },
+      "noResumes": "未找到简历"
     },
     "settings": {
       "title": "设置",

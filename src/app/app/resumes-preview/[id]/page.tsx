@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ShowError from "@/components/error/show";
 
 interface PreviewPanelProps {}
 
@@ -41,22 +42,15 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   const [activeResume, setActiveResume] = useState(null);
   const [password, setPassword] = useState("");
 
-  const { loading } = useRequest(
-    async () => {
-      const data = await getResumeById(createClient(), params.id);
-      const newResume = {
-        activeSection: "basic",
-        draggingProjectId: null,
-        ...data,
-      };
-      setActiveResume(newResume);
-    },
-    {
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    }
-  );
+  const { loading, error } = useRequest(async () => {
+    const data = await getResumeById(createClient(), params.id);
+    const newResume = {
+      activeSection: "basic",
+      draggingProjectId: null,
+      ...data,
+    };
+    setActiveResume(newResume);
+  });
 
   const template = useMemo(() => {
     return (
@@ -160,6 +154,8 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   }
 
   if (loading || !activeResume) return <SkeletonCard />;
+
+  if (error) return <ShowError error={error} />;
 
   if (!activeResume || !activeResume.isPublic) {
     return (

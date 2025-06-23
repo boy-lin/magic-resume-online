@@ -54,13 +54,17 @@ export const updateUserInfoById = async (
     .eq("id", id);
 };
 
-export const getResumesByUserId = cache(async (supabase: SupabaseClient) => {
-  const user = await getUser(supabase);
-  return supabase
-    .from("resumes")
-    .select("id, title, created_at, template_id")
-    .eq("user_id", user.id);
-});
+export const getResumesByUserId = cache(
+  async (supabase: SupabaseClient, { current, pageSize }) => {
+    const user = await getUser(supabase);
+    return supabase
+      .from("resumes")
+      .select("id, title, created_at, template_id", { count: "exact" })
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .range((current - 1) * pageSize, current * pageSize - 1);
+  }
+);
 
 export const upsertResumeById = async (supabase: SupabaseClient, val) => {
   const user = await getUser(supabase);
@@ -88,12 +92,11 @@ export const deleteResumeById = async (supabase: SupabaseClient, id) => {
 export const getResumeById = cache(async (supabase: SupabaseClient, id) => {
   const { data: val, error } = await supabase
     .from("resumes")
-    .select("*")
+    .select("*", {})
     .eq("id", id)
-    .limit(1)
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 
   return {
     id: val.id,

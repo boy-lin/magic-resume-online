@@ -26,7 +26,6 @@ const itemAnimations = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
-  transition: { type: "spring", stiffness: 500, damping: 50, mass: 1 },
 };
 
 const CustomField: React.FC<CustomFieldProps> = ({
@@ -41,14 +40,13 @@ const CustomField: React.FC<CustomFieldProps> = ({
       value={field}
       id={field.id}
       className="group touch-none list-none"
+      {...itemAnimations}
     >
-      <motion.div
-        {...itemAnimations}
+      <div
         className={cn(
           "grid grid-cols-[auto,auto,1fr,1fr,auto] gap-3 items-center p-3",
           "bg-white dark:bg-neutral-800 rounded-xl",
           "border border-neutral-100 dark:border-neutral-700",
-          "transition-all duration-200",
           "hover:border-neutral-200 dark:hover:border-neutral-600",
           !field.visible && "!opacity-60"
         )}
@@ -133,7 +131,7 @@ const CustomField: React.FC<CustomFieldProps> = ({
             <Trash2 className="w-4 h-4 text-red-400" />
           </Button>
         </div>
-      </motion.div>
+      </div>
     </Reorder.Item>
   );
 };
@@ -248,14 +246,13 @@ const BasicPanel: React.FC = () => {
         key={field.id}
         className="group touch-none list-none"
         dragListener={field.key !== "name" && field.key !== "title"}
+        {...itemAnimations}
       >
-        <motion.div
-          {...itemAnimations}
+        <div
           className={cn(
             "flex items-center gap-2 p-2",
             "bg-white dark:bg-neutral-900",
             "rounded-lg ",
-            "transition-all duration-200",
             !field.visible && "opacity-75"
           )}
         >
@@ -339,7 +336,7 @@ const BasicPanel: React.FC = () => {
               </Button>
             )}
           </div>
-        </motion.div>
+        </div>
       </Reorder.Item>
     );
   };
