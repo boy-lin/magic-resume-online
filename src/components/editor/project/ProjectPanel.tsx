@@ -37,13 +37,13 @@ const ProjectPanel = () => {
     >
       <Reorder.Group
         axis="y"
-        values={projects}
+        values={Array.isArray(projects) ? projects : []}
         onReorder={(newOrder) => {
           updateProjectsBatch(newOrder);
         }}
         className="space-y-3"
       >
-        {projects.map((project) => (
+        {(Array.isArray(projects) ? projects : []).map((project) => (
           <ProjectItem
             key={project.id}
             project={project}

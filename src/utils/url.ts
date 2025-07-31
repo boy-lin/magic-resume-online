@@ -6,16 +6,16 @@ const ARGS_REG = /(\?.*(?:$))/;
 export const jsonToUrlParams = (data, encodeValue?: boolean) => {
   if (!data) return "";
 
-  const params: string[] =[]
+  const params: string[] = [];
   Object.keys(data).map((k) => {
     if (!data[k]) return "";
-    let value = data[k]
+    let value = data[k];
     if (typeof value === "object") {
       value = JSON.stringify(value);
     }
     if (encodeValue === true) {
-      params.push(`${k}=${encodeURIComponent(value)}`)
-      return ;
+      params.push(`${k}=${encodeURIComponent(value)}`);
+      return;
     }
     params.push(`${k}=${value}`);
   });
@@ -55,3 +55,10 @@ export function getQueryObject(url?: string) {
   return obj;
 }
 
+/**
+ * 通过url解析图片文件格式
+ */
+export function getImageFormat(url: string): string | null {
+  const match = url.match(/\.([a-zA-Z0-9]+)(\?.*)?$/);
+  return match ? match[1] : null;
+}

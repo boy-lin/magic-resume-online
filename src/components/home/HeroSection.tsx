@@ -32,7 +32,7 @@ export default function HeroSection() {
                   {t("hero.subtitle")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <GoDashboard>
+                  <GoDashboard type="templates">
                     <Button
                       type="submit"
                       size="lg"

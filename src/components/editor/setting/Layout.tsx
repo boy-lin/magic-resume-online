@@ -17,7 +17,19 @@ export default function SettingLayout() {
 
   if (!activeResume) return;
 
-  const { activeSection = "", menuSections = [] } = activeResume || {};
+  const { activeSection: rawActiveSection = "", menuSections } =
+    activeResume || {};
+
+  // 确保 activeSection 是字符串
+  const activeSection =
+    typeof rawActiveSection === "string" ? rawActiveSection : "";
+
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections)
+    ? menuSections
+    : menuSections && typeof menuSections === "object"
+    ? Object.values(menuSections)
+    : [];
 
   return (
     <div className="space-y-4 p-2">
@@ -25,7 +37,7 @@ export default function SettingLayout() {
         {t("layout.title")}
       </h3>
       <LayoutSetting
-        menuSections={menuSections}
+        menuSections={safeMenuSections}
         activeSection={activeSection}
         setActiveSection={setActiveSection}
         toggleSectionVisibility={toggleSectionVisibility}

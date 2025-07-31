@@ -1,673 +1,89 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { getFileHandle, verifyPermission } from "@/utils/fileSystem";
-import {
-  BasicInfo,
-  Education,
-  Experience,
-  GlobalSettings,
-  Project,
-  CustomItem,
-  ResumeData,
-  MenuSection,
-} from "../types/resume";
-import { DEFAULT_TEMPLATES } from "@/config";
-import {
-  initialResumeState,
-  initialResumeStateEn,
-} from "@/config/initialResumeData";
-import { generateUUID } from "@/utils/uuid";
-import {
-  upsertResumeById,
-  getResumesByUserId,
-  deleteResumeById,
-  getResumeById,
-} from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
-interface ResumeStore {
-  resumes: Record<string, ResumeData>;
-  activeResumeId: string | null;
-  activeResume: ResumeData | null;
-  resumeView: Record<string, any>;
-  createResume: (templateId: string | null) => Promise<any>;
-  deleteResume: (resume: ResumeData) => void;
-  duplicateResume: (resumeId: string) => string;
-  updateResume: (
-    resumeId: string,
-    data: Partial<ResumeData>,
-    isNeedSync?: boolean
-  ) => void;
-  setActiveResume: (resumeId: string) => void;
+/**
+ * 简历状态管理兼容层
+ * 为了保持向后兼容，将原有的useResumeStore重构为使用新的分片状态管理
+ * 
+ * @deprecated 建议使用新的分片状态管理：
+ * - useResumeListStore: 简历列表管理
+ * - useResumeEditorStore: 简历编辑管理  
+ * - useResumeSettingsStore: 简历设置管理
+ */
 
-  updateResumeTitle: (title: string) => void;
-  updateResumeAsync: (resume: ResumeData) => Promise<any>;
-  updateBasicInfo: (data: Partial<BasicInfo>) => void;
-  updateEducation: (data: Education) => void;
-  updateEducationBatch: (educations: Education[]) => void;
-  deleteEducation: (id: string) => void;
-  updateExperience: (data: Experience) => void;
-  updateExperienceBatch: (experiences: Experience[]) => void;
-  deleteExperience: (id: string) => void;
-  updateProjects: (project: Project) => void;
-  updateProjectsBatch: (projects: Project[]) => void;
-  deleteProject: (id: string) => void;
-  setDraggingProjectId: (id: string | null) => void;
-  updateSkillContent: (skillContent: string) => void;
-  reorderSections: (newOrder: ResumeData["menuSections"]) => void;
-  toggleSectionVisibility: (sectionId: string) => void;
-  setActiveSection: (sectionId: string) => void;
-  updateMenuSections: (sections: ResumeData["menuSections"]) => void;
-  addCustomData: (sectionId: string) => void;
-  updateCustomData: (sectionId: string, items: CustomItem[]) => void;
-  removeCustomData: (sectionId: string) => void;
-  addCustomItem: (sectionId: string) => void;
-  updateCustomItem: (
-    sectionId: string,
-    itemId: string,
-    updates: Partial<CustomItem>
-  ) => void;
-  removeCustomItem: (sectionId: string, itemId: string) => void;
-  updateGlobalSettings: (settings: Partial<GlobalSettings>) => void;
-  setThemeColor: (color: string) => void;
-  setTemplate: (templateId: string, isNeedSync?: boolean) => void;
-  getResumeList: ({
-    current,
-    pageSize,
-  }: {
-    current: number;
-    pageSize: number;
-  }) => Promise<any>;
-  getResumeFullById: (id: string) => Promise<any>;
-  getViewScale: () => [number];
-  setResumeView: Function;
-}
+import { useResumeListStore } from './resume/useResumeListStore';
+import { useResumeEditorStore } from './resume/useResumeEditorStore';
+import { useResumeSettingsStore } from './resume/useResumeSettingsStore';
 
-export const useResumeStore = create(
-  persist<ResumeStore>(
-    (set, get) => ({
-      resumes: {},
-      activeResumeId: null,
-      activeResume: null,
-      resumeView: {
-        zoomX: 1,
-      },
+/**
+ * 兼容的简历状态管理Hook
+ * 保持原有API不变，内部使用新的分片状态管理
+ */
+export const useResumeStore = () => {
+  const listStore = useResumeListStore();
+  const editorStore = useResumeEditorStore();
+  const settingsStore = useResumeSettingsStore();
 
-      createResume: async (templateId = null) => {
-        const locale =
-          typeof document !== "undefined"
-            ? document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("NEXT_LOCALE="))
-                ?.split("=")[1] || "zh"
-            : "zh";
+  return {
+    // 状态
+    resumes: listStore.resumes,
+    activeResumeId: listStore.activeResumeId,
+    activeResume: listStore.activeResume,
+    resumeView: settingsStore.resumeView,
 
-        const initialResumeData =
-          locale === "en" ? initialResumeStateEn : initialResumeState;
+    // 简历管理
+    createResume: listStore.createResume,
+    deleteResume: listStore.deleteResume,
+    duplicateResume: listStore.duplicateResume,
+    setActiveResume: listStore.setActiveResume,
+    updateResume: listStore.updateResume,
+    updateResumeTitle: listStore.updateResumeTitle,
+    updateResumeAsync: listStore.updateResumeAsync,
 
-        const id = generateUUID();
-        const template = templateId
-          ? DEFAULT_TEMPLATES.find((t) => t.id === templateId)
-          : DEFAULT_TEMPLATES[0];
+    // 基础信息编辑
+    updateBasicInfo: editorStore.updateBasicInfo,
 
-        const newResume: ResumeData = {
-          ...initialResumeData,
-          id,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          templateId: template?.id,
-          title: `${locale === "en" ? "New Resume" : "新建简历"} ${id.slice(
-            0,
-            6
-          )}`,
-        };
-        await upsertResumeById(createClient(), newResume);
-        set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [id]: newResume,
-          },
-          activeResumeId: id,
-          activeResume: newResume,
-        }));
-        return id;
-      },
+    // 教育经历编辑
+    updateEducation: editorStore.updateEducation,
+    updateEducationBatch: editorStore.updateEducationBatch,
+    deleteEducation: editorStore.deleteEducation,
 
-      updateResume: (resumeId, data, isNeedSync = true) => {
-        const resume = get().resumes[resumeId];
+    // 工作经验编辑
+    updateExperience: editorStore.updateExperience,
+    updateExperienceBatch: editorStore.updateExperienceBatch,
+    deleteExperience: editorStore.deleteExperience,
 
-        if (!resume) return;
+    // 项目经验编辑
+    updateProjects: editorStore.updateProjects,
+    updateProjectsBatch: editorStore.updateProjectsBatch,
+    deleteProject: editorStore.deleteProject,
+    setDraggingProjectId: editorStore.setDraggingProjectId,
 
-        const updatedResume = {
-          ...resume,
-          ...data,
-          isNeedSync,
-        };
+    // 技能编辑
+    updateSkillContent: editorStore.updateSkillContent,
 
-        set((state) => {
-          return {
-            resumes: {
-              ...state.resumes,
-              [resumeId]: updatedResume,
-            },
-            activeResume:
-              state.activeResumeId === resumeId
-                ? updatedResume
-                : state.activeResume,
-          };
-        });
-      },
+    // 自定义内容编辑
+    addCustomData: editorStore.addCustomData,
+    updateCustomData: editorStore.updateCustomData,
+    removeCustomData: editorStore.removeCustomData,
+    addCustomItem: editorStore.addCustomItem,
+    updateCustomItem: editorStore.updateCustomItem,
+    removeCustomItem: editorStore.removeCustomItem,
 
-      updateResumeAsync: async (resume) => {
-        const { activeResumeId } = get();
-        let res;
-        if (activeResumeId) {
-          res = await upsertResumeById(createClient(), resume);
-          get().updateResume(activeResumeId, resume, false);
-        }
-        return res;
-      },
+    // 菜单和章节管理
+    reorderSections: editorStore.reorderSections,
+    toggleSectionVisibility: editorStore.toggleSectionVisibility,
+    setActiveSection: editorStore.setActiveSection,
+    updateMenuSections: editorStore.updateMenuSections,
 
-      updateResumeTitle: async (title) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const params = { id: activeResumeId, title };
-          await upsertResumeById(createClient(), params);
-          get().updateResume(activeResumeId, params, false);
-        }
-      },
+    // 设置管理
+    updateGlobalSettings: settingsStore.updateGlobalSettings,
+    setThemeColor: settingsStore.setThemeColor,
+    setTemplate: settingsStore.setTemplate,
+    getViewScale: settingsStore.getViewScale,
+    setResumeView: settingsStore.setResumeView,
 
-      deleteResume: async (resume) => {
-        const resumeId = resume.id;
-        await deleteResumeById(createClient(), resumeId);
-        set((state) => {
-          const { [resumeId]: _, activeResume, ...rest } = state.resumes;
-          return {
-            resumes: rest,
-            activeResumeId: null,
-            activeResume: null,
-          };
-        });
-        try {
-          const handle = await getFileHandle("syncDirectory");
-          if (!handle) return;
-          const hasPermission = await verifyPermission(handle);
-          if (!hasPermission) return;
-          const dirHandle = handle as FileSystemDirectoryHandle;
-          await dirHandle.removeEntry(`${resume.title}.json`);
-        } catch (error) {
-          console.error("Error deleting resume file:", error);
-        }
-      },
+    // 数据获取
+    getResumeList: listStore.getResumeList,
+    getResumeFullById: listStore.getResumeFullById,
+  };
+};
 
-      duplicateResume: (resumeId) => {
-        const newId = generateUUID();
-        const originalResume = get().resumes[resumeId];
-
-        // 获取当前语言环境
-        const locale =
-          typeof document !== "undefined"
-            ? document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("NEXT_LOCALE="))
-                ?.split("=")[1] || "zh"
-            : "zh";
-
-        const duplicatedResume = {
-          ...originalResume,
-          id: newId,
-          title: `${originalResume.title} (${
-            locale === "en" ? "Copy" : "复制"
-          })`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [newId]: duplicatedResume,
-          },
-          activeResumeId: newId,
-          activeResume: duplicatedResume,
-        }));
-
-        return newId;
-      },
-
-      setActiveResume: (resumeId) => {
-        const resume = get().resumes[resumeId];
-        if (resume) {
-          set({ activeResume: resume, activeResumeId: resumeId });
-        }
-      },
-
-      updateBasicInfo: (data) => {
-        set((state) => {
-          if (!state.activeResume) return state;
-
-          const updatedResume = {
-            ...state.activeResume,
-            basic: {
-              ...state.activeResume.basic,
-              ...data,
-            },
-            isNeedSync: true,
-          };
-
-          const newState = {
-            resumes: {
-              ...state.resumes,
-              [state.activeResume.id]: updatedResume,
-            },
-            activeResume: updatedResume,
-          };
-
-          return newState;
-        });
-      },
-
-      updateEducation: (education) => {
-        const { activeResumeId, resumes } = get();
-        if (!activeResumeId) return;
-
-        const currentResume = resumes[activeResumeId];
-        const newEducation = currentResume.education.some(
-          (e) => e.id === education.id
-        )
-          ? currentResume.education.map((e) =>
-              e.id === education.id ? education : e
-            )
-          : [...currentResume.education, education];
-        get().updateResume(activeResumeId, {
-          education: newEducation,
-        });
-      },
-
-      updateEducationBatch: (educations) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          get().updateResume(activeResumeId, {
-            education: educations,
-          });
-        }
-      },
-
-      deleteEducation: (id) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const resume = get().resumes[activeResumeId];
-          const updatedEducation = resume.education.filter((e) => e.id !== id);
-          get().updateResume(activeResumeId, {
-            education: updatedEducation,
-          });
-        }
-      },
-
-      updateExperience: (experience) => {
-        const { activeResumeId, resumes } = get();
-        if (!activeResumeId) return;
-
-        const currentResume = resumes[activeResumeId];
-        const newExperience = currentResume.experience.find(
-          (e) => e.id === experience.id
-        )
-          ? currentResume.experience.map((e) =>
-              e.id === experience.id ? experience : e
-            )
-          : [...currentResume.experience, experience];
-
-        get().updateResume(activeResumeId, {
-          experience: newExperience,
-        });
-      },
-
-      updateExperienceBatch: (experiences: Experience[]) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const updateData = { experience: experiences };
-          get().updateResume(activeResumeId, updateData);
-        }
-      },
-      deleteExperience: (id) => {
-        const { activeResumeId, resumes } = get();
-        if (!activeResumeId) return;
-
-        const currentResume = resumes[activeResumeId];
-        const updatedExperience = currentResume.experience.filter(
-          (e) => e.id !== id
-        );
-
-        get().updateResume(activeResumeId, {
-          experience: updatedExperience,
-        });
-      },
-
-      updateProjects: (project) => {
-        const { activeResumeId, resumes } = get();
-        if (!activeResumeId) return;
-        const currentResume = resumes[activeResumeId];
-        const newProjects = currentResume.projects.some(
-          (p) => p.id === project.id
-        )
-          ? currentResume.projects.map((p) =>
-              p.id === project.id ? project : p
-            )
-          : [...currentResume.projects, project];
-
-        get().updateResume(activeResumeId, {
-          projects: newProjects,
-        });
-      },
-
-      updateProjectsBatch: (projects: Project[]) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const updateData = { projects };
-          get().updateResume(activeResumeId, updateData);
-        }
-      },
-
-      deleteProject: (id) => {
-        const { activeResumeId } = get();
-        if (!activeResumeId) return;
-        const currentResume = get().resumes[activeResumeId];
-        const updatedProjects = currentResume.projects.filter(
-          (p) => p.id !== id
-        );
-        get().updateResume(activeResumeId, {
-          projects: updatedProjects,
-        });
-      },
-
-      setDraggingProjectId: (id: string | null) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          get().updateResume(
-            activeResumeId,
-            {
-              draggingProjectId: id,
-            },
-            false
-          );
-        }
-      },
-
-      updateSkillContent: (skillContent) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          get().updateResume(activeResumeId, {
-            skillContent,
-          });
-        }
-      },
-
-      reorderSections: (newOrder) => {
-        const { activeResumeId, resumes } = get();
-        if (activeResumeId) {
-          const currentResume = resumes[activeResumeId];
-          const basicInfoSection = currentResume.menuSections.find(
-            (section) => section.id === "basic"
-          );
-          const reorderedSections = [
-            basicInfoSection,
-            ...newOrder.filter((section) => section.id !== "basic"),
-          ].map((section, index) => ({
-            ...section,
-            order: index,
-          }));
-          get().updateResume(activeResumeId, {
-            menuSections: reorderedSections as MenuSection[],
-          });
-        }
-      },
-
-      toggleSectionVisibility: (sectionId) => {
-        const { activeResumeId, resumes } = get();
-        if (activeResumeId) {
-          const currentResume = resumes[activeResumeId];
-          const updatedSections = currentResume.menuSections.map((section) =>
-            section.id === sectionId
-              ? { ...section, enabled: !section.enabled }
-              : section
-          );
-          get().updateResume(activeResumeId, {
-            menuSections: updatedSections,
-          });
-        }
-      },
-
-      setActiveSection: (sectionId) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          get().updateResume(
-            activeResumeId,
-            {
-              activeSection: sectionId,
-            },
-            false
-          );
-        }
-      },
-
-      updateMenuSections: (sections) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          get().updateResume(activeResumeId, {
-            menuSections: sections,
-          });
-        }
-      },
-
-      addCustomData: (sectionId) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const updatedCustomData = {
-            ...currentResume.customData,
-            [sectionId]: [
-              {
-                id: generateUUID(),
-                title: "未命名模块",
-                subtitle: "",
-                dateRange: "",
-                description: "",
-                visible: true,
-              },
-            ],
-          };
-          get().updateResume(activeResumeId, {
-            customData: updatedCustomData,
-          });
-        }
-      },
-
-      updateCustomData: (sectionId, items) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const updatedCustomData = {
-            ...currentResume.customData,
-            [sectionId]: items,
-          };
-          get().updateResume(activeResumeId, {
-            customData: updatedCustomData,
-          });
-        }
-      },
-
-      removeCustomData: (sectionId) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const { [sectionId]: _, ...rest } = currentResume.customData;
-          get().updateResume(activeResumeId, {
-            customData: rest,
-          });
-        }
-      },
-
-      addCustomItem: (sectionId) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const updatedCustomData = {
-            ...currentResume.customData,
-            [sectionId]: [
-              ...(currentResume.customData[sectionId] || []),
-              {
-                id: generateUUID(),
-                title: "未命名模块",
-                subtitle: "",
-                dateRange: "",
-                description: "",
-                visible: true,
-              },
-            ],
-          };
-          get().updateResume(activeResumeId, {
-            customData: updatedCustomData,
-          });
-        }
-      },
-
-      updateCustomItem: (sectionId, itemId, updates) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const updatedCustomData = {
-            ...currentResume.customData,
-            [sectionId]: currentResume.customData[sectionId].map((item) =>
-              item.id === itemId ? { ...item, ...updates } : item
-            ),
-          };
-          get().updateResume(activeResumeId, {
-            customData: updatedCustomData,
-          });
-        }
-      },
-
-      removeCustomItem: (sectionId, itemId) => {
-        const { activeResumeId } = get();
-        if (activeResumeId) {
-          const currentResume = get().resumes[activeResumeId];
-          const updatedCustomData = {
-            ...currentResume.customData,
-            [sectionId]: currentResume.customData[sectionId].filter(
-              (item) => item.id !== itemId
-            ),
-          };
-          get().updateResume(activeResumeId, {
-            customData: updatedCustomData,
-          });
-        }
-      },
-
-      updateGlobalSettings: (settings: Partial<GlobalSettings>) => {
-        const { activeResumeId, updateResume, activeResume } = get();
-        if (activeResumeId) {
-          updateResume(activeResumeId, {
-            globalSettings: {
-              ...activeResume?.globalSettings,
-              ...settings,
-            },
-          });
-        }
-      },
-
-      setThemeColor: (color) => {
-        const { activeResumeId, updateResume } = get();
-        if (activeResumeId) {
-          updateResume(activeResumeId, {
-            globalSettings: {
-              ...get().activeResume?.globalSettings,
-              themeColor: color,
-            },
-          });
-        }
-      },
-
-      setTemplate: (templateId, isNeedSync = false) => {
-        const { activeResumeId, resumes } = get();
-        if (!activeResumeId) return;
-
-        const template = DEFAULT_TEMPLATES.find((t) => t.id === templateId);
-        if (!template) return;
-
-        const updatedResume = {
-          ...resumes[activeResumeId],
-          templateId,
-          globalSettings: {
-            ...resumes[activeResumeId].globalSettings,
-            themeColor: template.colorScheme.primary,
-            sectionSpacing: template.spacing.sectionGap,
-            paragraphSpacing: template.spacing.itemGap,
-            pagePadding: template.spacing.contentPadding,
-          },
-          basic: {
-            ...resumes[activeResumeId].basic,
-            layout: template.basic.layout,
-          },
-          isNeedSync,
-        };
-
-        set({
-          resumes: {
-            ...resumes,
-            [activeResumeId]: updatedResume,
-          },
-          activeResume: updatedResume,
-        });
-      },
-      getResumeList: async (page) => {
-        const { data } = await getResumesByUserId(createClient(), page);
-        const resumesMap = {};
-        data.forEach((it) => {
-          resumesMap[it.id] = {
-            id: it.id,
-            title: it.title,
-            createdAt: it.created_at,
-            templateId: it.template_id,
-          };
-        });
-        set((state) => ({
-          resumes: {
-            ...state.resumes,
-            ...resumesMap,
-          },
-        }));
-      },
-      getResumeFullById: async (id) => {
-        const data = await getResumeById(createClient(), id);
-        const newResume = {
-          activeSection: "basic",
-          draggingProjectId: null,
-          ...data,
-        };
-        set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [data.id]: newResume,
-          },
-          activeResumeId: id,
-          activeResume: newResume,
-        }));
-      },
-
-      setResumeView: (val) => {
-        console.log("setResumeView", val);
-        set((state) => ({
-          resumeView: {
-            ...state.resumeView,
-            ...val,
-          },
-        }));
-      },
-      getViewScale: () => {
-        const zoomX = get().resumeView.zoomX;
-        return [zoomX * 100];
-      },
-    }),
-    {
-      name: "resume-storage",
-    }
-  )
-);
+export default useResumeStore; // By Cursor

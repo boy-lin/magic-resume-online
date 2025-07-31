@@ -37,13 +37,13 @@ const ExperiencePanel = () => {
     >
       <Reorder.Group
         axis="y"
-        values={experience}
+        values={Array.isArray(experience) ? experience : []}
         onReorder={(newOrder) => {
           updateExperienceBatch(newOrder);
         }}
         className="space-y-3"
       >
-        {experience.map((item) => (
+        {(Array.isArray(experience) ? experience : []).map((item) => (
           <ExperienceItem
             key={item.id}
             experience={item}

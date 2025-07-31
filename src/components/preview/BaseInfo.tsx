@@ -144,7 +144,7 @@ const BaseInfo = ({
 
   // 基础样式
   const baseContainerClass =
-    "hover:cursor-pointer hover:bg-gray-100 rounded-md transition-all ease-in-out hover:shadow-md";
+    "hover:cursor-pointer hover:outline hover:outline-2 hover:outline-primary rounded-md transition-all ease-in-out hover:shadow-md";
   const baseFieldsClass = "";
   const baseFieldItemClass =
     "flex items-center whitespace-nowrap overflow-hidden text-baseFont";

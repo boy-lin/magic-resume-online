@@ -35,6 +35,7 @@ import {
 const ShareBtn = () => {
   const [loading, setLoading] = useState(null);
   const t = useTranslations("common");
+  const ts = useTranslations("share");
   const { activeResume } = useResumeStore();
   const [permission, setPermission] = useState("view");
   const [openPassword, setOpenPassword] = useState(false);
@@ -133,13 +134,13 @@ const ShareBtn = () => {
       <PopoverContent align="end" className="w-120">
         {/* <div className="px-2 py-1.5 text-sm">权限：获得此链接的任何人</div> */}
         <div className="flex items-center gap-2 text-lg font-semibold mb-2">
-          向其他人分享你的简历
+          {ts("title")}
         </div>
         <div className="space-y-6 min-w-[328px]">
           {/* 访问级别 */}
           <div>
             <div className="font-semibold mb-2 flex justify-between">
-              <span>公开访问</span>
+              <span>{ts("label.public")}</span>
               <span>
                 <Switch
                   checked={openPublic}
@@ -174,7 +175,7 @@ const ShareBtn = () => {
           {/* 链接密码及有效期 */}
           <div className="space-y-3">
             <div className="font-semibold mb-2 flex justify-between">
-              <span>链接密码</span>
+              <span>{ts("label.password")}</span>
               <div>
                 <Switch
                   disabled={!openPublic}
@@ -213,7 +214,7 @@ const ShareBtn = () => {
             loading={loading}
           >
             <Link2 className="mr-2" />
-            复制链接
+            {ts("btns.copyLink")}
           </Button>
         </div>
         <div className="flex justify-between gap-2 pt-4">

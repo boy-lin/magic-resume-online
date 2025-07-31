@@ -45,13 +45,28 @@ export const updateUserInfoById = async (
   id,
   params
 ) => {
-  return supabase
+  // 更新数据库中的用户信息
+  const { error: dbError } = await supabase
     .from("users")
     .update({
       full_name: params.fullName,
       avatar_url: params.avatarUrl,
     })
     .eq("id", id);
+
+  if (dbError) {
+    return { error: dbError };
+  }
+
+  // 同时更新Supabase Auth中的用户元数据
+  const { error: authError } = await supabase.auth.updateUser({
+    data: {
+      full_name: params.fullName,
+      avatar_url: params.avatarUrl,
+    },
+  });
+
+  return { error: authError };
 };
 
 export const getResumesByUserId = cache(

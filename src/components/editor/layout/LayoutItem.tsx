@@ -71,6 +71,11 @@ const LayoutItem = ({
       )}
       whileHover={{ scale: 1.01 }}
       whileDrag={{ scale: 1.02 }}
+      transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 40,
+      }}
     >
       <div
         onPointerDown={(event) => {
@@ -131,12 +136,17 @@ const LayoutItem = ({
             whileTap={{ scale: 0.9 }}
             onClick={(e) => {
               e.stopPropagation();
+              const safeMenuSections = Array.isArray(menuSections) 
+                ? menuSections 
+                : menuSections && typeof menuSections === 'object' 
+                  ? Object.values(menuSections) 
+                  : [];
               updateMenuSections(
-                menuSections.filter((section) => section.id !== item.id)
+                safeMenuSections.filter((section) => section.id !== item.id)
               );
               setActiveSection(
-                menuSections[
-                  menuSections.findIndex((s) => s.id === item.id) - 1
+                safeMenuSections[
+                  safeMenuSections.findIndex((s) => s.id === item.id) - 1
                 ].id
               );
             }}

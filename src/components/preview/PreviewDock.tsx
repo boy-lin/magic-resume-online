@@ -11,16 +11,13 @@ import {
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { createPortal } from "react-dom";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import TemplateSheet from "@/components/shared/TemplateSheet";
 import { cn } from "@/lib/utils";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
@@ -92,8 +89,11 @@ const PreviewDock = ({ viewerRef }) => {
     t,
   ]);
 
-  const { duplicateResume, activeResumeId, setResumeView } = useResumeStore();
-  const viewScale = useResumeStore((state) => state.getViewScale());
+  const { duplicateResume, activeResumeId, setResumeView, resumeView } =
+    useResumeStore();
+  const viewScale = resumeView?.zoomX ? [resumeView.zoomX * 100] : [100];
+
+  console.log("viewScale:", viewScale);
 
   const handleCopyResume = useCallback(() => {
     if (!activeResumeId) return;

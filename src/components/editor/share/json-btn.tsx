@@ -6,7 +6,7 @@ import { FileJson } from "lucide-react";
 import { Button } from "@/components/ui-lab/button";
 
 export default function JsonBtn({ activeResume }) {
-  const t = useTranslations("pdfExport");
+  const t = useTranslations("share");
   const [isLoading, setIsLoading] = useState(false);
   const { title } = activeResume || {};
 
@@ -26,10 +26,10 @@ export default function JsonBtn({ activeResume }) {
       link.click();
 
       window.URL.revokeObjectURL(url);
-      toast.success(t("toast.jsonSuccess"));
+      toast.success(t("pdf.toast.jsonSuccess"));
     } catch (error) {
       console.error("JSON export error:", error);
-      toast.error(t("toast.jsonError"));
+      toast.error(t("pdf.toast.jsonError"));
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +43,7 @@ export default function JsonBtn({ activeResume }) {
       loading={isLoading}
     >
       <FileJson className="w-5 h-5" role="icon" />
-      <span className="text-xs">Json</span>
+      <span className="text-xs">{t("btns.json")}</span>
     </Button>
   );
 }

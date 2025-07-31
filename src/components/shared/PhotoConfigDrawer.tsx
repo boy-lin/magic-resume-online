@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useResumeStore } from "@/store/useResumeStore";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
-import { DEFAULT_AVATAR } from "@/constants";
+import { DEFAULT_AVATAR, IMAGE_PROXY_URL } from "@/constants";
 console.log("DEFAULT_AVATAR", DEFAULT_AVATAR);
 interface Props {
   isOpen: boolean;
@@ -147,9 +147,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     }
 
     try {
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(
-        url
-      )}`;
+      const proxyUrl = `${IMAGE_PROXY_URL}${encodeURIComponent(url)}`;
 
       const img = new Image();
       img.crossOrigin = "anonymous";

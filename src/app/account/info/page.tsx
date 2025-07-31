@@ -18,10 +18,12 @@ const NextPage = () => {
       <div className="flex flex-1 flex-col justify-center max-w-4xl m-auto">
         <div className="flex items-center justify-start gap-4 p-6">
           <div className="shrink-0">
-            <Avatar className="size-16">
-              <AvatarImage src={avatarUrl} alt={fullName} />
-              <AvatarFallback>{fullName}</AvatarFallback>
-            </Avatar>
+            <Link href="/account/info/setting">
+              <Avatar className="size-16">
+                <AvatarImage src={avatarUrl} alt={fullName} />
+                <AvatarFallback>{fullName}</AvatarFallback>
+              </Avatar>
+            </Link>
           </div>
           <div className="flex flex-col truncate">
             <span className="text-sm/6 font-medium w-[20em]">
@@ -44,7 +46,7 @@ const NextPage = () => {
               <ChevronRightIcon />
             </Link>
             <div className=" px-4 py-4 bg-card">
-              <ButtonSignout variant="outline" className="" />
+              <ButtonSignout className="" />
             </div>
           </div>
         </div>

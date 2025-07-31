@@ -10,12 +10,16 @@ interface SkillSectionProps {
   showTitle?: boolean;
 }
 
-const SkillSection = ({ skill, globalSettings, showTitle = true }: SkillSectionProps) => {
+const SkillSection = ({
+  skill,
+  globalSettings,
+  showTitle = true,
+}: SkillSectionProps) => {
   const { setActiveSection } = useResumeStore();
 
   return (
     <motion.div
-      className="hover:cursor-pointer hover:bg-gray-100 rounded-md transition-all duration-300 ease-in-out hover:shadow-md"
+      className="hover:cursor-pointer hover:outline hover:outline-2 hover:outline-primary rounded-md transition-all duration-300 ease-in-out hover:shadow-md"
       style={{
         marginTop: `${globalSettings?.sectionSpacing || 24}px`,
       }}
@@ -23,7 +27,9 @@ const SkillSection = ({ skill, globalSettings, showTitle = true }: SkillSectionP
         setActiveSection("skills");
       }}
     >
-      {showTitle && <SectionTitle type="skills" globalSettings={globalSettings} />}
+      {showTitle && (
+        <SectionTitle type="skills" globalSettings={globalSettings} />
+      )}
       <motion.div
         style={{
           marginTop: `${globalSettings?.paragraphSpacing}px`,

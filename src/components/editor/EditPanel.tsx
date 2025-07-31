@@ -31,10 +31,19 @@ export function EditPanel({
   setEditPanelShow: (show: boolean) => void;
 }) {
   const { updateMenuSections, setActiveSection } = useResumeStore();
+  const { activeResume } = useResumeStore();
   const activeSection =
-    useResumeStore((state) => state.activeResume.activeSection) || "";
-  const menuSections =
-    useResumeStore((state) => state.activeResume.menuSections) || [];
+    typeof activeResume?.activeSection === "string"
+      ? activeResume.activeSection
+      : "";
+  const menuSections = activeResume?.menuSections;
+
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections)
+    ? menuSections
+    : menuSections && typeof menuSections === "object"
+    ? Object.values(menuSections)
+    : [];
   const renderFields = () => {
     switch (activeSection) {
       case "basic":
@@ -66,7 +75,7 @@ export function EditPanel({
     }
   };
 
-  const menu = menuSections?.find((s) => s.id === activeSection);
+  const menu = safeMenuSections.find((s) => s.id === activeSection);
 
   const renderTitle = () => {
     if (!menu?.title && !menu?.icon) return null;
@@ -89,7 +98,7 @@ export function EditPanel({
                 type="text"
                 value={menu?.title || "未知标题"}
                 onChange={(e) => {
-                  const newMenuSections = menuSections.map((s) => {
+                  const newMenuSections = safeMenuSections.map((s) => {
                     if (s.id === activeSection) {
                       return {
                         ...s,
@@ -117,13 +126,15 @@ export function EditPanel({
                 onClick={(e) => {
                   e.stopPropagation();
                   updateMenuSections(
-                    menuSections.filter(
+                    safeMenuSections.filter(
                       (section) => section.id !== activeSection
                     )
                   );
                   setActiveSection(
-                    menuSections[
-                      menuSections.findIndex((s) => s.id === activeSection) - 1
+                    safeMenuSections[
+                      safeMenuSections.findIndex(
+                        (s) => s.id === activeSection
+                      ) - 1
                     ].id
                   );
                 }}

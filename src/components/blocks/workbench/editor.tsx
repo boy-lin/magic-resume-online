@@ -161,15 +161,21 @@ export default function Editor() {
   const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
   const viewerRef = useRef<any>(null);
   const [editPanelShow, setEditPanelShow] = useState(true);
-  const { setActiveSection, setResumeView } = useResumeStore();
-  const activeSection = useResumeStore((s) => s.activeResume?.activeSection);
+  const { setActiveSection, setResumeView, activeResume } = useResumeStore();
+  const activeSection =
+    typeof activeResume?.activeSection === "string"
+      ? activeResume.activeSection
+      : "";
 
   const toggleEditPanel = (section: any) => {
     setActiveSection(section.id);
+    let isEditPanelCollapsed = editPanelCollapsed;
     if (activeSection === section.id) {
       setEditPanelCollapsed(!editPanelCollapsed);
+      isEditPanelCollapsed = !isEditPanelCollapsed;
     }
-    if (editPanelCollapsed) {
+
+    if (isEditPanelCollapsed) {
       setEditPanelShow(false);
     } else {
       setEditPanelShow(true);
@@ -207,17 +213,6 @@ export default function Editor() {
       }
     }
     updateLayout([...newSizes]);
-
-    // if (viewerRef.current) {
-    //   viewerRef.current.scrollCenter();
-    //   console.log("viewerRef.current", viewerRef.current);
-    //   console.log("viewerRef.getContainer", {
-    //     dom: viewerRef.current.getContainer(),
-    //   });
-    //   console.log("viewerRef.getViewport", {
-    //     dom: viewerRef.current.getViewport(),
-    //   });
-    // }
   }, [editPanelCollapsed, previewPanelCollapsed]);
 
   useEffect(() => {
@@ -287,7 +282,6 @@ export default function Editor() {
           {/* 预览面板 */}
           <ResizablePanel
             order={2}
-            // collapsible={false}
             defaultSize={panelSizes?.[1]}
             minSize={48}
             className="bg-gray-100 relative border-0"
@@ -305,21 +299,11 @@ export default function Editor() {
               zoomOnMouseWheel
               zoomOnPinch
               zoomOnScroll
-              // zoomBy={(e) => {
-              //   console.log("zoomBy", e);
-              // }}
-              // onPinch={(e) => {
-              //   console.log("InfiniteViewer", e);
-              // }}
               onScroll={(e) => {
                 setResumeView({
                   zoomX: e.zoomX,
                 });
-                // console.log("onScroll", e);
               }}
-              // onDrag={(e) => {
-              //   console.log("onDrag", e);
-              // }}
             >
               <PreviewPanel />
             </InfiniteViewer>

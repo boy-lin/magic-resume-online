@@ -13,21 +13,11 @@ type Props = {
   };
 };
 
-// export async function generateMetadata({
-//   params: { locale },
-// }: Props): Promise<Metadata> {
-//   const t = await getTranslations({ locale, namespace: "common" });
-//   return {
-//     title: t("title") + " - " + t("dashboard"),
-//   };
-// }
-
 export default async function LocaleLayout({ children }: Props) {
   const locale = await getLocale();
 
   const messages = await getMessages();
 
-  console.log("resume preview LocaleLayout", locale);
   return (
     <Document locale={locale} bodyClassName="">
       <NextIntlClientProvider messages={messages}>

@@ -44,13 +44,20 @@ export function SidePanel({
   onItemPointerEnter: (section: any) => void;
   onItemPointerLeave: (section: any) => void;
 }) {
-  // const { activeResume } = useResumeStore();
-  const { updateMenuSections, addCustomData } = useResumeStore();
+  const { updateMenuSections, addCustomData, activeResume } = useResumeStore();
+  const menuSections = activeResume?.menuSections || [];
+  console.log("SidePanel menuSections:", menuSections);
 
-  const menuSections = useResumeStore(
-    (s) => s.activeResume?.menuSections || []
-  );
-  const activeSection = useResumeStore((s) => s.activeResume?.activeSection);
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections)
+    ? menuSections
+    : menuSections && typeof menuSections === "object"
+    ? Object.values(menuSections)
+    : [];
+  const activeSection =
+    typeof activeResume?.activeSection === "string"
+      ? activeResume.activeSection
+      : "";
 
   const t = useTranslations("workbench.sidePanel");
 
@@ -69,15 +76,15 @@ export function SidePanel({
   };
 
   const handleCreateSection = () => {
-    const sectionId = generateCustomSectionId(menuSections);
+    const sectionId = generateCustomSectionId(safeMenuSections);
     const newSection = {
       id: sectionId,
       title: sectionId,
       enabled: true,
-      order: menuSections.length,
+      order: safeMenuSections.length,
     };
 
-    updateMenuSections([...menuSections, newSection]);
+    updateMenuSections([...safeMenuSections, newSection]);
     addCustomData(sectionId);
   };
 
@@ -88,13 +95,13 @@ export function SidePanel({
     }
     return section.icon || <SquareDashedKanban />;
   };
-
+  console.log("activeSection:", activeSection, safeMenuSections);
   return (
     <TransitionLeftToRight
       className={cn("overflow-y-auto h-full bg-gray-100 py-2")}
     >
       <div className="space-y-2 flex flex-col items-center">
-        {menuSections.map((section) => (
+        {safeMenuSections.map((section: any) => (
           <button
             key={section.id}
             className={cn("flex flex-col gap-2 p-2 items-center w-[5em]")}
@@ -140,7 +147,7 @@ export function SidePanel({
           >
             <BadgePlus className="w-8 h-8" />
           </span>
-          <div className="text-xs text-foreground whitespace-nowrap">
+          <div className="text-xs text-foreground">
             {t("layout.addCustomSection")}
           </div>
         </motion.button>

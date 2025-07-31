@@ -77,10 +77,20 @@ export function SidePanel() {
     addCustomData,
   } = useResumeStore();
   const {
-    menuSections = [],
+    menuSections,
     globalSettings = {},
-    activeSection,
+    activeSection: rawActiveSection,
   } = activeResume || {};
+  
+  // 确保 activeSection 是字符串
+  const activeSection = typeof rawActiveSection === 'string' ? rawActiveSection : "";
+
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections) 
+    ? menuSections 
+    : menuSections && typeof menuSections === 'object' 
+      ? Object.values(menuSections) 
+      : [];
 
   const { themeColor = THEME_COLORS[0] } = globalSettings;
   const t = useTranslations("workbench.sidePanel");
@@ -114,16 +124,16 @@ export function SidePanel() {
   };
 
   const handleCreateSection = () => {
-    const sectionId = generateCustomSectionId(menuSections);
+    const sectionId = generateCustomSectionId(safeMenuSections);
     const newSection = {
       id: sectionId,
       title: sectionId,
       icon: "➕",
       enabled: true,
-      order: menuSections.length,
+      order: safeMenuSections.length,
     };
 
-    updateMenuSections([...menuSections, newSection]);
+    updateMenuSections([...safeMenuSections, newSection]);
     addCustomData(sectionId);
   };
   return (
@@ -139,7 +149,7 @@ export function SidePanel() {
       <div className="p-2 space-y-2">
         <SettingCard icon={Layout} title={t("layout.title")}>
           <LayoutSetting
-            menuSections={menuSections}
+            menuSections={safeMenuSections}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             toggleSectionVisibility={toggleSectionVisibility}

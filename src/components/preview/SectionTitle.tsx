@@ -12,17 +12,29 @@ interface SectionTitleProps {
   showTitle?: boolean;
 }
 
-const SectionTitle = ({ type, title, globalSettings, showTitle = true }: SectionTitleProps) => {
+const SectionTitle = ({
+  type,
+  title,
+  globalSettings,
+  showTitle = true,
+}: SectionTitleProps) => {
   const { activeResume } = useResumeStore();
-  const { menuSections = [], templateId = "default" } = activeResume || {};
+  const { menuSections, templateId = "default" } = activeResume || {};
+
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections)
+    ? menuSections
+    : menuSections && typeof menuSections === "object"
+    ? Object.values(menuSections)
+    : [];
 
   const renderTitle = useMemo(() => {
     if (type === "custom") {
       return title;
     }
-    const sectionConfig = menuSections.find((s) => s.id === type);
+    const sectionConfig = safeMenuSections.find((s) => s.id === type);
     return sectionConfig?.title;
-  }, [menuSections, type, title]);
+  }, [safeMenuSections, type, title]);
 
   const config =
     templateConfigs[templateId as string] || templateConfigs["default"];

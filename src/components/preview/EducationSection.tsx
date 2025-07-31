@@ -23,7 +23,7 @@ const EducationSection = ({
     <motion.div
       className="
       hover:cursor-pointer
-      hover:bg-gray-100
+      hover:outline hover:outline-2 hover:outline-primary
       rounded-md
       transition-all
       duration-300

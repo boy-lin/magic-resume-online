@@ -2,6 +2,8 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { IMAGE_PROXY_URL } from "@/constants";
+import { getImageBase64 } from "@/utils/imageProxy";
 
 interface PropsType {
   className?: string;
@@ -40,21 +42,20 @@ export default function Base64(props: PropsType) {
     setLoading(false);
   };
 
-  const fetchImage = (url) => {
-    setLoading(true);
-    setError("");
-    setBase64Data("");
-
-    // 创建新的 Image 对象
-    const img = new Image();
-    img.crossOrigin = "anonymous"; // 处理跨域图片
-    img.onload = () => {
-      imgRef.current = img;
-      handleImageLoad();
+  const fetchImage = async (url) => {
+    try {
+      setLoading(true);
+      setError("");
+      setBase64Data("");
+      const base64 = await getImageBase64({
+        url,
+      });
+      setBase64Data(base64);
+    } catch (error) {
+      setError(`图片加载失败: ${error.message}`);
+    } finally {
       setLoading(false);
-    };
-    img.onerror = handleError;
-    img.src = url;
+    }
   };
 
   useEffect(() => {

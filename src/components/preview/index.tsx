@@ -8,7 +8,7 @@ import { useResumeStore } from "@/store/useResumeStore";
 import ResumeTemplateComponent from "../templates";
 import PreviewDock from "./PreviewDock";
 
-import PageBreakLine from "@/components/preview/PageBreakLine";
+import PageBreakLines from "@/components/preview/PageBreakLines";
 
 interface PreviewPanelProps {}
 
@@ -161,30 +161,11 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
               }
             `}</style>
             <ResumeTemplateComponent data={activeResume} template={template} />
-            {contentHeight > 0 && (
-              <>
-                <div key={`page-breaks-container-${contentHeight}`}>
-                  {Array.from(
-                    { length: Math.min(pageBreakCount, 20) },
-                    (_, i) => {
-                      const pageNumber = i + 1;
-
-                      const pageLinePosition = pageHeightPx * pageNumber;
-
-                      if (pageLinePosition <= contentHeight) {
-                        return (
-                          <PageBreakLine
-                            key={`page-break-${pageNumber}`}
-                            pageNumber={pageNumber}
-                          />
-                        );
-                      }
-                      return null;
-                    }
-                  ).filter(Boolean)}
-                </div>
-              </>
-            )}
+            <PageBreakLines
+              contentHeight={contentHeight}
+              pageHeightPx={pageHeightPx}
+              pageBreakCount={pageBreakCount}
+            />
           </div>
         </div>
       </div>
