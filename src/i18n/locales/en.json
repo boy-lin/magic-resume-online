@@ -23,7 +23,34 @@
       "prev": "Previous"
     },
     "menu": {
-      "product": "Products"
+      "items": [
+        {
+          "title": "Products",
+          "poster": {
+            "title": "ResumeX",
+            "description": "ResumeX is an open source resume editor, free, privacy-first. No registration required, all data stored locally, support data backup and export, ensuring your resume data is always available.",
+            "icon": "🚀",
+            "href": "/"
+          },
+          "items": [
+            {
+              "title": "My Resumes",
+              "description": "View my resumes",
+              "href": "/app/dashboard/resumes"
+            },
+            {
+              "title": "Browse Templates",
+              "description": "Browse all resume templates",
+              "href": "/app/dashboard/resumes"
+            },
+            {
+              "title": "Features",
+              "description": "",
+              "href": "/"
+            }
+          ]
+        }
+      ]
     },
     "pagination": {
       "prev": "Previous",
@@ -32,6 +59,7 @@
       "of": "of"
     }
   },
+
   "home": {
     "header": {
       "title": "ResumeX",
@@ -111,11 +139,31 @@
     }
   },
   "dashboard": {
+    "header": {
+      "title": "Dashboard",
+      "profile": "Profile",
+      "settings": "Settings",
+      "theme": "Theme",
+      "logout": "Logout",
+      "sidebar": {
+        "toggle": "Toggle Sidebar",
+        "collapse": "Collapse Sidebar",
+        "expand": "Expand Sidebar",
+        "collapsed": "Sidebar collapsed",
+        "expanded": "Sidebar expanded"
+      }
+    },
     "sidebar": {
+      "home": "Home",
       "resumes": "Resumes",
       "settings": "Settings",
       "templates": "Templates",
-      "ai": "AI Config"
+      "ai": "AI Config",
+      "footer": {
+        "feedback": "Feedback",
+        "github": "GitHub",
+        "docs": "Documentation"
+      }
     },
     "resumes": {
       "created": "Created At",
@@ -174,6 +222,17 @@
       "useTemplate": "Use Template",
       "preview": "Preview",
       "switchTemplate": "Switch Template",
+      "searchPlaceholder": "Search templates...",
+      "allTemplates": "All Templates",
+      "classicTemplates": "Classic Templates",
+      "modernTemplates": "Modern Templates",
+      "twoColumnLayout": "Two Column Layout",
+      "timelineTemplates": "Timeline",
+      "templateCount": "templates",
+      "freeToUse": "Free to use",
+      "searchResults": "Found {count} templates",
+      "noResults": "No matching templates found",
+      "noResultsHint": "Try adjusting your search or filters",
       "classic": {
         "name": "Classic",
         "description": "Traditional and minimalist layout, suitable for most job applications"
@@ -192,20 +251,34 @@
       }
     }
   },
-  "pdfExport": {
-    "button": {
-      "export": "Export",
-      "exportPdf": "Export PDF (Server)",
-      "exportJson": "Export JSON Config",
-      "exporting": "Exporting...",
-      "exportingJson": "Exporting...",
-      "print": "Browser Print"
+  "share": {
+    "title": "Share your resume with others",
+    "label": {
+      "public": "Public Access",
+      "password": "Link Password"
     },
-    "toast": {
-      "success": "PDF exported successfully",
-      "error": "PDF export failed",
-      "jsonSuccess": "Configuration exported successfully",
-      "jsonError": "Configuration export failed"
+    "btns": {
+      "copyLink": "Copy Link",
+      "download": "Download",
+      "print": "Print",
+      "json": "JSON Config",
+      "image": "Image"
+    },
+    "pdf": {
+      "button": {
+        "export": "Export",
+        "exportPdf": "Export PDF (Server)",
+        "exportJson": "Export JSON Config",
+        "exporting": "Exporting...",
+        "exportingJson": "Exporting...",
+        "print": "Browser Print"
+      },
+      "toast": {
+        "success": "PDF exported successfully",
+        "error": "PDF export failed",
+        "jsonSuccess": "Configuration exported successfully",
+        "jsonError": "Configuration export failed"
+      }
     }
   },
   "previewDock": {
@@ -675,7 +748,37 @@
       "sub": "Reset password via email"
     },
     "setting": {
-      "title": "Settings"
+      "title": "Settings",
+      "avatar": {
+        "title": "Avatar Settings",
+        "preview": "Avatar Preview",
+        "upload": {
+          "dragHint": "Drag and drop or click to upload image",
+          "sizeLimit": "Supports JPG, PNG format, size not exceeding 5MB",
+          "selectFile": "Select File",
+          "resetAvatar": "Reset Avatar",
+          "urlPlaceholder": "Enter image link address",
+          "urlLabel": "Avatar Link"
+        },
+        "success": {
+          "upload": "Avatar uploaded successfully",
+          "urlSet": "Avatar URL set successfully"
+        },
+        "error": {
+          "sizeLimit": "Image size must not exceed 5MB",
+          "typeLimit": "Please upload an image file",
+          "uploadFailed": "Upload failed, please try again",
+          "invalidUrl": "Invalid image URL or inaccessible, please try another image link",
+          "timeout": "Loading timeout",
+          "loadError": "Failed to load image"
+        }
+      },
+      "success": {
+        "update": "Personal information updated successfully"
+      },
+      "error": {
+        "update": "Update failed, please try again"
+      }
     }
   }
 }

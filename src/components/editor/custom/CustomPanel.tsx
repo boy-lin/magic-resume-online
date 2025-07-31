@@ -24,13 +24,13 @@ const CustomPanel = memo(({ sectionId }: { sectionId: string }) => {
     >
       <Reorder.Group
         axis="y"
-        values={items}
+        values={Array.isArray(items) ? items : []}
         onReorder={(newOrder) => {
           updateCustomData(sectionId, newOrder);
         }}
         className="space-y-3"
       >
-        {items.map((item: CustomItemType) => (
+        {(Array.isArray(items) ? items : []).map((item: CustomItemType) => (
           <CustomItem key={item.id} item={item} sectionId={sectionId} />
         ))}
 

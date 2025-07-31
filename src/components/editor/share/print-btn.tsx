@@ -3,9 +3,16 @@ import { Printer } from "lucide-react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { useHtmlPrint } from "@/hooks/pdf-export";
 import { Button } from "@/components/ui-lab/button";
+import { cn } from "@/lib/utils";
 
-export default function PrintBtn({ activeResume }) {
-  // const t = useTranslations("common");
+export default function PrintBtn({
+  activeResume,
+  className,
+}: {
+  activeResume: any;
+  className?: string;
+}) {
+  const t = useTranslations("share");
   const { globalSettings = {} } = activeResume || {};
   const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);
 
@@ -13,11 +20,11 @@ export default function PrintBtn({ activeResume }) {
     <>
       <Button
         variant="ghost"
-        className="flex flex-col items-center gap-1 h-auto"
+        className={cn("flex flex-col items-center gap-1 h-auto", className)}
         onClick={handlePrint}
       >
         <Printer className="w-5 h-5" role="icon" />
-        <span className="text-xs">打印</span>
+        <span className="text-xs">{t("btns.print")}</span>
       </Button>
       <iframe
         ref={printFrameRef}

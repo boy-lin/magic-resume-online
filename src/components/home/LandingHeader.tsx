@@ -45,8 +45,10 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          <div className="text-sm font-medium leading-none whitespace-nowrap">
+            {title}
+          </div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground whitespace-nowrap">
             {children}
           </p>
         </a>
@@ -63,7 +65,9 @@ export default function LandingHeader() {
   const pathname = usePathname();
   const locale = pathname.split("/")[1]; // 从路径中获取语言代码
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // console.debug("aa LandingHeader render user", user);
+  const menuItems = tc.raw("menu.items");
+  console.debug("aa LandingHeader render user", menuItems);
+
   return (
     <>
       <ScrollHeader>
@@ -80,81 +84,53 @@ export default function LandingHeader() {
             <div className="flex-1 flex items-center justify-start pl-8">
               <NavigationMenu>
                 <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent">
-                      {tc("menu.product")}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 md:w-[300px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
-                        <li className="row-span-3">
-                          <NavigationMenuLink asChild>
-                            <a
-                              className="flex h-full w-full select-none flex-col justify-center rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                              href="/"
-                            >
-                              <div className="flex items-center gap-2 mb-2 mt-4 text-lg leading-5 font-medium">
-                                <Logo size={32} />
-                                <div className="">{t("header.title")}</div>
-                              </div>
-                              <p className="text-sm leading-tight text-muted-foreground">
-                                利用 AI 技术，帮助您快速创建专业的简历,
-                                多种模板可选，多端同步。
-                              </p>
-                            </a>
-                          </NavigationMenuLink>
-                        </li>
-                        <ListItem
-                          href="/app/dashboard/resumes"
-                          title="我的简历"
-                        >
-                          查看我的简历
-                        </ListItem>
-                        <ListItem
-                          href="/app/dashboard/templates"
-                          title="浏览模板"
-                        >
-                          浏览所有简历模板
-                        </ListItem>
-                        <ListItem
-                          href={`/${locale}/docs/changelog`}
-                          title="更新日志"
-                        >
-                          新特性更新日志
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="bg-transparent">
-                      企业服务
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      {/* <ul className="grid gap-3 p-6 md:w-[220px]">
-                        <li className="row-span-3">
-                          <AlertTitle>功能未开启</AlertTitle>
-                          <AlertDescription>敬请期待</AlertDescription>
-                        </li>
-                        <ListItem
-                          href="/app/dashboard/resumes"
-                          title="我的简历"
-                        >
-                          查看我的简历
-                        </ListItem>
-                        <ListItem
-                          href="/app/dashboard/templates"
-                          title="浏览模板"
-                        >
-                          浏览所有简历模板
-                        </ListItem>
-                        <ListItem
-                          href={`/${locale}/docs/changelog`}
-                          title="更新日志"
-                        >
-                          新特性更新日志
-                        </ListItem>
-                      </ul> */}
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                  {menuItems.map((item, index) => (
+                    <NavigationMenuItem key={index}>
+                      <NavigationMenuTrigger className="bg-transparent">
+                        {item.title}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent className="flex p-4 gap-2">
+                        {item.poster && (
+                          <div className="">
+                            <NavigationMenuLink asChild>
+                              <a
+                                className={cn(
+                                  "h-full w-full select-none flex-col justify-center",
+                                  "rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md",
+                                  "md:flex hidden"
+                                )}
+                                href={item.poster.href}
+                              >
+                                <div className="flex items-center gap-2 mb-2 mt-4 text-lg leading-5 font-medium">
+                                  {item.poster.icon || <Logo size={32} />}
+                                  <div className="">{item.poster.title}</div>
+                                </div>
+                                <p
+                                  className="text-sm leading-tight text-muted-foreground"
+                                  style={{
+                                    width:
+                                      item.poster.description.length > 150
+                                        ? "150px"
+                                        : "auto",
+                                  }}
+                                >
+                                  {item.poster.description}
+                                </p>
+                              </a>
+                            </NavigationMenuLink>
+                          </div>
+                        )}
+                        <ul className="flex flex-col gap-2">
+                          {item.items &&
+                            item.items.map((it, i) => (
+                              <ListItem key={i} href={it.href} title={it.title}>
+                                {it.description}
+                              </ListItem>
+                            ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  ))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>

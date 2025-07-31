@@ -26,6 +26,7 @@ const itemAnimations = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
+  duration: 0,
 };
 
 const CustomField: React.FC<CustomFieldProps> = ({
@@ -370,11 +371,13 @@ const BasicPanel: React.FC = () => {
         <Reorder.Group
           axis="y"
           as="div"
-          values={basicFields}
+          values={Array.isArray(basicFields) ? basicFields : []}
           onReorder={handleBasicReorder}
           className="space-y-2"
         >
-          {basicFields.map((field) => renderBasicField(field))}
+          {(Array.isArray(basicFields) ? basicFields : []).map((field) =>
+            renderBasicField(field)
+          )}
         </Reorder.Group>
       </TransitionOpacity>
       <TransitionOpacity className="space-y-2">
@@ -384,19 +387,18 @@ const BasicPanel: React.FC = () => {
         <Reorder.Group
           axis="y"
           as="div"
-          values={customFields}
+          values={Array.isArray(customFields) ? customFields : []}
           onReorder={handleCustomFieldsReorder}
           className="space-y-2"
         >
-          {Array.isArray(customFields) &&
-            customFields.map((field) => (
-              <CustomField
-                key={field.id}
-                field={field}
-                onUpdate={updateCustomField}
-                onDelete={deleteCustomField}
-              />
-            ))}
+          {(Array.isArray(customFields) ? customFields : []).map((field) => (
+            <CustomField
+              key={field.id}
+              field={field}
+              onUpdate={updateCustomField}
+              onDelete={deleteCustomField}
+            />
+          ))}
         </Reorder.Group>
         <div>
           <Button onClick={addCustomField} className="w-full mt-4">

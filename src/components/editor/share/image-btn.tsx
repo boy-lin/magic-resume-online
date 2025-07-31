@@ -3,9 +3,17 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui-lab/button";
+import { cn } from "@/lib/utils";
 
-export default function ImageBtn({ activeResume }) {
+export default function ImageBtn({
+  activeResume,
+  className,
+}: {
+  activeResume: any;
+  className?: string;
+}) {
   const t = useTranslations("common");
+  const tbs = useTranslations("share");
   const [isLoading, setIsLoading] = useState(false);
   const { title } = activeResume || {};
 
@@ -41,12 +49,12 @@ export default function ImageBtn({ activeResume }) {
   return (
     <Button
       variant="ghost"
-      className="flex flex-col items-center gap-1 h-auto"
+      className={cn("flex flex-col items-center gap-1 h-auto", className)}
       onClick={handleJsonExport}
       loading={isLoading}
     >
       <ImageIcon className="w-5 h-5" role="icon" />
-      <span className="text-xs">Image</span>
+      <span className="text-xs">{tbs("btns.image")}</span>
     </Button>
   );
 }

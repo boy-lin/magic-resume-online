@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { throttle } from "lodash";
-import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,7 +18,7 @@ import PrintBtn from "@/components/editor/share/print-btn";
 import ImageBtn from "@/components/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
 import ResumeTemplateComponent from "@/components/templates";
-import PageBreakLine from "@/components/preview/PageBreakLine";
+import PageBreakLines from "@/components/preview/PageBreakLines";
 import { getResumeById } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui-lab/button";
@@ -225,9 +224,18 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     <div className="">
       <div className="fixed ml-2 left-1/2 translate-x-[105mm]">
         <div className="sticky top-8 flex flex-col gap-2 transform translate-x-[50%]">
-          <DownloadBtn activeResume={activeResume} />
-          <PrintBtn activeResume={activeResume} />
-          <ImageBtn activeResume={activeResume} />
+          <DownloadBtn
+            className="hover:bg-primary hover:text-primary-foreground"
+            activeResume={activeResume}
+          />
+          <PrintBtn
+            className="hover:bg-primary hover:text-primary-foreground"
+            activeResume={activeResume}
+          />
+          <ImageBtn
+            className="hover:bg-primary hover:text-primary-foreground"
+            activeResume={activeResume}
+          />
         </div>
       </div>
       <div
@@ -239,27 +247,12 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
         className="bg-white shadow-lg box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
       >
         <ResumeTemplateComponent data={activeResume} template={template} />
-        {contentHeight > 0 && (
-          <>
-            <div key={`page-breaks-container-${contentHeight}`}>
-              {Array.from({ length: Math.min(pageBreakCount, 20) }, (_, i) => {
-                const pageNumber = i + 1;
-
-                const pageLinePosition = pageHeightPx * pageNumber;
-
-                if (pageLinePosition <= contentHeight) {
-                  return (
-                    <PageBreakLine
-                      key={`page-break-${pageNumber}`}
-                      pageNumber={pageNumber}
-                    />
-                  );
-                }
-                return null;
-              }).filter(Boolean)}
-            </div>
-          </>
-        )}
+        {/* 分页线 */}
+        <PageBreakLines
+          contentHeight={contentHeight}
+          pageHeightPx={pageHeightPx}
+          pageBreakCount={pageBreakCount}
+        />
       </div>
     </div>
   );

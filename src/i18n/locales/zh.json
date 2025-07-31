@@ -23,7 +23,34 @@
       "prev": "上一步"
     },
     "menu": {
-      "product": "产品"
+      "items": [
+        {
+          "title": "产品",
+          "poster": {
+            "title": "ResumeX",
+            "description": "利用 AI 技术，帮助您快速创建专业的简历,多种模板可选，多端同步。",
+            "icon": "🚀",
+            "href": "/"
+          },
+          "items": [
+            {
+              "title": "我的简历",
+              "description": "查看我的简历",
+              "href": "/app/dashboard/resumes"
+            },
+            {
+              "title": "浏览模板",
+              "description": "浏览所有简历模板",
+              "href": "/app/dashboard/resumes"
+            },
+            {
+              "title": "功能特色",
+              "description": "",
+              "href": "/"
+            }
+          ]
+        }
+      ]
     },
     "pagination": {
       "prev": "上一页",
@@ -32,6 +59,7 @@
       "of": "共"
     }
   },
+
   "home": {
     "header": {
       "title": "ResumeX",
@@ -111,11 +139,31 @@
     }
   },
   "dashboard": {
+    "header": {
+      "title": "仪表盘",
+      "profile": "个人资料",
+      "settings": "设置",
+      "theme": "主题",
+      "logout": "退出登录",
+      "sidebar": {
+        "toggle": "切换侧边栏",
+        "collapse": "收起侧边栏",
+        "expand": "展开侧边栏",
+        "collapsed": "侧边栏已收起",
+        "expanded": "侧边栏已展开"
+      }
+    },
     "sidebar": {
+      "home": "首页",
       "resumes": "我的简历",
       "settings": "通用设置",
       "templates": "简历模板",
-      "ai": "AI服务商"
+      "ai": "AI服务商",
+      "footer": {
+        "feedback": "反馈建议",
+        "github": "GitHub",
+        "docs": "文档"
+      }
     },
     "resumes": {
       "created": "创建于",
@@ -174,6 +222,17 @@
       "useTemplate": "使用此模板",
       "preview": "预览",
       "switchTemplate": "切换模版",
+      "searchPlaceholder": "搜索模板...",
+      "allTemplates": "全部模板",
+      "classicTemplates": "经典模板",
+      "modernTemplates": "现代模板",
+      "twoColumnLayout": "双栏布局",
+      "timelineTemplates": "时间线",
+      "templateCount": "个模板",
+      "freeToUse": "免费使用",
+      "searchResults": "找到 {count} 个模板",
+      "noResults": "未找到匹配的模板",
+      "noResultsHint": "尝试调整搜索条件或筛选器",
       "classic": {
         "name": "经典模板",
         "description": "传统简约的简历布局，适合大多数求职场景"
@@ -192,20 +251,34 @@
       }
     }
   },
-  "pdfExport": {
-    "button": {
-      "export": "导出",
-      "exportPdf": "PDF(服务端)",
-      "exportJson": "JSON配置",
-      "exporting": "导出中...",
-      "exportingJson": "导出中...",
-      "print": "PDF(浏览器打印)"
+  "share": {
+    "title": "向其他人分享你的简历",
+    "label": {
+      "public": "公开访问",
+      "password": "链接密码"
     },
-    "toast": {
-      "success": "PDF导出成功",
-      "error": "PDF导出失败",
-      "jsonSuccess": "配置导出成功",
-      "jsonError": "配置导出失败"
+    "btns": {
+      "copyLink": "复制链接",
+      "download": "下载",
+      "print": "打印",
+      "json": "JSON配置",
+      "image": "图片"
+    },
+    "pdf": {
+      "button": {
+        "export": "导出",
+        "exportPdf": "PDF(服务端)",
+        "exportJson": "JSON配置",
+        "exporting": "导出中...",
+        "exportingJson": "导出中...",
+        "print": "PDF(浏览器打印)"
+      },
+      "toast": {
+        "success": "PDF导出成功",
+        "error": "PDF导出失败",
+        "jsonSuccess": "配置导出成功",
+        "jsonError": "配置导出失败"
+      }
     }
   },
   "workbench": {
@@ -677,7 +750,37 @@
       "sub": "通过邮箱重置密码"
     },
     "setting": {
-      "title": "设置"
+      "title": "设置",
+      "avatar": {
+        "title": "头像设置",
+        "preview": "头像预览",
+        "upload": {
+          "dragHint": "拖拽图片到此处或点击上传",
+          "sizeLimit": "支持 JPG、PNG 格式，大小不超过 5MB",
+          "selectFile": "选择文件",
+          "resetAvatar": "重置头像",
+          "urlPlaceholder": "输入图片链接地址",
+          "urlLabel": "头像链接"
+        },
+        "success": {
+          "upload": "头像上传成功",
+          "urlSet": "头像URL设置成功"
+        },
+        "error": {
+          "sizeLimit": "图片大小不能超过5MB",
+          "typeLimit": "请上传图片文件",
+          "uploadFailed": "上传失败，请重试",
+          "invalidUrl": "图片链接无效或无法访问，请尝试使用其他图片链接",
+          "timeout": "加载超时",
+          "loadError": "图片加载失败"
+        }
+      },
+      "success": {
+        "update": "个人信息更新成功"
+      },
+      "error": {
+        "update": "更新失败，请重试"
+      }
     }
   }
 }

@@ -187,7 +187,7 @@ export async function signUp(formData) {
     redirectPath = getFeedbackRedirect(
       "/feedback/success",
       "成功！",
-      "请查看您的电子邮件，获取确认链接。您现在可以关闭此页面了。"
+      "请查看您的电子邮件，获取来自 Supabase Auth 的确认链接。您现在可以关闭此页面了。"
     );
   } else {
     redirectPath = getErrorRedirect(

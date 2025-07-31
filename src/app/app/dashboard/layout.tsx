@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import LayoutHeader from "@/components/dashboard/LayoutHeader";
+import SidebarLeft from "@/components/dashboard/SidebarLeft";
 
 import Document from "@/components/Document";
 import { Providers } from "@/app/providers";
-
-import SidebarLeft from "./sidebar-left";
 
 type Props = {
   children: ReactNode;
@@ -22,7 +22,21 @@ export default async function LocaleLayout({ children }: Props) {
     <Document locale={locale}>
       <NextIntlClientProvider messages={messages}>
         <Providers>
-          <SidebarLeft>{children}</SidebarLeft>
+          <div className="flex flex-col h-screen bg-background">
+            {/* 顶部Header */}
+            <LayoutHeader />
+
+            {/* 主要内容区域 */}
+            <main className="flex-1 flex overflow-hidden">
+              {/* 侧边栏 */}
+              <SidebarLeft />
+
+              {/* 主内容区域 */}
+              <div className="flex-1 overflow-auto">
+                <div className="p-4 min-h-full">{children}</div>
+              </div>
+            </main>
+          </div>
         </Providers>
       </NextIntlClientProvider>
     </Document>

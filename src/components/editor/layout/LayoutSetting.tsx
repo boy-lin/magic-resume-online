@@ -20,8 +20,21 @@ const LayoutSetting = ({
   updateMenuSections,
   reorderSections,
 }: LayoutPanelProps) => {
-  const basicSection = menuSections.find((item) => item.id === "basic");
-  const draggableSections = menuSections.filter((item) => item.id !== "basic");
+  // 确保 menuSections 是数组
+  const safeMenuSections = Array.isArray(menuSections)
+    ? menuSections
+    : menuSections && typeof menuSections === "object"
+    ? Object.values(menuSections)
+    : [];
+  const basicSection = safeMenuSections.find((item) => item.id === "basic");
+  const draggableSections = safeMenuSections.filter(
+    (item) => item.id !== "basic"
+  );
+
+  // 确保 draggableSections 是有效的数组
+  const safeDraggableSections = Array.isArray(draggableSections)
+    ? draggableSections
+    : [];
 
   return (
     <div className="space-y-4  rounded-lg bg-white dark:bg-neutral-900/30">
@@ -33,23 +46,27 @@ const LayoutSetting = ({
           setActiveSection={setActiveSection}
           toggleSectionVisibility={toggleSectionVisibility}
           updateMenuSections={updateMenuSections}
-          menuSections={menuSections}
+          menuSections={safeMenuSections}
         />
       )}
 
       <Reorder.Group
         axis="y"
-        values={draggableSections}
+        values={safeDraggableSections}
         onReorder={(newOrder) => {
           const updatedSections = [
-            ...menuSections.filter((item) => item.id === "basic"),
+            ...safeMenuSections.filter((item) => item.id === "basic"),
             ...newOrder,
           ];
           reorderSections(updatedSections);
         }}
         className="space-y-2"
+        layout={false}
+        transition={{
+          duration: 0,
+        }}
       >
-        {draggableSections.map((item) => (
+        {safeDraggableSections.map((item) => (
           <LayoutItem
             key={item.id}
             item={item}
@@ -57,7 +74,7 @@ const LayoutSetting = ({
             setActiveSection={setActiveSection}
             toggleSectionVisibility={toggleSectionVisibility}
             updateMenuSections={updateMenuSections}
-            menuSections={menuSections}
+            menuSections={safeMenuSections}
           />
         ))}
       </Reorder.Group>

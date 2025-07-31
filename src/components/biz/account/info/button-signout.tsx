@@ -9,8 +9,10 @@ import { clearLocalStorage } from "@/utils/storage";
 import { LogOutIcon } from "lucide-react";
 import { useRequest } from "ahooks";
 import { toast } from "sonner";
+import { ButtonProps } from "@/components/ui-lab/button";
 
-const ButtonSignout = ({ className }) => {
+const ButtonSignout = (props: ButtonProps) => {
+  const { className, ...rest } = props;
   const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
@@ -45,6 +47,7 @@ const ButtonSignout = ({ className }) => {
         variant="destructive"
         loading={loading}
         onClick={(e) => e.stopPropagation()}
+        {...rest}
       >
         <LogOutIcon className="w-4 h-4" role="icon" />
         退出登录

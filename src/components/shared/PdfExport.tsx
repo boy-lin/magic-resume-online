@@ -20,7 +20,7 @@ import {
 import { usePdfExport, useHtmlPrint } from "@/hooks/pdf-export";
 
 const PdfExport = () => {
-  const t = useTranslations("pdfExport");
+  const t = useTranslations("share.pdf");
   const [isExportingJson, setIsExportingJson] = useState(false);
   const { activeResume } = useResumeStore();
   const { globalSettings = {}, title } = activeResume || {};

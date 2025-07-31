@@ -66,7 +66,7 @@ const optimizeImages = async (element: HTMLElement) => {
 
 export const usePdfExport = (props) => {
   const [isExporting, setIsExporting] = useState(false);
-  const t = useTranslations("pdfExport");
+  const t = useTranslations("share.pdf");
   const handleExport = async () => {
     const exportStartTime = performance.now();
     setIsExporting(true);

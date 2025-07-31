@@ -38,13 +38,13 @@ const EducationPanel = () => {
     >
       <Reorder.Group
         axis="y"
-        values={education}
+        values={Array.isArray(education) ? education : []}
         onReorder={(newOrder) => {
           updateEducationBatch(newOrder);
         }}
         className="space-y-3"
       >
-        {(education || []).map((education) => (
+        {(Array.isArray(education) ? education : []).map((education) => (
           <EducationItem
             key={education.id}
             education={education}
