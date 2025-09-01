@@ -23,7 +23,7 @@ import {
   getBorderRadiusValue,
 } from "@/types/resume";
 import { Textarea } from "@/components/ui/textarea";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
 import { DEFAULT_AVATAR, IMAGE_PROXY_URL } from "@/constants";
@@ -47,7 +47,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
   ...props
 }) => {
   const t = useTranslations("photoConfig");
-  const { updateBasicInfo } = useResumeStore();
+  const { updateBasicInfo } = useResumeEditorStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(photo);
   const [isDragging, setIsDragging] = useState(false);

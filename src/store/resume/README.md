@@ -38,24 +38,6 @@
 
 ## 使用方式
 
-### 方式一：使用统一的状态管理（推荐）
-
-```typescript
-import { useResumeStore } from "@/store/resume";
-
-const MyComponent = () => {
-  const {
-    activeResume,
-    createResume,
-    updateBasicInfo,
-    updateGlobalSettings,
-    // ... 其他方法
-  } = useResumeStore();
-
-  // 使用状态和方法
-};
-```
-
 ### 方式二：使用分片的状态管理
 
 ```typescript
@@ -71,23 +53,6 @@ const MyComponent = () => {
   const { updateGlobalSettings } = useResumeSettingsStore();
 
   // 使用状态和方法
-};
-```
-
-### 方式三：使用兼容层（向后兼容）
-
-```typescript
-import { useResumeStore } from "@/store/useResumeStore";
-
-const MyComponent = () => {
-  const {
-    activeResume,
-    createResume,
-    updateBasicInfo,
-    // ... 其他方法
-  } = useResumeStore();
-
-  // 使用状态和方法（API保持不变）
 };
 ```
 

@@ -3,11 +3,9 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { Search, Filter, Grid, List, Star, Users } from "lucide-react";
-
-import { useResumeStore } from "@/store/useResumeStore";
-import { Card, CardContent } from "@/components/ui/card";
+import { templateImages } from "@/app/constant/images";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -25,22 +23,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import classic from "@/assets/images/template-cover/classic.jpg";
-import modern from "@/assets/images/template-cover/modern.jpg";
-import leftRight from "@/assets/images/template-cover/left-right.jpg";
-import timeline from "@/assets/images/template-cover/timeline.jpg";
-
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
 import Template from "@/components/blocks/templates/template";
-
-const templateImages: Record<string, StaticImageData> = {
-  classic,
-  modern,
-  "left-right": leftRight,
-  timeline,
-};
+import { useResumeListStore } from "@/store/resume";
 
 const container = {
   hidden: { opacity: 0 },
@@ -68,7 +55,7 @@ const templateTags = {
 const TemplatesPage = () => {
   const t = useTranslations("dashboard.templates");
   const router = useRouter();
-  const { createResume } = useResumeStore();
+  const { createResume } = useResumeListStore();
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     open: boolean;
@@ -84,7 +71,7 @@ const TemplatesPage = () => {
     if (!template) return;
 
     const resumeId = await createResume(templateId);
-    const { resumes, updateResume } = useResumeStore.getState();
+    const { resumes, updateResume } = useResumeListStore.getState();
     const resume = resumes[resumeId];
 
     if (resume) {

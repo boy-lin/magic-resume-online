@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/form";
 import { useRequest } from "ahooks";
 import SkeletonCard from "@/components/ui-lab/skeleton-card";
-import DownloadBtn from "@/components/editor/share/download-btn";
-import PrintBtn from "@/components/editor/share/print-btn";
-import ImageBtn from "@/components/editor/share/image-btn";
+import DownloadBtn from "@/components/blocks/workbench/editor/share/download-btn";
+import PrintBtn from "@/components/blocks/workbench/editor/share/print-btn";
+import ImageBtn from "@/components/blocks/workbench/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
 import ResumeTemplateComponent from "@/components/templates";
 import PageBreakLines from "@/components/preview/PageBreakLines";
@@ -217,8 +217,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
       </div>
     );
   }
-
-  // console.log("pageHeightPx, pageBreakCount", pageHeightPx, pageBreakCount);
 
   return (
     <div className="">

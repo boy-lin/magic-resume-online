@@ -2,9 +2,9 @@ import { useState, useEffect, memo, useRef } from "react";
 import { Eye, Edit2, PanelLeft, Minimize2 } from "lucide-react";
 
 import InfiniteViewer from "react-infinite-viewer";
-import { EditorHeader } from "@/components/editor/header";
+import { EditorHeader } from "@/components/blocks/workbench/editor/header";
 import { SidePanel } from "./SidePanel";
-import { EditPanel } from "@/components/editor/EditPanel";
+import { EditPanel } from "@/components/blocks/workbench/EditPanel";
 import PreviewPanel from "@/components/preview";
 import {
   ResizableHandle,
@@ -20,7 +20,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PreviewDock from "@/components/preview/PreviewDock";
-import { useResumeStore } from "@/store/useResumeStore";
+import {
+  useResumeListStore,
+  useResumeEditorStore,
+  useResumeSettingsStore,
+} from "@/store/resume";
 import { viewZoomRange } from "@/constants/view";
 
 const LAYOUT_CONFIG = {
@@ -161,7 +165,9 @@ export default function Editor() {
   const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
   const viewerRef = useRef<any>(null);
   const [editPanelShow, setEditPanelShow] = useState(true);
-  const { setActiveSection, setResumeView, activeResume } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
+  const { setResumeView } = useResumeSettingsStore();
+  const { activeResume } = useResumeListStore();
   const activeSection =
     typeof activeResume?.activeSection === "string"
       ? activeResume.activeSection

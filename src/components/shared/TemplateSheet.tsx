@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/sheet-no-overlay";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { useResumeStore } from "@/store/useResumeStore";
+import useResumeListStore from "@/store/resume/useResumeListStore";
 import classic from "@/assets/images/template-cover/classic.jpg";
 import modern from "@/assets/images/template-cover/modern.jpg";
 import leftRight from "@/assets/images/template-cover/left-right.jpg";
 import timeline from "@/assets/images/template-cover/timeline.jpg";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 const templateImages: { [key: string]: any } = {
   classic,
@@ -27,7 +28,8 @@ const templateImages: { [key: string]: any } = {
 
 const TemplateSheet = () => {
   const t = useTranslations("templates");
-  const { activeResume, setTemplate } = useResumeStore();
+  const { activeResume } = useResumeListStore();
+  const { setTemplate } = useResumeSettingsStore();
   const currentTemplate =
     DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||
     DEFAULT_TEMPLATES[0];

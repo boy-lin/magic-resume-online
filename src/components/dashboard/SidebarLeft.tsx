@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/shared/Logo";
 import { useTranslations } from "next-intl";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeListStore } from "@/store/resume";
 import {
   getSidebarMenuItems,
   getSidebarFooterLinks,
@@ -60,7 +60,7 @@ const SidebarInner: React.FC = () => {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const pathname = usePathname();
-  const { resumes } = useResumeStore();
+  const { resumes } = useResumeListStore();
   const { open } = useUISidebar(); // 使用UI库的useSidebar Hook
   console.log("resumes:", resumes);
   // 状态管理

@@ -279,11 +279,6 @@ export const useResumeListStore = create(
     }),
     {
       name: "resume-list-store", // 持久化存储名称
-      partialize: (state) => ({
-        resumes: state.resumes,
-        activeResumeId: state.activeResumeId,
-        activeResume: state.activeResume,
-      }),
     }
   )
 );

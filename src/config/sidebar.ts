@@ -31,13 +31,13 @@ export const SIDEBAR_MENU_ITEMS: Omit<SidebarMenuItem, "title">[] = [
     id: "resumes",
     url: "/app/dashboard/resumes",
     icon: FileText,
-    badge: () => "0", // 动态获取简历数量
+    badge: "", // 动态获取简历数量
   },
   {
     id: "templates",
     url: "/app/dashboard/templates",
     icon: SwatchBook,
-    badge: "NEW",
+    badge: "",
   },
   {
     id: "ai",

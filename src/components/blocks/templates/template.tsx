@@ -4,26 +4,14 @@ import { useRouter } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import { Eye, Play, Star, Users } from "lucide-react";
 
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeListStore } from "@/store/resume";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui-lab/button";
 import { Badge } from "@/components/ui/badge";
-
-import classic from "@/assets/images/template-cover/classic.jpg";
-import modern from "@/assets/images/template-cover/modern.jpg";
-import leftRight from "@/assets/images/template-cover/left-right.jpg";
-import timeline from "@/assets/images/template-cover/timeline.jpg";
-
+import { templateImages } from "@/app/constant/images";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
-
-const templateImages: Record<string, StaticImageData> = {
-  classic,
-  modern,
-  "left-right": leftRight,
-  timeline,
-};
 
 const item = {
   hidden: { opacity: 0, y: 20 },
@@ -45,7 +33,7 @@ export default function Template({
 }: TemplateProps) {
   const t = useTranslations("dashboard.templates");
   const router = useRouter();
-  const { createResume } = useResumeStore();
+  const { createResume } = useResumeListStore();
 
   const createResumeAsync = async (templateId: string) => {
     const template = DEFAULT_TEMPLATES.find((t) => t.id === templateId);

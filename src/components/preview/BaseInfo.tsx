@@ -9,7 +9,7 @@ import {
   GlobalSettings,
 } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume";
 import Base64 from "@/components/photo/base64";
 
 interface BaseInfoProps {
@@ -26,7 +26,7 @@ const BaseInfo = ({
 }: BaseInfoProps) => {
   const t = useTranslations("workbench");
   const locale = useLocale();
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
   const useIconMode = globalSettings?.useIconMode ?? false;
   const layout = basic?.layout || "left";
 

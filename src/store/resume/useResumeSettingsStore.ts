@@ -13,23 +13,23 @@ interface ResumeSettingsStore {
   resumeView: {
     zoomX: number;
   };
-  
+
   // 全局设置
   updateGlobalSettings: (settings: Partial<GlobalSettings>) => void;
-  
+
   // 主题设置
   setThemeColor: (color: string) => void;
-  
+
   // 模板设置
   setTemplate: (templateId: string, isNeedSync?: boolean) => void;
-  
+
   // 视图设置
   getViewScale: () => [number];
   setResumeView: (view: { zoomX: number }) => void;
 }
 
-export const useResumeSettingsStore = create(
-  persist<ResumeSettingsStore>(
+export const useResumeSettingsStore = create<ResumeSettingsStore>()(
+  persist(
     (set, get) => ({
       resumeView: {
         zoomX: 1,
@@ -39,7 +39,8 @@ export const useResumeSettingsStore = create(
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (!activeResumeId) return;
 
-        const currentResume = useResumeListStore.getState().resumes[activeResumeId];
+        const currentResume =
+          useResumeListStore.getState().resumes[activeResumeId];
         if (!currentResume) return;
 
         const updatedSettings = {
@@ -56,7 +57,8 @@ export const useResumeSettingsStore = create(
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (!activeResumeId) return;
 
-        const currentResume = useResumeListStore.getState().resumes[activeResumeId];
+        const currentResume =
+          useResumeListStore.getState().resumes[activeResumeId];
         if (!currentResume) return;
 
         const updatedSettings = {
@@ -70,7 +72,8 @@ export const useResumeSettingsStore = create(
       },
 
       setTemplate: (templateId, isNeedSync = true) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const template = DEFAULT_TEMPLATES.find((t) => t.id === templateId);
@@ -123,4 +126,4 @@ export const useResumeSettingsStore = create(
   )
 );
 
-export default useResumeSettingsStore; // By Cursor 
+export default useResumeSettingsStore; // By Cursor

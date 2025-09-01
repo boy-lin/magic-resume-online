@@ -1,16 +1,17 @@
 export const sideSettings = [
   {
     id: "switchTemplate",
-    title: "切换模版",
+    title: "模版",
     lang: "switchTemplate",
   },
   {
     id: "layout",
     title: "布局",
+    notSupportList: ["two-column"],
   },
   {
     id: "theme",
-    title: "主题色",
+    title: "主题",
   },
   {
     id: "typography",
@@ -18,7 +19,6 @@ export const sideSettings = [
   },
   {
     id: "mode",
-    icon: "⚡",
     title: "模式",
   },
 ];

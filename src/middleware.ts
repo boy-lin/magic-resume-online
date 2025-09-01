@@ -7,7 +7,7 @@ const langList = ["/zh", "/en"];
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  // console.log("aa middleware:request.url", request.nextUrl.pathname);
+  console.log("aa middleware:request.url", request.nextUrl.pathname);
 
   if (pathname === "/" || langList.some((it) => pathname.startsWith(it))) {
     const i18nMiddleware = createMiddleware(routing);
@@ -25,8 +25,8 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!feedback|!hooks|auth|demo|app/resumes-preview|account/signup|account/signin|account/forgot-pwd|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest)$).*)",
-    // "/",
+    "/((?!api/hooks|api/images|feedback|auth|app/resumes-preview|account/signin|account/signup|account/forgot-pwd|fonts|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest)$).*)",
+    // "/((?!hooks|api/images$).*)",
     // "/(zh|en)/:path*",
     // {
     //   source: "/app/:path*"

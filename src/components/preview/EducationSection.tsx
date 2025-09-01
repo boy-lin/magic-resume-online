@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Education, GlobalSettings } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume";
 import { useLocale } from "next-intl";
 
 interface EducationSectionProps {
@@ -16,7 +16,7 @@ const EducationSection = ({
   globalSettings,
   showTitle = true,
 }: EducationSectionProps) => {
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
   const locale = useLocale();
   const visibleEducation = education?.filter((edu) => edu.visible);
   return (

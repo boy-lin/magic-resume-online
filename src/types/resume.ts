@@ -167,6 +167,8 @@ export interface MenuSection {
   icon?: string;
   enabled: boolean;
   order: number;
+  description?: string;
+  content?: string;
 }
 
 export interface ResumeData {

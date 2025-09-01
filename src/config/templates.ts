@@ -39,4 +39,14 @@ export const templateConfigs: Record<string, TemplateConfig> = {
       },
     },
   },
+  "two-column": {
+    sectionTitle: {
+      className: "font-bold uppercase border-b border-gray-300 pb-2 mb-4",
+      styles: {
+        fontSize: 16,
+        fontWeight: "bold",
+        textTransform: "uppercase",
+      },
+    },
+  },
 };

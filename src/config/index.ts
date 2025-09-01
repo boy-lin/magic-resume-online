@@ -102,6 +102,27 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
       layout: "right",
     },
   },
+  {
+    id: "two-column",
+    name: "双栏专业版",
+    description: "专业双栏布局，左侧个人信息，右侧主要内容",
+    thumbnail: "two-column",
+    layout: "two-column",
+    colorScheme: {
+      primary: "#1a1a1a",
+      secondary: "#6b7280",
+      background: "#ffffff",
+      text: "#111827",
+    },
+    spacing: {
+      sectionGap: 24,
+      itemGap: 16,
+      contentPadding: 24,
+    },
+    basic: {
+      layout: "left",
+    },
+  },
 ];
 
 export const avatarUrlDefault = "/images/avatar.jpeg";
