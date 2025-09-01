@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { GlobalSettings } from "@/types/resume";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeListStore } from "@/store/resume";
 import { cn } from "@/lib/utils";
 import { templateConfigs } from "@/config/templates";
 
@@ -18,7 +18,7 @@ const SectionTitle = ({
   globalSettings,
   showTitle = true,
 }: SectionTitleProps) => {
-  const { activeResume } = useResumeStore();
+  const { activeResume } = useResumeListStore();
   const { menuSections, templateId = "default" } = activeResume || {};
 
   // 确保 menuSections 是数组

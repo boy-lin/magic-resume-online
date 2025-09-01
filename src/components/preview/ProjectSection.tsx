@@ -4,7 +4,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { Project, GlobalSettings } from "@/types/resume";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume";
 
 interface ProjectItemProps {
   project: Project;
@@ -122,7 +122,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({
   globalSettings,
   showTitle = true,
 }) => {
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
 
   const visibleProjects = projects?.filter((project) => project.visible);
 

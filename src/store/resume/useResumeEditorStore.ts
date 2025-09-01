@@ -20,29 +20,30 @@ interface ResumeEditorStore {
   // 编辑器状态
   activeSection: string;
   draggingProjectId: string | null;
-  
+
   // 基础信息编辑
   updateBasicInfo: (data: Partial<BasicInfo>) => void;
-  
+
   // 教育经历编辑
   updateEducation: (data: Education) => void;
   updateEducationBatch: (educations: Education[]) => void;
   deleteEducation: (id: string) => void;
-  
+
   // 工作经验编辑
   updateExperience: (data: Experience) => void;
   updateExperienceBatch: (experiences: Experience[]) => void;
   deleteExperience: (id: string) => void;
-  
+
   // 项目经验编辑
   updateProjects: (project: Project) => void;
   updateProjectsBatch: (projects: Project[]) => void;
   deleteProject: (id: string) => void;
   setDraggingProjectId: (id: string | null) => void;
-  
+
   // 技能编辑
   updateSkillContent: (skillContent: string) => void;
-  
+  updateSectionContentById: (sectionId: string, content: string) => void;
+
   // 自定义内容编辑
   addCustomData: (sectionId: string) => void;
   updateCustomData: (sectionId: string, items: CustomItem[]) => void;
@@ -54,7 +55,7 @@ interface ResumeEditorStore {
     updates: Partial<CustomItem>
   ) => void;
   removeCustomItem: (sectionId: string, itemId: string) => void;
-  
+
   // 菜单和章节管理
   reorderSections: (newOrder: MenuSection[]) => void;
   toggleSectionVisibility: (sectionId: string) => void;
@@ -62,15 +63,16 @@ interface ResumeEditorStore {
   updateMenuSections: (sections: MenuSection[]) => void;
 }
 
-export const useResumeEditorStore = create(
-  persist<ResumeEditorStore>(
+export const useResumeEditorStore = create<ResumeEditorStore>()(
+  persist(
     (set, get) => ({
       activeSection: "basic",
       draggingProjectId: null,
 
       updateBasicInfo: (data) => {
         try {
-          const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+          const { activeResumeId, resumes, updateResume } =
+            useResumeListStore.getState();
           const currentResume = validateActiveResume(activeResumeId, resumes);
           if (!currentResume) return;
 
@@ -88,7 +90,8 @@ export const useResumeEditorStore = create(
       },
 
       updateEducation: (education) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -117,7 +120,8 @@ export const useResumeEditorStore = create(
       },
 
       deleteEducation: (id) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const resume = resumes[activeResumeId];
@@ -130,7 +134,8 @@ export const useResumeEditorStore = create(
       },
 
       updateExperience: (experience) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -159,7 +164,8 @@ export const useResumeEditorStore = create(
       },
 
       deleteExperience: (id) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -175,7 +181,8 @@ export const useResumeEditorStore = create(
       },
 
       updateProjects: (project) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -204,7 +211,8 @@ export const useResumeEditorStore = create(
       },
 
       deleteProject: (id) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -240,8 +248,26 @@ export const useResumeEditorStore = create(
         }
       },
 
+      updateSectionContentById: (sectionId, content) => {
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
+        if (!activeResumeId) return;
+
+        const currentResume = resumes[activeResumeId];
+        if (!currentResume) return;
+
+        const sections = currentResume.menuSections.map((section) =>
+          section.id === sectionId ? { ...section, content } : section
+        );
+
+        updateResume(activeResumeId, {
+          menuSections: sections,
+        });
+      },
+
       addCustomData: (sectionId) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -267,7 +293,8 @@ export const useResumeEditorStore = create(
       },
 
       updateCustomData: (sectionId, items) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -284,7 +311,8 @@ export const useResumeEditorStore = create(
       },
 
       removeCustomData: (sectionId) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -298,7 +326,8 @@ export const useResumeEditorStore = create(
       },
 
       addCustomItem: (sectionId) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -325,7 +354,8 @@ export const useResumeEditorStore = create(
       },
 
       updateCustomItem: (sectionId, itemId, updates) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -344,7 +374,8 @@ export const useResumeEditorStore = create(
       },
 
       removeCustomItem: (sectionId, itemId) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -363,7 +394,8 @@ export const useResumeEditorStore = create(
       },
 
       reorderSections: (newOrder) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -379,14 +411,15 @@ export const useResumeEditorStore = create(
           ...section,
           order: index,
         }));
-        
+
         updateResume(activeResumeId, {
           menuSections: reorderedSections,
         });
       },
 
       toggleSectionVisibility: (sectionId) => {
-        const { activeResumeId, resumes, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
         if (!activeResumeId) return;
 
         const currentResume = resumes[activeResumeId];
@@ -431,4 +464,4 @@ export const useResumeEditorStore = create(
   )
 );
 
-export default useResumeEditorStore; // By Cursor 
+export default useResumeEditorStore; // By Cursor

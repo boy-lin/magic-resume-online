@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
 import { Slider } from "@/components/ui/slider";
 import { useDebounceFn, useThrottleFn } from "ahooks";
 
@@ -89,8 +89,8 @@ const PreviewDock = ({ viewerRef }) => {
     t,
   ]);
 
-  const { duplicateResume, activeResumeId, setResumeView, resumeView } =
-    useResumeStore();
+  const { duplicateResume, activeResumeId } = useResumeListStore();
+  const { setResumeView, resumeView } = useResumeSettingsStore();
   const viewScale = resumeView?.zoomX ? [resumeView.zoomX * 100] : [100];
 
   console.log("viewScale:", viewScale);

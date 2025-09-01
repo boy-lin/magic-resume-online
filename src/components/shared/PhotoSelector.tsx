@@ -4,9 +4,10 @@ import { Settings2, Image as ImageIcon, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import PhotoConfigDrawer from "./PhotoConfigDrawer";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { BasicInfo, PhotoConfig } from "@/types/resume";
 import { useTranslations } from "next-intl";
+import useResumeListStore from "@/store/resume/useResumeListStore";
 
 interface Props {
   className?: string;
@@ -15,7 +16,8 @@ interface Props {
 const PhotoSelector: React.FC<Props> = ({ className }) => {
   const t = useTranslations("workbench");
   const [showConfig, setShowConfig] = useState(false);
-  const { updateBasicInfo, activeResume } = useResumeStore();
+  const { updateBasicInfo } = useResumeEditorStore();
+  const { activeResume } = useResumeListStore();
   const { basic = {} as BasicInfo } = activeResume || {};
   const handlePhotoChange = (
     photo: string | undefined,

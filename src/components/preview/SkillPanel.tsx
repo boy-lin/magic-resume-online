@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings } from "@/types/resume";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 interface SkillSectionProps {
   skill?: string;
@@ -15,7 +15,7 @@ const SkillSection = ({
   globalSettings,
   showTitle = true,
 }: SkillSectionProps) => {
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
 
   return (
     <motion.div

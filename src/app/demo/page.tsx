@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
-const NextPage = () => {
+const DemoPage = () => {
   const [list, setList] = useState([
     {
       label: "text-stone-200",
@@ -32,6 +33,30 @@ const NextPage = () => {
   return (
     <div className="self-start py-12 sm:px-6 lg:px-8">
       <div className="flex flex-1 flex-col justify-center max-w-4xl m-auto">
+        {/* 导航链接 */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold mb-4">Demo 页面</h1>
+          <div className="space-y-2">
+            <Link
+              href="/demo/resume-demo"
+              className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mr-4"
+            >
+              简历演示页面
+            </Link>
+            <Link
+              href="/demo/tabs-demo"
+              className="inline-block px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors mr-4"
+            >
+              Tabs 组件演示
+            </Link>
+            <Link
+              href="/demo/scrollable-tabs-demo"
+              className="inline-block px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+            >
+              可滚动 Tabs 演示
+            </Link>
+          </div>
+        </div>
         <table>
           <thead>
             <tr>
@@ -79,4 +104,4 @@ const NextPage = () => {
   );
 };
 
-export default NextPage;
+export default DemoPage;

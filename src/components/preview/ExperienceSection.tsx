@@ -3,7 +3,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Experience, GlobalSettings } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 interface ExperienceSectionProps {
   experiences?: Experience[];
@@ -71,7 +71,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({
   globalSettings,
   showTitle = true,
 }) => {
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
 
   const visibleExperiences = experiences?.filter(
     (experience) => experience.visible

@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings, CustomItem } from "@/types/resume";
-import { useResumeStore } from "@/store/useResumeStore";
+import { useResumeEditorStore } from "@/store/resume";
 
 interface CustomSectionProps {
   sectionId: string;
@@ -19,7 +19,7 @@ const CustomSection = ({
   globalSettings,
   showTitle = true,
 }: CustomSectionProps) => {
-  const { setActiveSection } = useResumeStore();
+  const { setActiveSection } = useResumeEditorStore();
   const visibleItems = items?.filter((item) => {
     return item.visible && (item.title || item.description);
   });

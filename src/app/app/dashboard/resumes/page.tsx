@@ -44,7 +44,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useResumeStore } from "@/store/useResumeStore";
 import { TransitionOpacity } from "@/components/transition/opacity";
 import { TransitionTopToBottom } from "@/components/transition/top-to-bottom";
 import { TransitionBottomToTop } from "@/components/transition/bottom-to-top";
@@ -53,6 +52,7 @@ import { TransitionSpringScale } from "@/components/transition/spring-scale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import PaginationLab from "@/components/ui-lab/pagination";
+import useResumeListStore from "@/store/resume/useResumeListStore";
 
 // 简历卡片组件
 const ResumeCard: React.FC<{
@@ -286,8 +286,8 @@ const CreateResumeCard: React.FC<{
 const ResumeWorkbench = () => {
   const t = useTranslations();
   const router = useRouter();
-  const { deleteResume, getResumeList } = useResumeStore();
-  const resumes = useResumeStore().resumes;
+  const { deleteResume, getResumeList } = useResumeListStore();
+  const { resumes } = useResumeListStore();
 
   // 状态管理
   const [searchQuery, setSearchQuery] = useState("");
