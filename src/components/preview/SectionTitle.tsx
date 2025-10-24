@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { GlobalSettings } from "@/types/resume";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { cn } from "@/lib/utils";
 import { templateConfigs } from "@/config/templates";
 

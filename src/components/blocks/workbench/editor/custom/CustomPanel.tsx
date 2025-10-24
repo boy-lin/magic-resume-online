@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 import { Reorder } from "framer-motion";
 import { PlusCircle } from "lucide-react";
 import CustomItem from "./CustomItem";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { CustomItem as CustomItemType } from "@/types/resume";
 import { InputName } from "../basic/input-name";
 
@@ -17,14 +18,10 @@ const CustomPanel = memo(
     handleDeleteSection: () => void;
   }) => {
     const { activeResume } = useResumeListStore();
-    const { addCustomItem, updateCustomData, updateMenuSections } =
-      useResumeEditorStore();
-
-    const { customData, menuSections = [] } = activeResume || {};
-    const items = customData?.[id] || [];
-    const handleCreateItem = () => {
-      addCustomItem(id);
-    };
+    const { updateMenuSections } = useResumeEditorStore();
+    const { menuSections = [] } = activeResume || {};
+    const section = menuSections.find((s) => s.id === id);
+    const items = section?.content?.[0]?.value || [];
 
     const handleTitleChange = (title: string) => {
       updateMenuSections(
@@ -53,9 +50,7 @@ const CustomPanel = memo(
         <Reorder.Group
           axis="y"
           values={Array.isArray(items) ? items : []}
-          onReorder={(newOrder) => {
-            updateCustomData(id, newOrder);
-          }}
+          onReorder={(newOrder) => {}}
           className="space-y-3"
         >
           {(Array.isArray(items) ? items : []).map((item: CustomItemType) => (
@@ -63,7 +58,7 @@ const CustomPanel = memo(
           ))}
         </Reorder.Group>
 
-        <Button onClick={handleCreateItem} className={cn("w-full")}>
+        <Button onClick={() => {}} className={cn("w-full")}>
           <PlusCircle className="w-4 h-4 mr-2" />
           添加
         </Button>

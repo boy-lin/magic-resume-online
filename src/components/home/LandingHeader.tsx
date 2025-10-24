@@ -66,7 +66,6 @@ export default function LandingHeader() {
   const locale = pathname.split("/")[1]; // 从路径中获取语言代码
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuItems = tc.raw("menu.items");
-  console.debug("aa LandingHeader render user", menuItems);
 
   return (
     <>

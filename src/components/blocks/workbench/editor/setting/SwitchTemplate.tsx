@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { templateImages } from "@/app/constant/images";
 
 const SwitchTemplate = () => {

@@ -20,11 +20,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PreviewDock from "@/components/preview/PreviewDock";
-import {
-  useResumeListStore,
-  useResumeEditorStore,
-  useResumeSettingsStore,
-} from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { viewZoomRange } from "@/constants/view";
 
 const LAYOUT_CONFIG = {
@@ -279,6 +278,7 @@ export default function Editor() {
             )}
           >
             <EditPanel
+              activeSection={activeSection}
               setEditPanelShow={setEditPanelShow}
               editPanelCollapsed={editPanelCollapsed}
             />

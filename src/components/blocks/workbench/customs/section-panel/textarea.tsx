@@ -1,24 +1,25 @@
 "use client";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import { cn } from "@/lib/utils";
 import Field from "../../editor/Field";
 import { InputName } from "../../editor/basic/input-name";
-import { MenuSection } from "@/types/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { ResumeSection } from "@/types/resume";
 
 const TextareaPanel = ({
   id,
-  content,
-  onChange,
+  section,
   placeholder,
-  menuSections,
 }: {
   id: string;
-  content: string;
-  onChange: (value: string) => void;
+  section: ResumeSection;
   placeholder: string;
-  menuSections: MenuSection[];
 }) => {
   const { updateMenuSections } = useResumeEditorStore();
+  const { activeResume } = useResumeListStore();
+  const { menuSections = [] } = activeResume || {};
+
   const handleTitleChange = (title: string) => {
     updateMenuSections(
       menuSections.map((s) => {
@@ -29,19 +30,26 @@ const TextareaPanel = ({
       })
     );
   };
+
   return (
     <div className={cn("rounded-lg p-2", "bg-white", "dark:bg-neutral-900/30")}>
-      <div className="space-y-2">
-        <InputName
-          value={menuSections.find((s) => s.id === id)?.title || ""}
-          onChange={handleTitleChange}
-        />
+      <div className="space-y-2 text-center text-2xl">
+        <InputName value={section.title} onChange={handleTitleChange} />
       </div>
       <div className="space-y-2">
         <Field
           type="editor"
-          value={content}
-          onChange={onChange}
+          value={section.content?.[0]?.value || ""}
+          onChange={(value) => {
+            updateMenuSections(
+              menuSections.map((s) => {
+                if (s.id === id) {
+                  return { ...s, content: [{ ...s.content?.[0], value }] };
+                }
+                return s;
+              })
+            );
+          }}
           placeholder={placeholder}
         />
       </div>

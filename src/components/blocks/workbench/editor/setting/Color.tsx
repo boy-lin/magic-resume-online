@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEME_COLORS } from "@/types/resume";
-import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { useTranslations } from "next-intl";
 import { debounce } from "lodash";
 import { SettingCard } from "./SettingCard";

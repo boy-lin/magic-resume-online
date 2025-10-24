@@ -5,35 +5,32 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import PhotoConfigDrawer from "./PhotoConfigDrawer";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
-import { BasicInfo, PhotoConfig } from "@/types/resume";
+import { PhotoConfig, ResumeSectionContent } from "@/types/resume";
 import { useTranslations } from "next-intl";
 import useResumeListStore from "@/store/resume/useResumeListStore";
+import Image from "next/image";
 
 interface Props {
   className?: string;
+  photo: ResumeSectionContent;
+  updatePhoto: (value: ResumeSectionContent) => void;
 }
 
-const PhotoSelector: React.FC<Props> = ({ className }) => {
+const PhotoSelector: React.FC<Props> = ({ className, photo, updatePhoto }) => {
   const t = useTranslations("workbench");
   const [showConfig, setShowConfig] = useState(false);
-  const { updateBasicInfo } = useResumeEditorStore();
-  const { activeResume } = useResumeListStore();
-  const { basic = {} as BasicInfo } = activeResume || {};
-  const handlePhotoChange = (
-    photo: string | undefined,
-    config?: PhotoConfig
-  ) => {
-    updateBasicInfo({
-      ...basic,
-      photo,
-      photoConfig: config,
-    });
+
+  const handlePhotoChange = (val: Partial<ResumeSectionContent>) => {
+    updatePhoto({ ...photo, ...val });
   };
 
   const handleConfigChange = (config: PhotoConfig) => {
-    updateBasicInfo({
-      ...basic,
-      photoConfig: config,
+    updatePhoto({
+      ...photo,
+      config: {
+        ...photo.config,
+        ...config,
+      },
     });
   };
 
@@ -44,11 +41,13 @@ const PhotoSelector: React.FC<Props> = ({ className }) => {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => setShowConfig(true)}
         >
-          {basic.photo ? (
-            <img
-              src={basic.photo}
+          {photo.value ? (
+            <Image
+              src={photo.value}
               alt="Selected"
               className="w-[48px] h-[48px] object-cover rounded"
+              width={48}
+              height={48}
             />
           ) : (
             <div>
@@ -73,16 +72,12 @@ const PhotoSelector: React.FC<Props> = ({ className }) => {
             size="sm"
             className="h-6 px-2"
             onClick={() => {
-              updateBasicInfo({
-                ...basic,
-                photoConfig: {
-                  ...basic.photoConfig,
-                  visible: !(basic.photoConfig?.visible ?? true),
-                },
+              handleConfigChange({
+                visible: !photo.config?.visible,
               });
             }}
           >
-            {basic.photoConfig?.visible !== false ? (
+            {photo.config?.visible !== false ? (
               <Eye className="w-4 h-4 text-primary" />
             ) : (
               <EyeOff className="w-4 h-4" />
@@ -94,8 +89,8 @@ const PhotoSelector: React.FC<Props> = ({ className }) => {
       <PhotoConfigDrawer
         isOpen={showConfig}
         onClose={() => setShowConfig(false)}
-        photo={basic.photo}
-        config={basic.photoConfig}
+        photo={photo.value}
+        config={photo.config}
         onPhotoChange={handlePhotoChange}
         onConfigChange={handleConfigChange}
       />

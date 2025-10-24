@@ -14,7 +14,7 @@ import {
   BadgePlus,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { cn } from "@/lib/utils";
 import { TransitionLeftToRight } from "@/components/transition/left-to-right";
 import { sideSettings } from "@/constants/side";
@@ -45,14 +45,11 @@ export function SidePanel({
   onItemPointerLeave: (section: any) => void;
 }) {
   const { activeResume } = useResumeListStore();
-  console.log("activeResume", activeResume);
   const templateId = activeResume?.templateId;
 
   const activeSection = activeResume?.activeSection || "";
 
   const t = useTranslations("workbench.sidePanel");
-
-  // console.log("activeSection", activeSection);
 
   const onPointerLeave = (section) => {
     onItemPointerLeave(section);

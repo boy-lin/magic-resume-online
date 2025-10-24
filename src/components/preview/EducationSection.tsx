@@ -2,7 +2,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Education, GlobalSettings } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import { useLocale } from "next-intl";
 
 interface EducationSectionProps {

@@ -17,28 +17,12 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import LayoutSetting from "./layout/LayoutSetting";
-import {
-  useResumeListStore,
-  useResumeEditorStore,
-  useResumeSettingsStore,
-} from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { cn } from "@/lib/utils";
 import { THEME_COLORS } from "@/types/resume";
-import { MenuSection } from "@/types/resume";
-
-// 字体选项配置
-const FONT_OPTIONS = [
-  { value: "sans", label: "无衬线体" },
-  { value: "serif", label: "衬线体" },
-  { value: "mono", label: "等宽体" },
-];
-
-// 行高选项配置
-const LINE_HEIGHT_OPTIONS = [
-  { value: "normal", label: "默认" },
-  { value: "relaxed", label: "适中" },
-  { value: "loose", label: "宽松" },
-];
 
 // 字体大小选项
 const FONT_SIZE_OPTIONS = [12, 13, 14, 15, 16, 18, 20, 24];
@@ -273,70 +257,11 @@ function ThemeColorSelector({
  */
 export function SidePanel() {
   const { activeResume } = useResumeListStore();
-  const {
-    setActiveSection,
-    toggleSectionVisibility,
-    updateMenuSections,
-    reorderSections,
-    addCustomData,
-  } = useResumeEditorStore();
   const { updateGlobalSettings, setThemeColor } = useResumeSettingsStore();
-
-  const {
-    menuSections,
-    globalSettings = {},
-    activeSection: rawActiveSection,
-  } = activeResume || {};
-
-  // 确保 activeSection 是字符串
-  const activeSection =
-    typeof rawActiveSection === "string" ? rawActiveSection : "";
-
-  // 确保 menuSections 是数组并过滤有效数据
-  const safeMenuSections: MenuSection[] = useMemo(() => {
-    if (!Array.isArray(menuSections)) {
-      return [];
-    }
-    return menuSections.filter(
-      (section): section is MenuSection =>
-        section &&
-        typeof section === "object" &&
-        "id" in section &&
-        "title" in section &&
-        "enabled" in section &&
-        "order" in section
-    );
-  }, [menuSections]);
-
+  const { addMenuSection } = useResumeEditorStore();
+  const { globalSettings = {} } = activeResume || {};
   const { themeColor = THEME_COLORS[0] } = globalSettings;
   const t = useTranslations("workbench.sidePanel");
-
-  // 生成自定义区块ID
-  const generateCustomSectionId = useCallback((sections: MenuSection[]) => {
-    const customSections = sections.filter((s) => s.id.startsWith("custom"));
-    const nextNum = customSections.length + 1;
-    return `custom-${nextNum}`;
-  }, []);
-
-  // 创建自定义区块
-  const handleCreateSection = useCallback(() => {
-    const sectionId = generateCustomSectionId(safeMenuSections);
-    const newSection: MenuSection = {
-      id: sectionId,
-      title: sectionId,
-      icon: "➕",
-      enabled: true,
-      order: safeMenuSections.length,
-    };
-
-    updateMenuSections([...safeMenuSections, newSection]);
-    addCustomData(sectionId);
-  }, [
-    safeMenuSections,
-    generateCustomSectionId,
-    updateMenuSections,
-    addCustomData,
-  ]);
 
   // 更新全局设置
   const handleUpdateGlobalSettings = useCallback(
@@ -359,20 +284,12 @@ export function SidePanel() {
       <div className="p-2 space-y-2">
         {/* 布局设置 */}
         <SettingCard icon={Layout} title={t("layout.title")}>
-          <LayoutSetting
-            menuSections={safeMenuSections}
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-            toggleSectionVisibility={toggleSectionVisibility}
-            updateMenuSections={updateMenuSections}
-            reorderSections={reorderSections}
-          />
-
+          <LayoutSetting />
           <div className="space-y-2 py-4">
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.9 }}
-              onClick={handleCreateSection}
+              onClick={addMenuSection}
               className="flex justify-center w-full rounded-lg items-center gap-2 py-2 px-3 text-sm font-medium text-primary bg-indigo-50"
             >
               {t("layout.addCustomSection")}

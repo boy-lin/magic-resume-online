@@ -1,7 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import {
   AnimatePresence,
   motion,
@@ -13,32 +14,19 @@ import { useCallback, useState } from "react";
 import Field from "../Field";
 import ThemeModal from "@/components/shared/ThemeModal";
 import { useTranslations } from "next-intl";
-
-interface Project {
-  id: string;
-  name: string;
-  role: string;
-  date: string;
-  description: string;
-  visible: boolean;
-  link?: string;
-}
+import { ResumeSectionContent } from "@/types/resume";
+import { FieldType } from "@/types/resume";
 
 interface ProjectEditorProps {
-  project: Project;
-  onSave: (project: Project) => void;
+  fields: FieldType[];
+  onSave: (field: FieldType) => void;
   onDelete: () => void;
   onCancel: () => void;
 }
 
-const ProjectEditor: React.FC<ProjectEditorProps> = ({ project, onSave }) => {
+const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
   const t = useTranslations("workbench.projectItem");
-  const handleChange = (field: keyof Project, value: string) => {
-    onSave({
-      ...project,
-      [field]: value,
-    });
-  };
+  const [position, role, link, date, description] = fields;
 
   return (
     <div className="space-y-5">
@@ -46,35 +34,35 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({ project, onSave }) => {
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.name")}
-            value={project.name}
-            onChange={(value) => handleChange("name", value)}
+            value={position.value}
+            onChange={(value) => onSave({ ...position, value })}
             placeholder={t("placeholders.name")}
           />
           <Field
             label={t("labels.role")}
-            value={project.role}
-            onChange={(value) => handleChange("role", value)}
+            value={role.value}
+            onChange={(value) => onSave({ ...role, value })}
             placeholder={t("placeholders.role")}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.link")}
-            value={project.link || ""}
-            onChange={(value) => handleChange("link", value)}
+            value={link.value || ""}
+            onChange={(value) => onSave({ ...link, value })}
             placeholder={t("placeholders.link")}
           />
           <Field
             label={t("labels.date")}
-            value={project.date}
-            onChange={(value) => handleChange("date", value)}
+            value={date.value}
+            onChange={(value) => onSave({ ...date, value })}
             placeholder={t("placeholders.date")}
           />
         </div>
         <Field
           label={t("labels.description")}
-          value={project.description}
-          onChange={(value) => handleChange("description", value)}
+          value={description.value}
+          onChange={(value) => onSave({ ...description, value })}
           type="editor"
           placeholder={t("placeholders.description")}
         />
@@ -87,34 +75,26 @@ const ProjectItem = ({
   project,
   expandedId,
   setExpandedId,
+  deleteProjects,
+  updateSectionProjectsContent,
 }: {
-  project: Project;
+  project: ResumeSectionContent;
   expandedId: string | null;
   setExpandedId: (id: string | null) => void;
+  deleteProjects;
+  updateSectionProjectsContent: (item: ResumeSectionContent) => void;
 }) => {
-  const { updateProjects, deleteProject, setDraggingProjectId } =
-    useResumeEditorStore();
+  const { setDraggingProjectId } = useResumeEditorStore();
   const dragControls = useDragControls();
-  const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const handleVisibilityToggle = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      if (isUpdating) return;
-
-      setIsUpdating(true);
-      setTimeout(() => {
-        updateProjects({
-          ...project,
-          visible: !project.visible,
-        });
-        setIsUpdating(false);
-      }, 10);
-    },
-    [project, updateProjects, isUpdating]
-  );
+  const handleVisibilityToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateSectionProjectsContent({
+      ...project,
+      visible: !project.visible,
+    });
+  };
 
   return (
     <Reorder.Item
@@ -185,14 +165,13 @@ const ProjectItem = ({
                 "text-gray-700 dark:text-neutral-200"
               )}
             >
-              {project.name || "未命名项目"}
+              {project.value}
             </h3>
           </div>
           <div className="flex items-center gap-2 ml-4 shrink-0">
             <Button
               variant="ghost"
               size="sm"
-              disabled={isUpdating}
               className={cn(
                 "text-sm",
                 project.visible
@@ -223,10 +202,10 @@ const ProjectItem = ({
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={project.name}
+              title={project.value}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
-                deleteProject(project.id);
+                deleteProjects(project.id);
                 setExpandedId(null);
                 setDeleteDialogOpen(false);
               }}
@@ -271,12 +250,18 @@ const ProjectItem = ({
                   )}
                 />
                 <ProjectEditor
-                  project={project}
-                  onSave={(updatedProject) => {
-                    updateProjects(updatedProject);
+                  fields={project.fields}
+                  onSave={(field) => {
+                    updateSectionProjectsContent({
+                      ...project,
+                      fields: project.fields?.map((it) => {
+                        if (it.id !== field.id) return it;
+                        return { ...it, ...field };
+                      }),
+                    });
                   }}
                   onDelete={() => {
-                    deleteProject(project.id);
+                    deleteProjects(project.id);
                     setExpandedId(null);
                   }}
                   onCancel={() => setExpandedId(null)}

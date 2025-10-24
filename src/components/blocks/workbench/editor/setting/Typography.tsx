@@ -9,7 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import AlignSelector from "../basic/AlignSelector";

@@ -5,40 +5,69 @@ import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import ExperienceItem from "./ExperienceItem";
-import { Experience } from "@/types/resume";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+import { ResumeSection, ResumeSectionContent } from "@/types/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
 import { InputName } from "../basic/input-name";
 
-const ExperiencePanel = ({ id }: { id: string }) => {
+const ExperiencePanel = ({
+  id,
+  section,
+}: {
+  id: string;
+  section: ResumeSection;
+}) => {
   const t = useTranslations("workbench.experiencePanel");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const { activeResume } = useResumeListStore();
-  const { updateExperience, updateExperienceBatch, updateMenuSections } =
-    useResumeEditorStore();
-  const { experience = [], menuSections = [] } = activeResume || {};
-  const handleCreateProject = () => {
-    const newProject: Experience = {
-      id: generateUUID(),
-      company: t("defaultProject.company"),
-      position: t("defaultProject.position"),
-      date: t("defaultProject.date"),
-      details: t("defaultProject.details"),
-      visible: true,
-    };
-    updateExperience(newProject);
+  const { updateSectionExperience } = useResumeEditorStore();
+  const updateSectionExperienceContent = (item) => {
+    updateSectionExperience({
+      ...section,
+      content: section.content.map((c) =>
+        c.id !== item.id ? c : { ...c, ...item }
+      ),
+    });
   };
 
-  const handleTitleChange = (title: string) => {
-    updateMenuSections(
-      menuSections.map((s) => {
-        if (s.id === id) {
-          return { ...s, title };
-        }
-        return s;
-      })
-    );
+  const addSectionExperience = (item: ResumeSectionContent) => {
+    updateSectionExperience({
+      ...section,
+      content: [...section.content, item],
+    });
+  };
+
+  const deleteExperience = () => {
+    updateSectionExperience({
+      ...section,
+      content: section.content.filter((c) => c.id !== id),
+    });
+  };
+  const handleCreateProject = () => {
+    const newProject: ResumeSectionContent = {
+      id: generateUUID(),
+      type: "project",
+      value: "xxxx",
+      fields: [
+        {
+          id: "position",
+          type: "text",
+          value: "前端负责人",
+        },
+        {
+          id: "date",
+          type: "text",
+          value: "2022/6 - 2023/12",
+        },
+        {
+          id: "description",
+          type: "textarea",
+          value: ``,
+        },
+      ],
+    };
+    addSectionExperience(newProject);
   };
 
   return (
@@ -48,27 +77,38 @@ const ExperiencePanel = ({ id }: { id: string }) => {
         "bg-white dark:bg-neutral-900/30"
       )}
     >
-      <div className="space-y-2">
+      <div className="space-y-2 text-center text-2xl">
         <InputName
-          value={menuSections.find((s) => s.id === id)?.title || ""}
-          onChange={handleTitleChange}
+          value={section?.title || ""}
+          onChange={(value) => {
+            updateSectionExperience({
+              ...section,
+              title: value,
+            });
+          }}
         />
       </div>
       <div className="space-y-2">
         <Reorder.Group
           axis="y"
-          values={Array.isArray(experience) ? experience : []}
-          onReorder={(newOrder) => {
-            updateExperienceBatch(newOrder);
+          values={section.content}
+          onReorder={(vals) => {
+            updateSectionExperience({
+              ...section,
+              content: vals,
+            });
           }}
           className="space-y-3"
         >
-          {(Array.isArray(experience) ? experience : []).map((item) => (
+          {section.content.map((item) => (
             <ExperienceItem
               key={item.id}
               experience={item}
               expandedId={expandedId}
               setExpandedId={setExpandedId}
+              deleteExperience={deleteExperience}
+              updateSectionExperience={updateSectionExperience}
+              updateSectionExperienceContent={updateSectionExperienceContent}
             />
           ))}
 

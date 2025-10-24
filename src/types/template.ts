@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-
+import { ResumeSection } from "./resume";
 export interface ResumeTemplate {
   id: string;
   name: string;
@@ -23,9 +23,7 @@ export interface ResumeTemplate {
     itemGap: number;
     contentPadding: number;
   };
-  basic: {
-    layout?: "left" | "center" | "right";
-  };
+  menuSections: ResumeSection[];
 }
 
 export interface TemplateConfig {

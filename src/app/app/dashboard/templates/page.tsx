@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
 import Template from "@/components/blocks/templates/template";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 
 const container = {
   hidden: { opacity: 0 },
@@ -71,24 +71,6 @@ const TemplatesPage = () => {
     if (!template) return;
 
     const resumeId = await createResume(templateId);
-    const { resumes, updateResume } = useResumeListStore.getState();
-    const resume = resumes[resumeId];
-
-    if (resume) {
-      updateResume(resumeId, {
-        globalSettings: {
-          ...resume.globalSettings,
-          themeColor: template.colorScheme.primary,
-          sectionSpacing: template.spacing.sectionGap,
-          paragraphSpacing: template.spacing.itemGap,
-          pagePadding: template.spacing.contentPadding,
-        },
-        basic: {
-          ...resume.basic,
-          layout: template.basic.layout,
-        },
-      });
-    }
 
     router.push(`/app/workbench/${resumeId}`);
   };

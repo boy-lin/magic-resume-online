@@ -1,21 +1,43 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import { Reorder } from "framer-motion";
 import { PlusCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import EducationItem from "./EducationItem";
-import { Education } from "@/types/resume";
+import { Education, ResumeSection } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
 import { InputName } from "../basic/input-name";
 
-const EducationPanel = ({ id }) => {
+const EducationPanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.educationPanel");
-  const { activeResume } = useResumeListStore();
-  const { updateEducation, updateEducationBatch, updateMenuSections } =
-    useResumeEditorStore();
-  const { education = [], menuSections = [] } = activeResume || {};
+  const { updateSectionEducation } = useResumeEditorStore();
+
+  const updateSectionEducationContent = (item) => {
+    updateSectionEducation({
+      ...section,
+      content: section.content.map((c) =>
+        c.id !== item.id ? c : { ...c, ...item }
+      ),
+    });
+  };
+
+  const addSectionEducation = (item) => {
+    updateSectionEducation({
+      ...section,
+      content: [...section.content, item],
+    });
+  };
+
+  const deleteSectionEducation = (id: string) => {
+    updateSectionEducation({
+      ...section,
+      content: section.content.filter((c) => c.id !== id),
+    });
+  };
+
   const handleCreateProject = () => {
     const newEducation: Education = {
       id: generateUUID(),
@@ -27,18 +49,7 @@ const EducationPanel = ({ id }) => {
       description: "",
       visible: true,
     };
-    updateEducation(newEducation);
-  };
-
-  const handleTitleChange = (title: string) => {
-    updateMenuSections(
-      menuSections.map((s) => {
-        if (s.id === id) {
-          return { ...s, title };
-        }
-        return s;
-      })
-    );
+    addSectionEducation(newEducation);
   };
 
   return (
@@ -50,10 +61,15 @@ const EducationPanel = ({ id }) => {
       )}
     >
       <div className="space-y-2">
-        <div className="">
+        <div className="text-center text-2xl">
           <InputName
-            value={menuSections.find((s) => s.id === id)?.title || ""}
-            onChange={handleTitleChange}
+            value={section?.title || ""}
+            onChange={(title) => {
+              updateSectionEducation({
+                ...section,
+                title: title,
+              });
+            }}
           />
         </div>
       </div>
@@ -61,16 +77,22 @@ const EducationPanel = ({ id }) => {
         <div className="">
           <Reorder.Group
             axis="y"
-            values={Array.isArray(education) ? education : []}
-            onReorder={(newOrder) => {
-              updateEducationBatch(newOrder);
+            values={section.content}
+            onReorder={(vals) => {
+              updateSectionEducation({
+                ...section,
+                content: vals,
+              });
             }}
             className="space-y-3"
           >
-            {(Array.isArray(education) ? education : []).map((education) => (
+            {section.content.map((item) => (
               <EducationItem
-                key={education.id}
-                education={education}
+                key={item.id}
+                education={item}
+                deleteSectionEducation={deleteSectionEducation}
+                updateSectionEducation={updateSectionEducation}
+                updateSectionEducationContent={updateSectionEducationContent}
               ></EducationItem>
             ))}
 

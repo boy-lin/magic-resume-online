@@ -9,7 +9,7 @@ import { Share, Link2, Globe } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { isSupportClipboardWrite, textToBlob } from "@/utils/copy";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import {
   Select,
   SelectTrigger,

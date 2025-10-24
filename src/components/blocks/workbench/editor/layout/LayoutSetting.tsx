@@ -1,40 +1,25 @@
 "use client";
 import { Reorder } from "framer-motion";
-import { MenuSection } from "@/types/resume";
 import LayoutItem from "./LayoutItem";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 
-interface LayoutPanelProps {
-  menuSections: MenuSection[];
-  activeSection: string;
-  setActiveSection: (id: string) => void;
-  toggleSectionVisibility: (id: string) => void;
-  updateMenuSections: (sections: MenuSection[]) => void;
-  reorderSections: (sections: MenuSection[]) => void;
-}
+const LayoutSetting = () => {
+  const {
+    setActiveSection,
+    toggleSectionVisibility,
+    updateMenuSections,
+    reorderSections,
+  } = useResumeEditorStore();
+  const { activeResume } = useResumeListStore();
 
-const LayoutSetting = ({
-  menuSections,
-  activeSection,
-  setActiveSection,
-  toggleSectionVisibility,
-  updateMenuSections,
-  reorderSections,
-}: LayoutPanelProps) => {
-  // 确保 menuSections 是数组
-  const safeMenuSections = Array.isArray(menuSections)
-    ? menuSections
-    : menuSections && typeof menuSections === "object"
-    ? Object.values(menuSections)
-    : [];
-  const basicSection = safeMenuSections.find((item) => item.id === "basic");
-  const draggableSections = safeMenuSections.filter(
-    (item) => item.id !== "basic"
-  );
+  const { menuSections, activeSection: rawActiveSection } = activeResume;
 
-  // 确保 draggableSections 是有效的数组
-  const safeDraggableSections = Array.isArray(draggableSections)
-    ? draggableSections
-    : [];
+  // 确保 activeSection 是字符串
+  const activeSection =
+    typeof rawActiveSection === "string" ? rawActiveSection : "";
+
+  const [basicSection, ...draggableSections] = menuSections;
 
   return (
     <div className="space-y-4  rounded-lg bg-white dark:bg-neutral-900/30">
@@ -46,16 +31,16 @@ const LayoutSetting = ({
           setActiveSection={setActiveSection}
           toggleSectionVisibility={toggleSectionVisibility}
           updateMenuSections={updateMenuSections}
-          menuSections={safeMenuSections}
+          menuSections={menuSections}
         />
       )}
 
       <Reorder.Group
         axis="y"
-        values={safeDraggableSections}
+        values={draggableSections}
         onReorder={(newOrder) => {
           const updatedSections = [
-            ...safeMenuSections.filter((item) => item.id === "basic"),
+            ...menuSections.filter((item) => item.id === "basic"),
             ...newOrder,
           ];
           reorderSections(updatedSections);
@@ -66,7 +51,7 @@ const LayoutSetting = ({
           duration: 0,
         }}
       >
-        {safeDraggableSections.map((item) => (
+        {draggableSections.map((item) => (
           <LayoutItem
             key={item.id}
             item={item}
@@ -74,7 +59,7 @@ const LayoutSetting = ({
             setActiveSection={setActiveSection}
             toggleSectionVisibility={toggleSectionVisibility}
             updateMenuSections={updateMenuSections}
-            menuSections={safeMenuSections}
+            menuSections={menuSections}
           />
         ))}
       </Reorder.Group>
