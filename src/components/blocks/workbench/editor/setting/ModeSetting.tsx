@@ -1,7 +1,8 @@
 import { Switch } from "@/components/ui-lab/switch";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "next-intl";
-import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 export function ModeSetting() {
   const { activeResume } = useResumeListStore();

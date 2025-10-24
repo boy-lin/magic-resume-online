@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings, CustomItem } from "@/types/resume";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 interface CustomSectionProps {
   sectionId: string;

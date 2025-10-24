@@ -9,7 +9,8 @@ import {
   GlobalSettings,
 } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+
 import Base64 from "@/components/photo/base64";
 
 interface BaseInfoProps {

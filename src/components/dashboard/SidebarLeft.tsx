@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/shared/Logo";
 import { useTranslations } from "next-intl";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import {
   getSidebarMenuItems,
   getSidebarFooterLinks,

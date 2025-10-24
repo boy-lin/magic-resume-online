@@ -1,14 +1,7 @@
 "use client";
-import React, { useRef, useState } from "react";
-import {
-  PlusCircle,
-  GripVertical,
-  Trash2,
-  Eye,
-  EyeOff,
-  Pencil,
-} from "lucide-react";
-import { Reorder, AnimatePresence, motion } from "framer-motion";
+import React from "react";
+import { GripVertical, Trash2, Eye, EyeOff } from "lucide-react";
+import { Reorder } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,25 +9,16 @@ import { Switch } from "@/components/ui/switch";
 import PhotoUpload from "@/components/shared/PhotoSelector";
 import IconSelector from "../IconSelector";
 import AlignSelector from "./AlignSelector";
-import Field from "../Field";
+import Field, { FieldType } from "../Field";
 import { cn } from "@/lib/utils";
-import { DEFAULT_FIELD_ORDER } from "@/config";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
-import { BasicFieldType, CustomFieldType } from "@/types/resume";
-import { generateUUID } from "@/utils/uuid";
-import { TransitionOpacity } from "@/components/transition/opacity";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+  ResumeSectionContent,
+  FieldType as ResumeFieldType,
+  ResumeSection,
+} from "@/types/resume";
+import { TransitionOpacity } from "@/components/transition/opacity";
 import { InputName } from "./input-name";
-interface CustomFieldProps {
-  field: CustomFieldType;
-  onUpdate: (field: CustomFieldType) => void;
-  onDelete: (id: string) => void;
-}
 
 const itemAnimations = {
   initial: { opacity: 0 },
@@ -43,240 +27,29 @@ const itemAnimations = {
   duration: 0,
 };
 
-const CustomField: React.FC<CustomFieldProps> = ({
-  field,
-  onUpdate,
-  onDelete,
-}) => {
+const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
+  const { updateSectionBasic } = useResumeEditorStore();
+  const [name, title, photo, github, ...otherFields] = section.content;
   const t = useTranslations("workbench.basicPanel");
 
-  return (
-    <Reorder.Item
-      value={field}
-      id={field.id}
-      className="group touch-none list-none"
-      {...itemAnimations}
-    >
-      <div
-        className={cn(
-          "grid grid-cols-[auto,auto,1fr,1fr,auto] gap-3 items-center p-3",
-          "bg-white dark:bg-neutral-800 rounded-xl",
-          "border border-neutral-100 dark:border-neutral-700",
-          "hover:border-neutral-200 dark:hover:border-neutral-600",
-          !field.visible && "!opacity-60"
-        )}
-      >
-        <div className="flex items-center justify-center">
-          <GripVertical
-            className={cn(
-              "w-4 h-4 cursor-grab active:cursor-grabbing",
-              "text-neutral-300 dark:text-neutral-500",
-              "transition-colors duration-200",
-              "group-hover:text-neutral-400 dark:group-hover:text-neutral-400"
-            )}
-          />
-        </div>
-        <div className="flex items-center justify-center">
-          <IconSelector
-            value={field.icon}
-            onChange={(value) => onUpdate({ ...field, icon: value })}
-          />
-        </div>
-        <Field
-          value={field.label ?? ""}
-          onChange={(value) =>
-            onUpdate({
-              ...field,
-              label: value,
-            })
-          }
-          placeholder={t("customFields.placeholders.label")}
-          className={cn(
-            "bg-neutral-50 dark:bg-neutral-900",
-            "border-neutral-200 dark:border-neutral-700",
-            "focus:border-blue-500 dark:focus:border-blue-400",
-            "placeholder-neutral-400 dark:placeholder-neutral-500"
-          )}
-        />
-        <Field
-          value={field.value}
-          onChange={(value) =>
-            onUpdate({
-              ...field,
-              value: value,
-            })
-          }
-          placeholder={t("customFields.placeholders.value")}
-          className={cn(
-            "bg-neutral-50 dark:bg-neutral-900",
-            "border-neutral-200 dark:border-neutral-700",
-            "focus:border-blue-500 dark:focus:border-blue-400",
-            "placeholder-neutral-400 dark:placeholder-neutral-500"
-          )}
-        />
-
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "shrink-0 h-8 px-2",
-              "text-neutral-500 dark:text-neutral-400",
-              "hover:text-neutral-700 dark:hover:text-neutral-200"
-            )}
-            onClick={() => onUpdate({ ...field, visible: !field.visible })}
-          >
-            {field.visible ? (
-              <Eye className="w-4 h-4 text-primary" />
-            ) : (
-              <EyeOff className="w-4 h-4" />
-            )}
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(field.id)}
-            className={cn(
-              "shrink-0 h-8 px-2",
-              "text-neutral-500 dark:text-neutral-400",
-              "hover:text-red-600 dark:hover:text-red-400"
-            )}
-          >
-            <Trash2 className="w-4 h-4 text-red-400" />
-          </Button>
-        </div>
-      </div>
-    </Reorder.Item>
-  );
-};
-
-const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
-  const { activeResume } = useResumeListStore();
-  const { updateBasicInfo, updateMenuSections } = useResumeEditorStore();
-  console.log("activeResume", activeResume);
-  const { basic } = activeResume || {};
-  const menuSections = activeResume?.menuSections || [];
-
-  const [customFields, setCustomFields] = useState<CustomFieldType[]>(
-    basic?.customFields?.map((field) => ({
-      ...field,
-      visible: field.visible ?? true,
-    })) || []
-  );
-  const [basicFields, setBasicFields] = useState<BasicFieldType[]>(() => {
-    if (!basic?.fieldOrder) {
-      return DEFAULT_FIELD_ORDER;
-    }
-    return basic.fieldOrder.map((field) => ({
-      ...field,
-      visible: field.visible ?? true,
-    }));
-  });
-  const t = useTranslations("workbench.basicPanel");
-  const handleBasicReorder = (newOrder: BasicFieldType[]) => {
-    setBasicFields(newOrder);
-    updateBasicInfo({
-      ...basic,
-      fieldOrder: newOrder,
+  const updateSectionBasicContent = (item: ResumeSectionContent) => {
+    updateSectionBasic({
+      content: section.content.map((c) =>
+        c.id !== item.id ? c : { ...c, ...item }
+      ),
     });
   };
 
-  const toggleFieldVisibility = (fieldId: string, isVisible: boolean) => {
-    const newFields = basicFields.map((field) =>
-      field.id === fieldId ? { ...field, visible: isVisible } : field
-    );
-    setBasicFields(newFields);
-    updateBasicInfo({
-      ...basic,
-      fieldOrder: newFields,
-    });
-  };
-
-  const deleteBasicField = (fieldId: string) => {
-    const fieldToDelete = basicFields.find((field) => field.id === fieldId);
-    if (
-      fieldToDelete &&
-      (fieldToDelete.key === "name" || fieldToDelete.key === "title")
-    ) {
-      return;
-    }
-
-    const updatedFields = basicFields.filter((field) => field.id !== fieldId);
-    setBasicFields(updatedFields);
-    updateBasicInfo({
-      ...basic,
-      fieldOrder: updatedFields,
-    });
-  };
-
-  const addCustomField = () => {
-    const fieldToAdd: CustomFieldType = {
-      id: generateUUID(),
-      label: "",
-      value: "",
-      icon: "User",
-      visible: true,
-    };
-    const updatedFields = [...customFields, fieldToAdd];
-    setCustomFields(updatedFields);
-    updateBasicInfo({
-      ...basic,
-      customFields: updatedFields,
-    });
-  };
-
-  const updateCustomField = (updatedField: CustomFieldType) => {
-    const updatedFields = customFields.map((field) =>
-      field.id === updatedField.id ? updatedField : field
-    );
-    setCustomFields(updatedFields);
-    updateBasicInfo({
-      ...basic,
-      customFields: updatedFields,
-    });
-  };
-
-  const deleteCustomField = (id: string) => {
-    const updatedFields = customFields.filter((field) => field.id !== id);
-    setCustomFields(updatedFields);
-    updateBasicInfo({
-      ...basic,
-      customFields: updatedFields,
-    });
-  };
-
-  const handleCustomFieldsReorder = (newOrder: CustomFieldType[]) => {
-    setCustomFields(newOrder);
-    updateBasicInfo({
-      ...basic,
-      customFields: newOrder,
-    });
-  };
-
-  const handleTitleChange = (title: string) => {
-    const list = menuSections.map((s) => {
-      if (s.id === "basic") {
-        return {
-          ...s,
-          title,
-        };
-      }
-      return s;
-    });
-    updateMenuSections(list);
-  };
-
-  const renderBasicField = (field: BasicFieldType) => {
-    const selectedIcon = basic?.icons?.[field.key] || "User";
-
+  const renderBasicField = (field: ResumeFieldType) => {
+    const selectedIcon = section.config?.useIconMode ? field.icon : field.label;
+    console.log("field", field);
     return (
       <Reorder.Item
         value={field}
         id={field.id}
         key={field.id}
         className="group touch-none list-none"
-        dragListener={field.key !== "name" && field.key !== "title"}
+        dragListener={field.id !== "name" && field.id !== "title"}
         {...itemAnimations}
       >
         <div
@@ -287,7 +60,7 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
             !field.visible && "opacity-75"
           )}
         >
-          {field.key !== "name" && field.key !== "title" && (
+          {field.id !== "name" && field.id !== "title" && (
             <div className="shrink-0">
               <GripVertical
                 className={cn(
@@ -301,35 +74,32 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
           )}
 
           <div className="flex flex-1 min-w-0 items-center">
-            {field.key !== "name" && field.key !== "title" && (
+            {field.id !== "name" && field.id !== "title" && (
               <IconSelector
                 value={selectedIcon}
                 onChange={(value) => {
-                  updateBasicInfo({
-                    ...basic,
-                    icons: {
-                      ...(basic?.icons || {}),
-                      [field.key]: value,
-                    },
+                  updateSectionBasicContent({
+                    ...field,
+                    icon: value,
                   });
                 }}
               />
             )}
             <div className=" w-[80px] ml-[4px] text-sm font-medium text-neutral-700 dark:text-neutral-200">
-              {t(`basicFields.${field.key}`)}
+              {t(`basicFields.${field.id}`)}
             </div>
             <div className="flex-1">
               <Field
                 label=""
-                value={(basic?.[field.key] as string) ?? ""}
+                value={field.value}
                 onChange={(value) =>
-                  updateBasicInfo({
-                    ...basic,
-                    [field.key]: value,
+                  updateSectionBasicContent({
+                    ...field,
+                    value,
                   })
                 }
                 placeholder={`请输入${field.label}`}
-                type={field.type}
+                type={field.type as FieldType}
               />
             </div>
           </div>
@@ -343,7 +113,12 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
                 "text-neutral-500 dark:text-neutral-400",
                 "hover:text-neutral-700 dark:hover:text-neutral-200"
               )}
-              onClick={() => toggleFieldVisibility(field.id, !field.visible)}
+              onClick={() => {
+                updateSectionBasicContent({
+                  ...field,
+                  visible: !field.visible,
+                });
+              }}
             >
               {field.visible ? (
                 <Eye className="w-4 h-4 text-primary" />
@@ -352,7 +127,7 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
               )}
             </Button>
 
-            {field.key !== "name" && field.key !== "title" && (
+            {field.id !== "name" && field.id !== "title" && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -361,7 +136,12 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
                   "text-neutral-500 dark:text-neutral-400",
                   "hover:text-red-600 dark:hover:text-red-400"
                 )}
-                onClick={() => deleteBasicField(field.id)}
+                onClick={() => {
+                  updateSectionBasicContent({
+                    ...field,
+                    visible: false,
+                  });
+                }}
               >
                 <Trash2 className="w-4 h-4 text-red-400" />
               </Button>
@@ -375,33 +155,47 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
   return (
     <div className="space-y-4 p-2">
       <div className="space-y-2">
-        <div className=" ">
+        <div className="text-center text-2xl">
           <InputName
-            value={menuSections.find((s) => s.id === id)?.title || ""}
-            onChange={handleTitleChange}
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <h2 className="text-lg font-medium">{t("layout")}</h2>
-        <div className=" ">
-          <AlignSelector
-            value={basic?.layout || "left"}
-            onChange={(value) =>
-              updateBasicInfo({
-                ...basic,
-                layout: value,
+            value={section.title}
+            onChange={(title) =>
+              updateSectionBasic({
+                title,
               })
             }
           />
         </div>
       </div>
-      <TransitionOpacity className="space-y-2">
-        <h2 className="text-lg font-medium">{t("title")}</h2>
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-3 border border-neutral-100 dark:border-neutral-700">
-          <PhotoUpload />
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
+          <h2 className="text-lg font-medium">{t("layout")}</h2>
+          <div className=" ">
+            <AlignSelector
+              value={section.config?.layout || "left"}
+              onChange={(value) => {
+                updateSectionBasic({
+                  config: {
+                    ...section.config,
+                    layout: value,
+                  },
+                });
+              }}
+            />
+          </div>
         </div>
-      </TransitionOpacity>
+        <div className="space-y-2">
+          <h2 className="text-lg font-medium">{t("title")}</h2>
+          <div className="bg-white dark:bg-neutral-900 rounded-xl p-3 border border-neutral-100 dark:border-neutral-700">
+            <PhotoUpload
+              photo={photo}
+              updatePhoto={(value) => {
+                updateSectionBasicContent(value);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
       <TransitionOpacity className="space-y-2">
         <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
           {t("basicField")}
@@ -409,41 +203,16 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
         <Reorder.Group
           axis="y"
           as="div"
-          values={Array.isArray(basicFields) ? basicFields : []}
-          onReorder={handleBasicReorder}
+          values={otherFields}
+          onReorder={(fields) =>
+            updateSectionBasic({
+              content: [name, title, photo, github, ...fields],
+            })
+          }
           className="space-y-2"
         >
-          {(Array.isArray(basicFields) ? basicFields : []).map((field) =>
-            renderBasicField(field)
-          )}
+          {otherFields.map((field) => renderBasicField(field))}
         </Reorder.Group>
-      </TransitionOpacity>
-      <TransitionOpacity className="space-y-2">
-        <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
-          {t("customField")}
-        </h3>
-        <Reorder.Group
-          axis="y"
-          as="div"
-          values={Array.isArray(customFields) ? customFields : []}
-          onReorder={handleCustomFieldsReorder}
-          className="space-y-2"
-        >
-          {(Array.isArray(customFields) ? customFields : []).map((field) => (
-            <CustomField
-              key={field.id}
-              field={field}
-              onUpdate={updateCustomField}
-              onDelete={deleteCustomField}
-            />
-          ))}
-        </Reorder.Group>
-        <div>
-          <Button onClick={addCustomField} className="w-full mt-4">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            {t("customFields.addButton")}
-          </Button>
-        </div>
       </TransitionOpacity>
       <TransitionOpacity className="space-y-2">
         <div>
@@ -453,11 +222,14 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
             </h3>
 
             <Switch
-              checked={basic?.githubContributionsVisible}
+              checked={github?.config?.githubContributionsVisible}
               onCheckedChange={(checked) =>
-                updateBasicInfo({
-                  ...basic,
-                  githubContributionsVisible: checked,
+                updateSectionBasicContent({
+                  ...github,
+                  config: {
+                    ...github.config,
+                    githubContributionsVisible: checked,
+                  },
                 })
               }
             />
@@ -469,11 +241,14 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
               <Input
                 placeholder="请输入github access token"
                 className="flex-1"
-                value={basic?.githubKey}
+                value={github.config?.githubKey}
                 onChange={(e) =>
-                  updateBasicInfo({
-                    ...basic,
-                    githubKey: e.target.value,
+                  updateSectionBasicContent({
+                    ...github,
+                    config: {
+                      ...github.config,
+                      githubKey: e.target.value,
+                    },
                   })
                 }
               />
@@ -483,11 +258,14 @@ const BasicPanel: React.FC<{ id: string }> = ({ id }) => {
               <Input
                 className="flex-1"
                 placeholder="请输入github username"
-                value={basic?.githubUseName}
+                value={github.config?.githubUseName}
                 onChange={(e) =>
-                  updateBasicInfo({
-                    ...basic,
-                    githubUseName: e.target.value,
+                  updateSectionBasicContent({
+                    ...github,
+                    config: {
+                      ...github.config,
+                      githubUseName: e.target.value,
+                    },
                   })
                 }
               />

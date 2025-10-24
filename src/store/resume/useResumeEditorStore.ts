@@ -1,12 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
-  BasicInfo,
   Education,
   Experience,
   Project,
   CustomItem,
-  MenuSection,
+  ResumeSection,
 } from "@/types/resume";
 import { useResumeListStore } from "./useResumeListStore";
 import { generateUUID } from "@/utils/uuid";
@@ -21,21 +20,19 @@ interface ResumeEditorStore {
   activeSection: string;
   draggingProjectId: string | null;
 
-  // 基础信息编辑
-  updateBasicInfo: (data: Partial<BasicInfo>) => void;
+  updateSectionBasic: (data: Record<string, any>) => void;
+  updateSectionEducation: (data: Record<string, any>) => void;
+  updateSectionExperience: (data: Record<string, any>) => void;
+  updateSectionProjects: (data: Record<string, any>) => void;
 
-  // 教育经历编辑
-  updateEducation: (data: Education) => void;
   updateEducationBatch: (educations: Education[]) => void;
   deleteEducation: (id: string) => void;
 
   // 工作经验编辑
-  updateExperience: (data: Experience) => void;
   updateExperienceBatch: (experiences: Experience[]) => void;
   deleteExperience: (id: string) => void;
 
   // 项目经验编辑
-  updateProjects: (project: Project) => void;
   updateProjectsBatch: (projects: Project[]) => void;
   deleteProject: (id: string) => void;
   setDraggingProjectId: (id: string | null) => void;
@@ -47,7 +44,6 @@ interface ResumeEditorStore {
   // 自定义内容编辑
   addCustomData: (sectionId: string) => void;
   updateCustomData: (sectionId: string, items: CustomItem[]) => void;
-  removeCustomData: (sectionId: string) => void;
   addCustomItem: (sectionId: string) => void;
   updateCustomItem: (
     sectionId: string,
@@ -60,7 +56,8 @@ interface ResumeEditorStore {
   reorderSections: (newOrder: MenuSection[]) => void;
   toggleSectionVisibility: (sectionId: string) => void;
   setActiveSection: (sectionId: string) => void;
-  updateMenuSections: (sections: MenuSection[]) => void;
+  updateMenuSections: (sections: ResumeSection[]) => void;
+  addMenuSection: () => void;
 }
 
 export const useResumeEditorStore = create<ResumeEditorStore>()(
@@ -68,28 +65,23 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
     (set, get) => ({
       activeSection: "basic",
       draggingProjectId: null,
+      // 基础信息编辑
+      updateSectionBasic: (vals) => {
+        const { activeResumeId, resumes, updateResume } =
+          useResumeListStore.getState();
 
-      updateBasicInfo: (data) => {
-        try {
-          const { activeResumeId, resumes, updateResume } =
-            useResumeListStore.getState();
-          const currentResume = validateActiveResume(activeResumeId, resumes);
-          if (!currentResume) return;
+        const resume = validateActiveResume(activeResumeId, resumes);
+        if (!resume) return;
 
-          const updatedBasic = {
-            ...currentResume.basic,
-            ...data,
-          };
-
-          updateResume(activeResumeId!, {
-            basic: updatedBasic,
-          });
-        } catch (error) {
-          logger.warn("Failed to update basic info:", error);
-        }
+        updateResume(activeResumeId!, {
+          menuSections: resume.menuSections.map((s) => {
+            if (s.id !== "basic") return s;
+            return { ...s, ...vals };
+          }),
+        });
       },
-
-      updateEducation: (education) => {
+      // 教育经历编辑
+      updateSectionEducation: (vals) => {
         const { activeResumeId, resumes, updateResume } =
           useResumeListStore.getState();
         if (!activeResumeId) return;
@@ -97,24 +89,24 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const currentResume = resumes[activeResumeId];
         if (!currentResume) return;
 
-        const newEducation = currentResume.education.some(
-          (e) => e.id === education.id
-        )
-          ? currentResume.education.map((e) =>
-              e.id === education.id ? education : e
-            )
-          : [...currentResume.education, education];
-
         updateResume(activeResumeId, {
-          education: newEducation,
+          menuSections: currentResume.menuSections.map((s) => {
+            if (s.id !== "education") return s;
+            return { ...s, ...vals };
+          }),
         });
       },
 
       updateEducationBatch: (educations) => {
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (activeResumeId) {
+          const { resumes } = useResumeListStore.getState();
+          const currentResume = resumes[activeResumeId];
+          if (!currentResume) return;
           updateResume(activeResumeId, {
-            education: educations,
+            menuSections: currentResume.menuSections.map((s) =>
+              s.id === "education" ? { ...s, content: educations } : s
+            ),
           });
         }
       },
@@ -123,17 +115,19 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const { activeResumeId, resumes, updateResume } =
           useResumeListStore.getState();
         if (!activeResumeId) return;
-
         const resume = resumes[activeResumeId];
         if (!resume) return;
 
-        const updatedEducation = resume.education.filter((e) => e.id !== id);
         updateResume(activeResumeId, {
-          education: updatedEducation,
+          menuSections: resume.menuSections.map((s) => {
+            if (s.id !== "education") return s;
+            const content = s.content as Education[];
+            return { ...s, content: content.filter((e) => e.id !== id) };
+          }),
         });
       },
-
-      updateExperience: (experience) => {
+      // 工作经验编辑
+      updateSectionExperience: (vals) => {
         const { activeResumeId, resumes, updateResume } =
           useResumeListStore.getState();
         if (!activeResumeId) return;
@@ -141,24 +135,23 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const currentResume = resumes[activeResumeId];
         if (!currentResume) return;
 
-        const newExperience = currentResume.experience.find(
-          (e) => e.id === experience.id
-        )
-          ? currentResume.experience.map((e) =>
-              e.id === experience.id ? experience : e
-            )
-          : [...currentResume.experience, experience];
-
         updateResume(activeResumeId, {
-          experience: newExperience,
+          menuSections: currentResume.menuSections.map((s) =>
+            s.id === "experience" ? { ...s, ...vals } : s
+          ),
         });
       },
 
       updateExperienceBatch: (experiences) => {
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (activeResumeId) {
+          const { resumes } = useResumeListStore.getState();
+          const currentResume = resumes[activeResumeId];
+          if (!currentResume) return;
           updateResume(activeResumeId, {
-            experience: experiences,
+            menuSections: currentResume.menuSections.map((s) =>
+              s.id === "experience" ? { ...s, content: experiences } : s
+            ),
           });
         }
       },
@@ -171,16 +164,16 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const currentResume = resumes[activeResumeId];
         if (!currentResume) return;
 
-        const updatedExperience = currentResume.experience.filter(
-          (e) => e.id !== id
-        );
-
         updateResume(activeResumeId, {
-          experience: updatedExperience,
+          menuSections: currentResume.menuSections.map((s) => {
+            if (s.id !== "experience") return s;
+            const content = s.content as Experience[];
+            return { ...s, content: content.filter((e) => e.id !== id) };
+          }),
         });
       },
 
-      updateProjects: (project) => {
+      updateSectionProjects: (project) => {
         const { activeResumeId, resumes, updateResume } =
           useResumeListStore.getState();
         if (!activeResumeId) return;
@@ -188,24 +181,23 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const currentResume = resumes[activeResumeId];
         if (!currentResume) return;
 
-        const newProjects = currentResume.projects.some(
-          (p) => p.id === project.id
-        )
-          ? currentResume.projects.map((p) =>
-              p.id === project.id ? project : p
-            )
-          : [...currentResume.projects, project];
-
         updateResume(activeResumeId, {
-          projects: newProjects,
+          menuSections: currentResume.menuSections.map((s) =>
+            s.id === "projects" ? { ...s, ...project } : s
+          ),
         });
       },
 
       updateProjectsBatch: (projects) => {
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (activeResumeId) {
+          const { resumes } = useResumeListStore.getState();
+          const currentResume = resumes[activeResumeId];
+          if (!currentResume) return;
           updateResume(activeResumeId, {
-            projects,
+            menuSections: currentResume.menuSections.map((s) =>
+              s.id === "projects" ? { ...s, content: projects } : s
+            ),
           });
         }
       },
@@ -218,11 +210,12 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         const currentResume = resumes[activeResumeId];
         if (!currentResume) return;
 
-        const updatedProjects = currentResume.projects.filter(
-          (p) => p.id !== id
-        );
         updateResume(activeResumeId, {
-          projects: updatedProjects,
+          menuSections: currentResume.menuSections.map((s) => {
+            if (s.id !== "projects") return s;
+            const content = s.content as Project[];
+            return { ...s, content: content.filter((p) => p.id !== id) };
+          }),
         });
       },
 
@@ -242,8 +235,13 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
       updateSkillContent: (skillContent) => {
         const { activeResumeId, updateResume } = useResumeListStore.getState();
         if (activeResumeId) {
+          const { resumes } = useResumeListStore.getState();
+          const currentResume = resumes[activeResumeId];
+          if (!currentResume) return;
           updateResume(activeResumeId, {
-            skillContent,
+            menuSections: currentResume.menuSections.map((s) =>
+              s.id === "skills" ? { ...s, content: skillContent } : s
+            ),
           });
         }
       },
@@ -304,21 +302,6 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
           ...currentResume.customData,
           [sectionId]: items,
         };
-
-        updateResume(activeResumeId, {
-          customData: newCustomData,
-        });
-      },
-
-      removeCustomData: (sectionId) => {
-        const { activeResumeId, resumes, updateResume } =
-          useResumeListStore.getState();
-        if (!activeResumeId) return;
-
-        const currentResume = resumes[activeResumeId];
-        if (!currentResume) return;
-
-        const { [sectionId]: _, ...newCustomData } = currentResume.customData;
 
         updateResume(activeResumeId, {
           customData: newCustomData,
@@ -450,6 +433,24 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
         if (activeResumeId) {
           updateResume(activeResumeId, {
             menuSections: sections,
+          });
+        }
+      },
+
+      addMenuSection: () => {
+        const { activeResumeId, updateResume, activeResume } =
+          useResumeListStore.getState();
+        const newSection = {
+          id: generateUUID(),
+          title: "未命名",
+          icon: "➕",
+          enabled: true,
+          order: activeResume.menuSections.length,
+        };
+
+        if (activeResumeId) {
+          updateResume(activeResumeId, {
+            menuSections: [...(activeResume.menuSections || []), newSection],
           });
         }
       },

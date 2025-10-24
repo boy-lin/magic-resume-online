@@ -10,28 +10,35 @@ import {
 import { ChevronDown, Eye, EyeOff, GripVertical, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import Field from "../Field";
-import { Experience } from "@/types/resume";
+import { Experience, FieldType as ResumeFieldType } from "@/types/resume";
 import ThemeModal from "@/components/shared/ThemeModal";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { Education, ResumeSection, ResumeSectionContent } from "@/types/resume";
 import { useTranslations } from "next-intl";
 
 interface ProjectEditorProps {
-  experience: Experience;
-  onSave: (experience: Experience) => void;
+  experience: ResumeSectionContent;
+  updateSectionExperience: (it: Record<string, any>) => void;
+  updateSectionExperienceContent: (it: ResumeSectionContent) => void;
   onDelete: () => void;
   onCancel: () => void;
 }
 
 const ProjectEditor: React.FC<ProjectEditorProps> = ({
   experience,
-  onSave,
+  updateSectionExperience,
+  updateSectionExperienceContent,
 }) => {
   const t = useTranslations("workbench.experienceItem");
+  const [position, date, description] = experience.fields || [];
 
-  const handleChange = (field: keyof Experience, value: string) => {
-    onSave({
+  const handleChange = (field: ResumeFieldType) => {
+    updateSectionExperienceContent({
       ...experience,
-      [field]: value,
+      fields: experience?.fields?.map((it) => {
+        if (it.id !== field.id) return it;
+        return { ...it, ...field };
+      }),
     });
   };
 
@@ -41,27 +48,47 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.company")}
-            value={experience.company}
-            onChange={(value) => handleChange("company", value)}
+            value={experience.value}
+            onChange={(value) => {
+              updateSectionExperienceContent({
+                ...experience,
+                value,
+              });
+            }}
             placeholder={t("placeholders.company")}
           />
           <Field
             label={t("labels.position")}
-            value={experience.position}
-            onChange={(value) => handleChange("position", value)}
+            value={position.value}
+            onChange={(value) => {
+              handleChange({
+                ...position,
+                value,
+              });
+            }}
             placeholder={t("placeholders.position")}
           />
         </div>
         <Field
           label={t("labels.date")}
-          value={experience.date}
-          onChange={(value) => handleChange("date", value)}
+          value={date.value}
+          onChange={(value) => {
+            handleChange({
+              ...date,
+              value,
+            });
+          }}
           placeholder={t("placeholders.date")}
         />
         <Field
           label={t("labels.details")}
-          value={experience.details}
-          onChange={(value) => handleChange("details", value)}
+          value={description.value}
+          onChange={(value) => {
+            handleChange({
+              ...description,
+              value,
+            });
+          }}
           type="editor"
           placeholder={t("placeholders.details")}
         />
@@ -74,32 +101,33 @@ const ExperienceItem = ({
   experience,
   expandedId,
   setExpandedId,
+  updateSectionExperience,
+  updateSectionExperienceContent,
+  deleteExperience,
 }: {
-  experience: Experience;
+  experience: ResumeSectionContent;
   expandedId: string | null;
   setExpandedId: (id: string | null) => void;
+  updateSectionExperience: (it: Record<string, any>) => void;
+  updateSectionExperienceContent: (it: ResumeSectionContent) => void;
+  deleteExperience;
 }) => {
   const dragControls = useDragControls();
-  const { updateExperience, deleteExperience } = useResumeEditorStore();
   const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleVisibilityToggle = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-
       if (isUpdating) return;
-
       setIsUpdating(true);
-      setTimeout(() => {
-        updateExperience({
-          ...experience,
-          visible: !experience.visible,
-        });
-        setIsUpdating(false);
-      }, 10);
+      updateSectionExperienceContent({
+        ...experience,
+        visible: !experience.visible,
+      });
+      setIsUpdating(false);
     },
-    [experience, updateExperience, isUpdating]
+    [experience, updateSectionExperienceContent, isUpdating]
   );
 
   return (
@@ -161,7 +189,7 @@ const ExperienceItem = ({
                 "text-gray-700 dark:text-neutral-200"
               )}
             >
-              {experience.company || "家里蹲公司"}
+              {experience.value || "-"}
             </h3>
           </div>
           <div className="flex items-center gap-2 ml-4 shrink-0">
@@ -200,7 +228,7 @@ const ExperienceItem = ({
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={experience.company}
+              title={experience.value}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
                 deleteExperience(experience.id);
@@ -245,7 +273,10 @@ const ExperienceItem = ({
                 />
                 <ProjectEditor
                   experience={experience}
-                  onSave={updateExperience}
+                  updateSectionExperience={updateSectionExperience}
+                  updateSectionExperienceContent={
+                    updateSectionExperienceContent
+                  }
                   onDelete={() => {
                     deleteExperience(experience.id);
                     setExpandedId(null);

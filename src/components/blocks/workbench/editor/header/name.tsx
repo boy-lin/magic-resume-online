@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { useRequest } from "ahooks";
 import { Loader2 } from "lucide-react";
 

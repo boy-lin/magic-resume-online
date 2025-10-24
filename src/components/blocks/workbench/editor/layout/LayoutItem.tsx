@@ -136,17 +136,12 @@ const LayoutItem = ({
             whileTap={{ scale: 0.9 }}
             onClick={(e) => {
               e.stopPropagation();
-              const safeMenuSections = Array.isArray(menuSections) 
-                ? menuSections 
-                : menuSections && typeof menuSections === 'object' 
-                  ? Object.values(menuSections) 
-                  : [];
               updateMenuSections(
-                safeMenuSections.filter((section) => section.id !== item.id)
+                menuSections.filter((section) => section.id !== item.id)
               );
               setActiveSection(
-                safeMenuSections[
-                  safeMenuSections.findIndex((s) => s.id === item.id) - 1
+                menuSections[
+                  menuSections.findIndex((s) => s.id === item.id) - 1
                 ].id
               );
             }}

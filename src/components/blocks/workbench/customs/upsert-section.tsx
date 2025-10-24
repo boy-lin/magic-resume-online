@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useResumeEditorStore, useResumeListStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+
 import { DialogProps } from "@radix-ui/react-dialog";
 import { MenuSection } from "@/types/resume";
 import { zodResolver } from "@hookform/resolvers/zod";

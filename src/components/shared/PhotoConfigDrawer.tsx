@@ -21,6 +21,7 @@ import {
   DEFAULT_CONFIG,
   getRatioMultiplier,
   getBorderRadiusValue,
+  ResumeSectionContent,
 } from "@/types/resume";
 import { Textarea } from "@/components/ui/textarea";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
@@ -33,7 +34,7 @@ interface Props {
   onClose: () => void;
   photo?: string;
   config?: PhotoConfig;
-  onPhotoChange: (photo: string | undefined, config?: PhotoConfig) => void;
+  onPhotoChange: (val: Partial<ResumeSectionContent>) => void;
   onConfigChange: (config: PhotoConfig) => void;
 }
 
@@ -47,7 +48,6 @@ const PhotoConfigDrawer: React.FC<Props> = ({
   ...props
 }) => {
   const t = useTranslations("photoConfig");
-  const { updateBasicInfo } = useResumeEditorStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(photo);
   const [isDragging, setIsDragging] = useState(false);
@@ -118,8 +118,8 @@ const PhotoConfigDrawer: React.FC<Props> = ({
       setPreviewUrl(res.data);
       setImageUrl(res.data);
       localStorage.setItem("photo", res.data);
-      updateBasicInfo({
-        photo: res.data,
+      onPhotoChange({
+        value: res.data,
       });
     },
     {
@@ -169,10 +169,9 @@ const PhotoConfigDrawer: React.FC<Props> = ({
       });
 
       setPreviewUrl(proxyUrl);
-      updateBasicInfo({
-        photo: proxyUrl,
+      onPhotoChange({
+        value: proxyUrl,
       });
-      onPhotoChange(proxyUrl, config);
     } catch (error) {
       toast.error(
         t("upload.invalidUrl", {
@@ -212,11 +211,9 @@ const PhotoConfigDrawer: React.FC<Props> = ({
       inputRef.current.value = "";
     }
 
-    updateBasicInfo({
-      photo: "",
+    onPhotoChange({
+      value: "",
     });
-
-    onPhotoChange("", config);
 
     setTimeout(() => {
       setPreviewUrl("");
@@ -282,7 +279,9 @@ const PhotoConfigDrawer: React.FC<Props> = ({
   };
 
   const handleSave = () => {
-    onPhotoChange(previewUrl, config);
+    onPhotoChange({
+      value: previewUrl,
+    });
     onClose();
   };
 

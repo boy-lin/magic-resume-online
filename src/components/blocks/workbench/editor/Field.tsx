@@ -20,11 +20,12 @@ import AIPolishDialog from "../../../shared/ai/AIPolishDialog";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
 
+export type FieldType = "text" | "textarea" | "date" | "editor";
 interface FieldProps {
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  type?: "text" | "textarea" | "date" | "editor";
+  type?: FieldType;
   placeholder?: string;
   required?: boolean;
   className?: string;

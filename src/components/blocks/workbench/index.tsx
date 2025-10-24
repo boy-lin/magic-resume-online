@@ -3,7 +3,7 @@
 import { useRequest } from "ahooks";
 import { useParams } from "next/navigation";
 
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import SkeletonCard from "@/components/ui-lab/skeleton-card";
 
 import Editor from "./editor";

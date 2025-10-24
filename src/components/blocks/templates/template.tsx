@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import { Eye, Play, Star, Users } from "lucide-react";
 
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui-lab/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,26 +40,6 @@ export default function Template({
     if (!template) return;
 
     const resumeId = await createResume(templateId);
-    // 注意：这里需要从 store 中获取当前状态，但 useResumeStore 不支持 getState
-    // 暂时跳过这部分逻辑，或者需要重构状态管理
-    // const { resumes, updateResume } = useResumeStore.getState();
-    // const resume = resumes[resumeId];
-
-    // if (resume) {
-    //   updateResume(resumeId, {
-    //     globalSettings: {
-    //       ...resume.globalSettings,
-    //       themeColor: template.colorScheme.primary,
-    //       sectionSpacing: template.spacing.sectionGap,
-    //       paragraphSpacing: template.spacing.itemGap,
-    //       pagePadding: template.spacing.contentPadding,
-    //     },
-    //     basic: {
-    //       ...resume.basic,
-    //       layout: template.basic.layout,
-    //   });
-    // }
-
     router.push(`/app/workbench/${resumeId}`);
   };
 

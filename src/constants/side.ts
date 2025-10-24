@@ -7,7 +7,7 @@ export const sideSettings = [
   {
     id: "layout",
     title: "布局",
-    notSupportList: ["two-column"],
+    notSupportList: [],
   },
   {
     id: "theme",

@@ -4,7 +4,14 @@ import EducationSection from "../preview/EducationSection";
 import SkillSection from "../preview/SkillPanel";
 import ProjectSection from "../preview/ProjectSection";
 import CustomSection from "../preview/CustomSection";
-import { ResumeData } from "@/types/resume";
+import {
+  BasicInfo,
+  Education,
+  Experience,
+  MenuSection,
+  Project,
+  ResumeData,
+} from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import GithubContribution from "../shared/GithubContribution";
 
@@ -23,62 +30,66 @@ const LeftRightTemplate: React.FC<LeftRightTemplateProps> = ({
   );
   const sortedSections = [...enabledSections].sort((a, b) => a.order - b.order);
 
-  const renderSection = (sectionId: string) => {
-    switch (sectionId) {
+  const renderSection = (section: MenuSection) => {
+    switch (section.id) {
       case "basic":
+        const basic = section.content as BasicInfo;
         return (
           <>
             <BaseInfo
-              basic={data.basic}
+              basic={basic}
               globalSettings={data.globalSettings}
               template={template}
             ></BaseInfo>
-            {data.basic.githubContributionsVisible && (
+            {basic.githubContributionsVisible && (
               <GithubContribution
                 className="mt-2"
-                githubKey={data.basic.githubKey}
-                username={data.basic.githubUseName}
+                githubKey={basic.githubKey}
+                username={basic.githubUseName}
               />
             )}
           </>
         );
       case "experience":
+        const experience = section.content as Experience[];
         return (
           <ExperienceSection
-            experiences={data.experience}
+            experiences={experience}
             globalSettings={data.globalSettings}
           />
         );
       case "education":
+        const education = section.content as Education[];
         return (
           <EducationSection
-            education={data.education}
+            education={education}
             globalSettings={data.globalSettings}
           />
         );
       case "skills":
+        const skill = section.content as string;
         return (
-          <SkillSection
-            skill={data.skillContent}
-            globalSettings={data.globalSettings}
-          />
+          <SkillSection skill={skill} globalSettings={data.globalSettings} />
         );
       case "projects":
+        const projects = section.content as Project[];
         return (
           <ProjectSection
-            projects={data.projects}
+            projects={projects}
             globalSettings={data.globalSettings}
           />
         );
       default:
-        if (sectionId in data.customData) {
-          const sectionTitle = data.menuSections.find(s => s.id === sectionId)?.title || sectionId;
+        if (section.id in data.customData) {
+          const sectionTitle =
+            data.menuSections.find((s) => s.id === section.id)?.title ||
+            section.id;
           return (
             <CustomSection
               title={sectionTitle}
-              key={sectionId}
-              sectionId={sectionId}
-              items={data.customData[sectionId]}
+              key={section.id}
+              sectionId={section.id}
+              items={data.customData[section.id]}
               globalSettings={data.globalSettings}
             />
           );
@@ -96,7 +107,7 @@ const LeftRightTemplate: React.FC<LeftRightTemplateProps> = ({
       }}
     >
       {sortedSections.map((section) => (
-        <div key={section.id}>{renderSection(section.id)}</div>
+        <div key={section.id}>{renderSection(section)}</div>
       ))}
     </div>
   );

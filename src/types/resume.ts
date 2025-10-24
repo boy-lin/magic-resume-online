@@ -1,3 +1,30 @@
+export interface FieldType {
+  id: string;
+  type: string;
+  value?: string;
+  visible?: boolean;
+  icon?: string;
+  label?: string;
+}
+export interface ResumeSectionContent {
+  id: string;
+  type: string;
+  value?: string;
+  visible?: boolean;
+  icon?: string;
+  label?: string;
+  config?: Record<string, any>;
+  fields?: FieldType[];
+}
+export interface ResumeSection {
+  id: string;
+  title: string;
+  enabled: boolean;
+  content?: ResumeSectionContent[];
+  config?: Record<string, any>;
+  visible?: boolean;
+}
+
 export interface PhotoConfig {
   width?: number;
   height?: number;
@@ -44,15 +71,6 @@ export const getBorderRadiusValue = (config?: PhotoConfig) => {
   }
 };
 
-export interface BasicFieldType {
-  id: string;
-  key: keyof BasicInfo;
-  label: string;
-  type?: "date" | "textarea" | "text" | "editor";
-  visible: boolean;
-  custom?: boolean;
-}
-
 export interface CustomFieldType {
   id: string;
   label: string;
@@ -60,24 +78,6 @@ export interface CustomFieldType {
   icon?: string;
   visible?: boolean;
   custom?: boolean;
-}
-export interface BasicInfo {
-  birthDate: string;
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  location: string;
-  icons: Record<string, string>;
-  employementStatus: string;
-  photo: string;
-  photoConfig: PhotoConfig;
-  fieldOrder?: BasicFieldType[];
-  customFields: CustomFieldType[];
-  githubKey: string;
-  githubUseName: string;
-  githubContributionsVisible: boolean;
-  layout?: "left" | "center" | "right";
 }
 
 export interface Education {
@@ -161,14 +161,13 @@ export const THEME_COLORS = [
   "#2E8B57",
 ];
 
-export interface MenuSection {
-  id: string;
-  title: string;
-  icon?: string;
-  enabled: boolean;
-  order: number;
-  description?: string;
-  content?: string;
+export enum MenuSectionId {
+  introduction = "introduction",
+  basic = "basic",
+  experience = "experience",
+  education = "education",
+  skills = "skills",
+  projects = "projects",
 }
 
 export interface ResumeData {
@@ -177,40 +176,11 @@ export interface ResumeData {
   createdAt: string;
   updatedAt: string;
   templateId: string | null | undefined;
-  basic: BasicInfo;
-  education: Education[];
-  experience: Experience[];
-  projects: Project[];
-  customData: Record<string, CustomItem[]>;
-  skillContent: string;
   activeSection: string;
   draggingProjectId: string | null;
-  menuSections: MenuSection[];
+  menuSections: ResumeSection[];
   globalSettings: GlobalSettings;
   isNeedSync?: boolean;
   isPublic?: boolean;
   publicPassword?: string;
-}
-
-export interface ResumeStore {
-  resumes: ResumeData[];
-  currentResumeId: string | null;
-  currentResume: ResumeData | null;
-  updateResume: (id: string, data: Partial<ResumeData>) => void;
-  deleteResume: (id: string) => void;
-  setCurrentResume: (id: string) => void;
-  updateBasicInfo: (info: Partial<ResumeData["basic"]>) => void;
-  addEducation: (education: Omit<ResumeData["education"][0], "id">) => void;
-  updateEducation: (
-    educationId: string,
-    data: Partial<ResumeData["education"][0]>
-  ) => void;
-  removeEducation: (educationId: string) => void;
-  addExperience: (experience: Omit<ResumeData["experience"][0], "id">) => void;
-  updateExperience: (
-    experienceId: string,
-    data: Partial<ResumeData["experience"][0]>
-  ) => void;
-  removeExperience: (experienceId: string) => void;
-  updateSkillContent: (skillContent: string) => void;
 }

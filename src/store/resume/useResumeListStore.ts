@@ -15,7 +15,7 @@ import {
   initialResumeStateEn,
 } from "@/config/initialResumeData";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { validateApiResponse, validateResume, logger } from "./utils";
+import { validateResume, logger } from "./utils";
 
 /**
  * 简历列表状态管理
@@ -60,7 +60,7 @@ export const useResumeListStore = create(
       activeResumeId: null,
       activeResume: null,
 
-      createResume: async (templateId = null) => {
+      createResume: async (templateId) => {
         const locale =
           typeof document !== "undefined"
             ? document.cookie
@@ -73,13 +73,16 @@ export const useResumeListStore = create(
           locale === "en" ? initialResumeStateEn : initialResumeState;
 
         const id = generateUUID();
+
         const template = templateId
           ? DEFAULT_TEMPLATES.find((t) => t.id === templateId)
           : DEFAULT_TEMPLATES[0];
 
         const newResume: ResumeData = {
-          ...initialResumeData,
           id,
+          ...initialResumeData,
+          activeSection: "basic",
+          draggingProjectId: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           templateId: template?.id,
@@ -87,6 +90,14 @@ export const useResumeListStore = create(
             0,
             6
           )}`,
+          globalSettings: {
+            ...initialResumeData.globalSettings,
+            themeColor: template.colorScheme.primary,
+            sectionSpacing: template.spacing.sectionGap,
+            paragraphSpacing: template.spacing.itemGap,
+            pagePadding: template.spacing.contentPadding,
+          },
+          menuSections: template.menuSections,
         };
 
         await upsertResumeById(createClient(), newResume);
@@ -102,28 +113,25 @@ export const useResumeListStore = create(
       },
 
       updateResume: (resumeId, data, isNeedSync = true) => {
-        try {
-          const resume = validateResume(resumeId, get().resumes);
+        const resume = validateResume(resumeId, get().resumes);
 
-          const updatedResume = {
-            ...resume,
-            ...data,
-            isNeedSync,
-          };
+        const updatedResume: ResumeData = {
+          ...resume,
+          ...data,
+          isNeedSync,
+          menuSections: data.menuSections ?? resume.menuSections,
+        };
 
-          set((state) => ({
-            resumes: {
-              ...state.resumes,
-              [resumeId]: updatedResume,
-            },
-            activeResume:
-              state.activeResumeId === resumeId
-                ? updatedResume
-                : state.activeResume,
-          }));
-        } catch (error) {
-          logger.warn(`Failed to update resume ${resumeId}:`, error);
-        }
+        set((state) => ({
+          resumes: {
+            ...state.resumes,
+            [resumeId]: updatedResume,
+          },
+          activeResume:
+            state.activeResumeId === resumeId
+              ? updatedResume
+              : state.activeResume,
+        }));
       },
 
       updateResumeAsync: async (resume) => {
@@ -182,7 +190,7 @@ export const useResumeListStore = create(
                   ?.split("=")[1] || "zh"
               : "zh";
 
-          const duplicatedResume = {
+          const duplicatedResumeBase = {
             ...originalResume,
             id: newId,
             title: `${originalResume.title} (${
@@ -190,6 +198,11 @@ export const useResumeListStore = create(
             })`,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+          };
+
+          const duplicatedResume: ResumeData = {
+            ...duplicatedResumeBase,
+            menuSections: [...(duplicatedResumeBase.menuSections || [])],
           };
 
           set((state) => ({
@@ -251,30 +264,22 @@ export const useResumeListStore = create(
       },
 
       getResumeFullById: async (id) => {
-        try {
-          const client = createClient();
-          const resumeData = await getResumeById(client, id);
-
-          const newResume = {
-            activeSection: "basic",
-            draggingProjectId: null,
-            ...resumeData,
-          };
-
-          set((state) => ({
-            resumes: {
-              ...state.resumes,
-              [resumeData.id]: newResume,
-            },
-            activeResumeId: id,
-            activeResume: newResume,
-          }));
-
-          return resumeData;
-        } catch (error) {
-          logger.error(`Failed to get resume by id ${id}:`, error);
-          throw error;
-        }
+        const client = createClient();
+        const resumeData = await getResumeById(client, id);
+        const newResume: ResumeData = {
+          activeSection: "basic",
+          draggingProjectId: null,
+          ...resumeData,
+        };
+        set((state) => ({
+          resumes: {
+            ...state.resumes,
+            [resumeData.id]: newResume,
+          },
+          activeResumeId: id,
+          activeResume: newResume,
+        }));
+        return resumeData;
       },
     }),
     {

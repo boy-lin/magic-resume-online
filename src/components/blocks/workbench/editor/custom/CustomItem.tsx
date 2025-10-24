@@ -7,12 +7,12 @@ import {
 } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { GripVertical, Eye, EyeOff, ChevronDown, Trash2 } from "lucide-react";
 import Field from "../Field";
-
-import { CustomItem as CustomItemType } from "@/types/resume";
 import ThemeModal from "@/components/shared/ThemeModal";
+import { CustomItem as CustomItemType } from "@/types/resume";
+
 const CustomItemEditor = ({
   item,
   onSave,

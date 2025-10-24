@@ -22,7 +22,9 @@ import { cn } from "@/lib/utils";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
-import { useResumeListStore, useResumeSettingsStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+
 import { Slider } from "@/components/ui/slider";
 import { useDebounceFn, useThrottleFn } from "ahooks";
 

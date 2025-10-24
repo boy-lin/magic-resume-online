@@ -86,16 +86,11 @@ export const upsertResumeById = async (supabase: SupabaseClient, val) => {
   const params = filterValEqUndefined({
     id: val.id,
     title: val.title,
-    basic: JSON.stringify(val.basic),
     user_id: user.id,
     template_id: val.templateId,
     custom_data: JSON.stringify(val.customData),
-    education: JSON.stringify(val.education),
-    experience: JSON.stringify(val.experience),
     global_settings: JSON.stringify(val.globalSettings),
     menu_sections: JSON.stringify(val.menuSections),
-    projects: JSON.stringify(val.projects),
-    skill_content: JSON.stringify(val.skillContent),
   });
   return supabase.from("resumes").upsert(params);
 };
@@ -126,7 +121,6 @@ export const getResumeById = cache(async (supabase: SupabaseClient, id) => {
     globalSettings: JSON.parse(val.global_settings),
     menuSections: JSON.parse(val.menu_sections),
     projects: JSON.parse(val.projects),
-    skillContent: JSON.parse(val.skill_content),
     isPublic: val.is_public,
     publicPassword: val.public_password,
   };

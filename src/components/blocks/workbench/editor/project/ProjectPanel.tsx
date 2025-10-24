@@ -1,44 +1,66 @@
 import { cn } from "@/lib/utils";
-import { useResumeListStore, useResumeEditorStore } from "@/store/resume";
+
 import { Reorder } from "framer-motion";
 import { PlusCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import ProjectItem from "./ProjectItem";
-import { Project } from "@/types/resume";
+import { ResumeSection, ResumeSectionContent } from "@/types/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
 import { InputName } from "../basic/input-name";
 
-const ProjectPanel = ({ id }: { id: string }) => {
+const ProjectPanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.projectPanel");
-  const { activeResume } = useResumeListStore();
-  const { updateProjects, updateProjectsBatch, updateMenuSections } =
-    useResumeEditorStore();
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const { projects = [], menuSections = [] } = activeResume || {};
-  const handleCreateProject = () => {
-    const newProject: Project = {
-      id: generateUUID(),
-      name: t("defaultProject.name"),
-      role: t("defaultProject.role"),
-      date: t("defaultProject.date"),
-      description: t("defaultProject.description"),
-      visible: true,
-    };
-    updateProjects(newProject);
+  const { updateSectionProjects } = useResumeEditorStore();
+  const updateSectionProjectsContent = (item) => {
+    updateSectionProjects({
+      ...section,
+      content: section.content.map((c) =>
+        c.id !== item.id ? c : { ...c, ...item }
+      ),
+    });
   };
 
-  const handleTitleChange = (title: string) => {
-    updateMenuSections(
-      menuSections.map((s) => {
-        if (s.id === id) {
-          return { ...s, title };
-        }
-        return s;
-      })
-    );
+  const addSectionProjects = (item: ResumeSectionContent) => {
+    updateSectionProjects({
+      ...section,
+      content: [...section.content, item],
+    });
+  };
+
+  const deleteProjects = (id: string) => {
+    updateSectionProjects({
+      ...section,
+      content: section.content.filter((c) => c.id !== id),
+    });
+  };
+  const handleCreateProject = () => {
+    const newProject: ResumeSectionContent = {
+      id: generateUUID(),
+      type: "project",
+      value: "xxxx",
+      fields: [
+        {
+          id: "position",
+          type: "text",
+          value: "前端负责人",
+        },
+        {
+          id: "date",
+          type: "text",
+          value: "2022/6 - 2023/12",
+        },
+        {
+          id: "description",
+          type: "textarea",
+          value: ``,
+        },
+      ],
+    };
+    addSectionProjects(newProject);
   };
 
   return (
@@ -48,27 +70,37 @@ const ProjectPanel = ({ id }: { id: string }) => {
         "bg-white dark:bg-neutral-900/30"
       )}
     >
-      <div className="space-y-2">
+      <div className="space-y-2 text-center text-2xl">
         <InputName
-          value={menuSections.find((s) => s.id === id)?.title || ""}
-          onChange={handleTitleChange}
+          value={section.title}
+          onChange={(value) => {
+            updateSectionProjects({
+              ...section,
+              title: value,
+            });
+          }}
         />
       </div>
       <div className="space-y-2">
         <Reorder.Group
           axis="y"
-          values={Array.isArray(projects) ? projects : []}
-          onReorder={(newOrder) => {
-            updateProjectsBatch(newOrder);
+          values={section.content}
+          onReorder={(vals) => {
+            updateSectionProjects({
+              ...section,
+              content: vals,
+            });
           }}
           className="space-y-3"
         >
-          {(Array.isArray(projects) ? projects : []).map((project) => (
+          {section.content.map((project) => (
             <ProjectItem
               key={project.id}
               project={project}
               expandedId={expandedId}
               setExpandedId={setExpandedId}
+              updateSectionProjectsContent={updateSectionProjectsContent}
+              deleteProjects={deleteProjects}
             ></ProjectItem>
           ))}
 

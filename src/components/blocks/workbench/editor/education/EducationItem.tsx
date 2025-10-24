@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume";
-import { Education } from "@/types/resume";
+import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { Education, ResumeSection, ResumeSectionContent } from "@/types/resume";
 import {
   useDragControls,
   Reorder,
@@ -16,23 +16,30 @@ import ThemeModal from "@/components/shared/ThemeModal";
 import { useTranslations } from "next-intl";
 
 interface EducationEditorProps {
-  education: Education;
-  onSave: (education: Education) => void;
+  education: ResumeSectionContent;
   onDelete: () => void;
   onCancel: () => void;
+  updateSectionEducationContent: (education: ResumeSectionContent) => void;
 }
 
-const EducationEditor: React.FC<EducationEditorProps> = ({
+const EducationFiled: React.FC<EducationEditorProps> = ({
   education,
-  onSave,
+  onDelete,
+  onCancel,
+  updateSectionEducationContent,
 }) => {
   const t = useTranslations("workbench.educationItem");
-  const handleChange = (field: keyof Education, value: string) => {
-    onSave({
+  const handleFiledChange = (field) => {
+    updateSectionEducationContent({
       ...education,
-      [field]: value,
+      fields: education?.fields?.map((it) => {
+        if (it.id !== field.id) return it;
+        return { ...it, ...field };
+      }),
     });
   };
+  const [major, degree, startDate, endDate, description] =
+    education.fields || [];
 
   return (
     <div className="space-y-5">
@@ -40,15 +47,22 @@ const EducationEditor: React.FC<EducationEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.school")}
-            value={education.school}
-            onChange={(value) => handleChange("school", value)}
+            value={education.value}
+            onChange={(value) => {
+              updateSectionEducationContent({
+                ...education,
+                value,
+              });
+            }}
             placeholder={t("placeholders.school")}
             required
           />
           <Field
             label={t("labels.major")}
-            value={education.major}
-            onChange={(value) => handleChange("major", value)}
+            value={major.value}
+            onChange={(value) => {
+              handleFiledChange({ ...major, value });
+            }}
             placeholder={t("placeholders.major")}
             required
           />
@@ -57,33 +71,39 @@ const EducationEditor: React.FC<EducationEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.degree")}
-            value={education.degree}
-            onChange={(value) => handleChange("degree", value)}
+            value={degree.value}
+            onChange={(value) => {
+              handleFiledChange({ ...degree, value });
+            }}
             placeholder={t("placeholders.degree")}
             required
           />
 
-          <Field
+          {/* <Field
             label={t("labels.gpa")}
-            value={education.gpa || ""}
+            value={gpa || ""}
             onChange={(value) => handleChange("gpa", value)}
             placeholder={t("placeholders.gpa")}
-          />
+          /> */}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.startDate")}
-            value={education.startDate}
-            onChange={(value) => handleChange("startDate", value)}
+            value={startDate.value}
+            onChange={(value) => {
+              handleFiledChange({ ...startDate, value });
+            }}
             type="date"
             placeholder="YYYY-MM"
             required
           />
           <Field
             label={t("labels.endDate")}
-            value={education.endDate}
-            onChange={(value) => handleChange("endDate", value)}
+            value={endDate.value}
+            onChange={(value) => {
+              handleFiledChange({ ...endDate, value });
+            }}
             type="date"
             placeholder="YYYY-MM"
             required
@@ -92,8 +112,10 @@ const EducationEditor: React.FC<EducationEditorProps> = ({
 
         <Field
           label={t("labels.description")}
-          value={education.description}
-          onChange={(value) => handleChange("description", value)}
+          value={description?.value}
+          onChange={(value) => {
+            handleFiledChange({ ...description, value });
+          }}
           type="editor"
           placeholder={t("placeholders.description")}
         />
@@ -102,12 +124,23 @@ const EducationEditor: React.FC<EducationEditorProps> = ({
   );
 };
 
-const EducationItem = ({ education }: { education: Education }) => {
-  const { updateEducation, deleteEducation } = useResumeEditorStore();
+const EducationItem = ({
+  education,
+  deleteSectionEducation,
+  updateSectionEducation,
+  updateSectionEducationContent,
+}: {
+  education: ResumeSectionContent;
+  deleteSectionEducation: (id: string) => void;
+  updateSectionEducation: (education: ResumeSection) => void;
+  updateSectionEducationContent: (education: ResumeSectionContent) => void;
+}) => {
   const dragControls = useDragControls();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [major, degree, startDate, endDate, description] =
+    education.fields || [];
 
   const handleVisibilityToggle = useCallback(
     (e: React.MouseEvent) => {
@@ -116,15 +149,13 @@ const EducationItem = ({ education }: { education: Education }) => {
       if (isUpdating) return;
 
       setIsUpdating(true);
-      setTimeout(() => {
-        updateEducation({
-          ...education,
-          visible: !education.visible,
-        });
-        setIsUpdating(false);
-      }, 10);
+      updateSectionEducationContent({
+        ...education,
+        visible: !education.visible,
+      });
+      setIsUpdating(false);
     },
-    [education, updateEducation, isUpdating]
+    [education, updateSectionEducation, isUpdating]
   );
 
   return (
@@ -191,21 +222,22 @@ const EducationItem = ({ education }: { education: Education }) => {
                     "text-gray-700"
                   )}
                 >
-                  {education.school || "未填写学校"}
+                  {education.value || "未填写学校"}
                 </h3>
-                {(education.major || education.degree) && (
-                  <p
-                    className={cn(
-                      "text-sm truncate",
-                      "dark:text-neutral-400",
-                      "text-gray-500"
-                    )}
-                  >
-                    {[education.major, education.degree]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                )}
+                <div className={cn("flex items-center gap-2")}>
+                  {[major, degree].map((field) => (
+                    <p
+                      key={field.id}
+                      className={cn(
+                        "text-sm truncate",
+                        "dark:text-neutral-400",
+                        "text-gray-500"
+                      )}
+                    >
+                      {field.value}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -239,10 +271,10 @@ const EducationItem = ({ education }: { education: Education }) => {
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={education.school}
+              title={education.value}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
-                deleteEducation(education.id);
+                deleteSectionEducation(education.id);
                 setExpandedId(null);
                 setDeleteDialogOpen(false);
               }}
@@ -282,11 +314,11 @@ const EducationItem = ({ education }: { education: Education }) => {
                     "bg-gray-100 dark:bg-neutral-800"
                   )}
                 />
-                <EducationEditor
+                <EducationFiled
                   education={education}
-                  onSave={updateEducation}
+                  updateSectionEducationContent={updateSectionEducationContent}
                   onDelete={() => {
-                    deleteEducation(education.id);
+                    deleteSectionEducation(education.id);
                     setExpandedId(null);
                   }}
                   onCancel={() => setExpandedId(null)}

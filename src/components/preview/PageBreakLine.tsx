@@ -1,5 +1,5 @@
 import React from "react";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 
 const PageBreakLine = React.memo(({ pageNumber }: { pageNumber: number }) => {
   const { activeResume } = useResumeListStore();

@@ -4,7 +4,7 @@ import { AlertCircle, RefreshCcwDot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "../../../../shared/ThemeToggle";
-import { useResumeListStore } from "@/store/resume";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { toast } from "sonner";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import {

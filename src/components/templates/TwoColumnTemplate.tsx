@@ -1,14 +1,19 @@
-import React from "react";
-import { ResumeData } from "@/types/resume";
+import React, { useMemo } from "react";
+import {
+  Experience,
+  Education,
+  Project,
+  ResumeData,
+  MenuSectionId,
+  ResumeSection,
+} from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import Base64Image from "@/components/photo/base64";
-import BaseInfo from "../preview/BaseInfo";
-import GithubContribution from "../shared/GithubContribution";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { useLocale, useTranslations } from "next-intl";
 import * as Icons from "lucide-react";
-import { getAlignItems, getFlexDirection } from "./utils";
+import { getFlexDirection } from "./utils";
 
 interface TwoColumnTemplateProps {
   data: ResumeData;
@@ -19,118 +24,253 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
   data,
   template,
 }) => {
-  const {
-    basic,
-    experience,
-    education,
-    skillContent,
-    projects,
-    globalSettings,
-  } = data;
+  const { globalSettings } = data;
   const t = useTranslations("workbench.basicPanel");
-  const { name, photo, title, email, phone, location, githubKey } = basic;
   const { colorScheme } = template;
-  console.log("data", data);
-  console.log("template", template);
 
-  const enabledSections = data.menuSections.filter(
-    (section) => section.enabled
+  const [section1, ...otherSections] = data.menuSections;
+  const leftSection = otherSections.slice(
+    0,
+    Math.floor(otherSections.length / 2)
   );
+  const rightSection = otherSections.slice(
+    Math.floor(otherSections.length / 2)
+  );
+  const [name, title, photo, github, ...otherSection1Fields] = section1.content;
+
   const useIconMode = globalSettings?.useIconMode ?? false;
-  const locale = useLocale();
   const getIcon = (iconName: string | undefined) => {
     const IconComponent = Icons[
       iconName as keyof typeof Icons
     ] as React.ElementType;
     return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
   };
-  const getOrderedFields = React.useMemo(() => {
-    if (!basic.fieldOrder) {
-      return [
-        {
-          key: "email",
-          value: basic.email,
-          icon: basic.icons?.email || "Mail",
-          label: "电子邮箱",
-          visible: true,
-          custom: false,
-        },
-      ].filter((item) => Boolean(item.value && item.visible));
+
+  const renderFiled = (item) => {
+    if (item.type === "text") {
+      return (
+        <div className="text-sm" style={{ color: colorScheme.secondary }}>
+          {item.value}
+        </div>
+      );
+    } else if (item.type === "textarea") {
+      return (
+        <div
+          className="text-sm"
+          style={{ color: colorScheme.secondary }}
+          dangerouslySetInnerHTML={{ __html: item.value }}
+        />
+      );
+    } else if (item.type === "email") {
+      return (
+        <a href={`mailto:${item.value}`} className="underline">
+          {item.value}
+        </a>
+      );
+    } else if (item.type === "link") {
+      return (
+        <a href={item.value} className="underline">
+          {item.value}
+        </a>
+      );
     }
 
-    return basic.fieldOrder
-      .filter(
-        (field) =>
-          field.visible !== false &&
-          field.key !== "name" &&
-          field.key !== "title"
-      )
-      .map((field) => ({
-        key: field.key,
-        value:
-          field.key === "birthDate" && basic[field.key]
-            ? new Date(basic[field.key] as string).toLocaleDateString(locale)
-            : (basic[field.key] as string),
-        icon: basic.icons?.[field.key] || "User",
-        label: field.label,
-        visible: field.visible,
-        custom: field.custom,
-      }))
-      .filter((item) => Boolean(item.value));
-  }, [basic]);
+    return item?.value || "";
+  };
 
-  const allFields = [
-    ...getOrderedFields,
-    ...(basic.customFields
-      ?.filter((field) => field.visible !== false)
-      .map((field) => ({
-        key: field.id,
-        value: field.value,
-        icon: field.icon,
-        label: field.label,
-        visible: true,
-        custom: true,
-      })) || []),
-  ];
+  const renderIntroduction = (section: ResumeSection) => {
+    const list = section.content;
+    return (
+      <>
+        <h2
+          className="text-lg font-bold pb-2 mb-4 border-b"
+          style={{
+            color: colorScheme.text,
+            borderColor: colorScheme.primary,
+          }}
+        >
+          {section.title}
+        </h2>
+        <div>{list.map((it) => renderFiled(it))}</div>
+      </>
+    );
+  };
+
+  const renderExperience = (section: ResumeSection) => {
+    const list = section.content;
+    return (
+      <>
+        <h2
+          className="text-lg font-bold pb-2 mb-4 border-b"
+          style={{
+            color: colorScheme.text,
+            borderColor: colorScheme.primary,
+          }}
+        >
+          {section.title}
+        </h2>
+        <div className="space-y-6">
+          {list.map((exp) => {
+            return (
+              <>
+                {renderFiled(exp)}
+                {exp.fields.map((exp) => renderFiled(exp))}
+              </>
+            );
+          })}
+        </div>
+      </>
+    );
+  };
+
+  const renderEducation = (section: ResumeSection) => {
+    const list = section.content;
+    return (
+      <>
+        <h2
+          className="text-lg font-bold pb-2 mb-4 border-b"
+          style={{
+            color: colorScheme.text,
+            borderColor: colorScheme.primary,
+          }}
+        >
+          {section.title}
+        </h2>
+        <div className="space-y-4">
+          {list.map((edu) => {
+            return (
+              <div key={edu.id}>
+                {renderFiled(edu)}
+                {edu.fields.map((edu) => renderFiled(edu))}
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
+  };
+
+  const renderSkills = (section: ResumeSection) => {
+    const list = section.content;
+    return (
+      <>
+        <h2
+          className="text-lg font-bold pb-2 mb-4 border-b"
+          style={{
+            color: colorScheme.text,
+            borderColor: colorScheme.primary,
+          }}
+        >
+          {section.title}
+        </h2>
+        <div>{list.map((it) => renderFiled(it))}</div>
+      </>
+    );
+  };
+
+  const renderProjects = (section: ResumeSection) => {
+    const list = section.content;
+    return (
+      <>
+        <h2
+          className="text-lg font-bold pb-2 mb-4 border-b"
+          style={{
+            color: colorScheme.text,
+            borderColor: colorScheme.primary,
+          }}
+        >
+          {section.title}
+        </h2>
+        <div className="space-y-4">
+          {list.map((pj) => {
+            return (
+              <div key={pj.id}>
+                {renderFiled(pj)}
+                {pj.fields.map((pj) => renderFiled(pj))}
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
+  };
+
+  const renderSection = (section, index) => {
+    let content = null;
+    switch (section.id) {
+      case MenuSectionId.introduction:
+        content = renderIntroduction(section);
+        break;
+      case MenuSectionId.experience:
+        content = renderExperience(section);
+        break;
+      case MenuSectionId.education:
+        content = renderEducation(section);
+        break;
+      case MenuSectionId.skills:
+        content = renderSkills(section);
+        break;
+      case MenuSectionId.projects:
+        content = renderProjects(section);
+        break;
+      default:
+        content = null;
+    }
+    if (!content) return null;
+    return (
+      <div
+        key={section.id}
+        className={cn("p-8")}
+        style={{
+          borderColor: colorScheme.primary,
+        }}
+      >
+        {content}
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white">
       {/* 简历主体 */}
       <div
-        className="grid grid-cols-5 min-h-[297mm] border-2"
+        className="min-h-[297mm] border-2"
         style={{
           borderColor: colorScheme.secondary,
           backgroundColor: colorScheme.background,
         }}
       >
+        {/* 个人信息 */}
         <div
-          className="col-span-5 p-4 gap-4 flex justify-between border-b items-center"
+          className="p-4 gap-4 flex justify-between border-b items-center"
           style={{
             backgroundColor: colorScheme.background,
             borderColor: colorScheme.secondary,
-            flexDirection: getFlexDirection(basic?.layout),
+            flexDirection: getFlexDirection(section1.config?.layout),
           }}
         >
           {/* 姓名和职位 */}
           <div
             className={cn(
               "flex h-full justify-around",
-              basic?.layout === "center" ? "flex-row gap-8" : "flex-col",
-              basic?.layout === "center" ? "order-2" : "order-1"
+              section1.config?.layout === "center"
+                ? "flex-row gap-8"
+                : "flex-col",
+              section1.config?.layout === "center" ? "order-2" : "order-1"
             )}
           >
             <h1
               className="text-3xl font-bold"
               style={{ color: colorScheme.text }}
             >
-              {name}
+              {name.value}
             </h1>
             <div
               className="text-white px-4 py-2 inline-block"
               style={{ backgroundColor: colorScheme.primary }}
             >
               <span className="text-sm font-medium tracking-wider">
-                {title}
+                {title.value}
               </span>
             </div>
           </div>
@@ -141,12 +281,12 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
               fontSize: `${globalSettings?.baseFontSize || 14}px`,
               color: colorScheme.text,
               maxWidth: "600px",
-              order: basic?.layout === "center" ? 3 : 1,
+              order: section1.config?.layout === "center" ? 3 : 1,
             }}
           >
-            {allFields.map((item) => (
+            {otherSection1Fields.map((item) => (
               <motion.div
-                key={item.key}
+                key={item.id}
                 className={cn(
                   "flex items-center whitespace-nowrap overflow-hidden text-baseFont"
                 )}
@@ -154,40 +294,29 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   width: "100%",
                 }}
               >
-                {useIconMode ? (
-                  <div className="flex items-center gap-1">
-                    {getIcon(item.icon)}
-                    {item.key === "email" ? (
-                      <a href={`mailto:${item.value}`} className="underline">
-                        {item.value}
-                      </a>
-                    ) : (
-                      <span>{item.value}</span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    {!item.custom && (
-                      <span>{t(`basicPanel.basicFields.${item.key}`)}:</span>
-                    )}
-                    {item.custom && <span>{item.label}:</span>}
-                    <span className="truncate" suppressHydrationWarning>
-                      {item.value}
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 overflow-hidden">
+                  {section1.config?.useIconMode ? (
+                    getIcon(item.icon)
+                  ) : (
+                    <span>{item.label}:</span>
+                  )}
+                  <span className="truncate" suppressHydrationWarning>
+                    {renderFiled(item)}
+                  </span>
+                </div>
               </motion.div>
             ))}
           </motion.div>
           {/* 头像 */}
           <div
-            className="flex justify-end"
+            className="justify-end"
             style={{
-              order: basic?.layout === "center" ? 1 : 1,
+              order: section1.config?.layout === "center" ? 1 : 1,
+              display: photo.config?.visible ? "flex" : "none",
             }}
           >
             <div
-              className="w-24 h-24 rounded-full border-2 overflow-hidden flex items-center justify-center"
+              className="flex w-24 h-24 rounded-full border-2 overflow-hidden items-center justify-center"
               style={{
                 borderColor: colorScheme.primary,
                 backgroundColor: colorScheme.secondary,
@@ -195,201 +324,29 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
             >
               <Base64Image
                 imageAttributes={{
-                  src: photo,
+                  src: photo.value,
                 }}
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
           </div>
         </div>
-        {/* 左侧栏 - 个人信息 */}
+        {/* 主要内容 */}
         <div
-          className="col-span-2 p-8 border-r"
+          className="flex"
           style={{
             backgroundColor: colorScheme.background,
             borderColor: colorScheme.secondary,
           }}
         >
-          {/* 个人简介 */}
-          <div className="mb-8">
-            <h2
-              className="text-lg font-bold pb-2 mb-4 border-b"
-              style={{
-                color: colorScheme.text,
-                borderColor: colorScheme.primary,
-              }}
-            >
-              PROFILE
-            </h2>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: colorScheme.secondary }}
-            >
-              {basic.employementStatus && `${basic.employementStatus} - `}
-              {basic.birthDate && `出生于 ${basic.birthDate} - `}
-              具备丰富的{experience?.length || 0}
-              年工作经验，专注于前端开发技术。
-              具备扎实的计算机基础，熟悉现代前端技术栈，有良好的代码规范和团队协作能力。
-              热爱技术，持续学习新技术，追求代码质量和用户体验的完美结合。
-            </p>
-          </div>
-
-          {/* 工作经验 */}
-          <div>
-            <h2
-              className="text-lg font-bold pb-2 mb-4 border-b"
-              style={{
-                color: colorScheme.text,
-                borderColor: colorScheme.primary,
-              }}
-            >
-              EXPERIENCE
-            </h2>
-            <div className="space-y-6">
-              {experience?.map((exp) => (
-                <div key={exp.id}>
-                  <h3
-                    className="font-bold text-sm mb-1"
-                    style={{ color: colorScheme.text }}
-                  >
-                    {exp.position}
-                  </h3>
-                  <p
-                    className="text-sm mb-1"
-                    style={{ color: colorScheme.secondary }}
-                  >
-                    {exp.company}
-                  </p>
-                  <p
-                    className="text-sm mb-2"
-                    style={{ color: colorScheme.secondary }}
-                  >
-                    {exp.date}
-                  </p>
-                  <div
-                    className="text-sm space-y-1"
-                    style={{ color: colorScheme.secondary }}
-                    dangerouslySetInnerHTML={{ __html: exp.details }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 右侧栏 - 教育、技能和联系方式 */}
-        <div
-          className="col-span-3 flex flex-col"
-          style={{ backgroundColor: colorScheme.background }}
-        >
-          <div className="flex-1 p-8">
-            {/* 教育经历 */}
-            <div className="mb-8">
-              <h2
-                className="text-lg font-bold pb-2 mb-4 border-b"
-                style={{
-                  color: colorScheme.text,
-                  borderColor: colorScheme.primary,
-                }}
-              >
-                EDUCATION
-              </h2>
-              <div className="space-y-4">
-                {education?.map((edu) => (
-                  <div key={edu.id}>
-                    <h3
-                      className="font-bold text-sm mb-1"
-                      style={{ color: colorScheme.text }}
-                    >
-                      {edu.degree}
-                    </h3>
-                    <p
-                      className="text-sm mb-1"
-                      style={{ color: colorScheme.secondary }}
-                    >
-                      {edu.school}
-                    </p>
-                    <p
-                      className="text-sm"
-                      style={{ color: colorScheme.secondary }}
-                    >
-                      {edu.startDate} - {edu.endDate}
-                    </p>
-                    {edu.description && (
-                      <div
-                        className="text-sm mt-2"
-                        style={{ color: colorScheme.secondary }}
-                        dangerouslySetInnerHTML={{ __html: edu.description }}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 技能 */}
-            <div className="mb-8">
-              <h2
-                className="text-lg font-bold pb-2 mb-4 border-b"
-                style={{
-                  color: colorScheme.text,
-                  borderColor: colorScheme.primary,
-                }}
-              >
-                SKILLS
-              </h2>
-              <div
-                className="text-sm"
-                style={{ color: colorScheme.secondary }}
-                dangerouslySetInnerHTML={{ __html: skillContent }}
-              />
-            </div>
-
-            {/* 项目经历 */}
-            {projects && projects.length > 0 && (
-              <div className="mb-8">
-                <h2
-                  className="text-lg font-bold pb-2 mb-4 border-b"
-                  style={{
-                    color: colorScheme.text,
-                    borderColor: colorScheme.primary,
-                  }}
-                >
-                  PROJECTS
-                </h2>
-                <div className="space-y-4">
-                  {projects.map((project) => (
-                    <div key={project.id}>
-                      <h3
-                        className="font-bold text-sm mb-1"
-                        style={{ color: colorScheme.text }}
-                      >
-                        {project.name}
-                      </h3>
-                      <p
-                        className="text-sm mb-1"
-                        style={{ color: colorScheme.secondary }}
-                      >
-                        {project.role}
-                      </p>
-                      <p
-                        className="text-sm mb-2"
-                        style={{ color: colorScheme.secondary }}
-                      >
-                        {project.date}
-                      </p>
-                      <div
-                        className="text-sm"
-                        style={{ color: colorScheme.secondary }}
-                        dangerouslySetInnerHTML={{
-                          __html: project.description,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="basis-1/3">{leftSection.map(renderSection)}</div>
+          <div
+            className="basis-2/3 border-l"
+            style={{
+              borderColor: colorScheme.primary,
+            }}
+          >
+            {rightSection.map(renderSection)}
           </div>
         </div>
       </div>
