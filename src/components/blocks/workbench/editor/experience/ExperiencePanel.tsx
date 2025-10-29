@@ -11,6 +11,7 @@ import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
 import { InputName } from "../basic/input-name";
+import { experienceContentDefault } from "@/config";
 
 const ExperiencePanel = ({
   id,
@@ -38,36 +39,17 @@ const ExperiencePanel = ({
     });
   };
 
-  const deleteExperience = () => {
+  const deleteExperience = (id) => {
     updateSectionExperience({
       ...section,
       content: section.content.filter((c) => c.id !== id),
     });
   };
   const handleCreateProject = () => {
-    const newProject: ResumeSectionContent = {
+    addSectionExperience({
+      ...experienceContentDefault,
       id: generateUUID(),
-      type: "project",
-      value: "xxxx",
-      fields: [
-        {
-          id: "position",
-          type: "text",
-          value: "前端负责人",
-        },
-        {
-          id: "date",
-          type: "text",
-          value: "2022/6 - 2023/12",
-        },
-        {
-          id: "description",
-          type: "textarea",
-          value: ``,
-        },
-      ],
-    };
-    addSectionExperience(newProject);
+    });
   };
 
   return (

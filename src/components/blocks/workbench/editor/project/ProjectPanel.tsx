@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import ProjectItem from "./ProjectItem";
 import { ResumeSection, ResumeSectionContent } from "@/types/resume";
+import { projectContentDefault } from "@/config";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
@@ -40,25 +41,7 @@ const ProjectPanel = ({ section }: { section: ResumeSection }) => {
   const handleCreateProject = () => {
     const newProject: ResumeSectionContent = {
       id: generateUUID(),
-      type: "project",
-      value: "xxxx",
-      fields: [
-        {
-          id: "position",
-          type: "text",
-          value: "前端负责人",
-        },
-        {
-          id: "date",
-          type: "text",
-          value: "2022/6 - 2023/12",
-        },
-        {
-          id: "description",
-          type: "textarea",
-          value: ``,
-        },
-      ],
+      ...projectContentDefault,
     };
     addSectionProjects(newProject);
   };

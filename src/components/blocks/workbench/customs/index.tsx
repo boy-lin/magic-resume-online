@@ -36,7 +36,6 @@ export default function Customs() {
 
   useEffect(() => {
     if (activeTab) return;
-    console.log("menuSections", activeTab, menuSections);
     if (menuSections.length > 0) {
       setActiveTab(menuSections[0].id);
     }

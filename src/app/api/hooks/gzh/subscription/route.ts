@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 // 微信公众号配置
@@ -25,7 +25,7 @@ function verifySignature(query: URLSearchParams) {
   // 将token、timestamp、nonce三个参数进行字典序排序
   const sorted = [token, timestamp, nonce].sort();
   // 将三个参数字符串拼接成一个字符串进行sha1加密
-  const sha1 = crypto.createHash("sha1");
+  const sha1 = createHash("sha1");
   sha1.update(sorted.join(""));
   const hash = sha1.digest("hex");
 
