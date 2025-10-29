@@ -23,6 +23,7 @@ export interface ResumeSection {
   content?: ResumeSectionContent[];
   config?: Record<string, any>;
   visible?: boolean;
+  order?: number;
 }
 
 export interface PhotoConfig {

@@ -7,9 +7,10 @@ import { PlusCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import EducationItem from "./EducationItem";
-import { Education, ResumeSection } from "@/types/resume";
+import { ResumeSection } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
 import { InputName } from "../basic/input-name";
+import { educationContentDefault } from "@/config";
 
 const EducationPanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.educationPanel");
@@ -39,17 +40,10 @@ const EducationPanel = ({ section }: { section: ResumeSection }) => {
   };
 
   const handleCreateProject = () => {
-    const newEducation: Education = {
+    addSectionEducation({
+      ...educationContentDefault,
       id: generateUUID(),
-      school: t("defaultProject.school"),
-      major: t("defaultProject.major"),
-      degree: t("defaultProject.degree"),
-      startDate: "2015-09-01",
-      endDate: "2019-06-30",
-      description: "",
-      visible: true,
-    };
-    addSectionEducation(newEducation);
+    });
   };
 
   return (

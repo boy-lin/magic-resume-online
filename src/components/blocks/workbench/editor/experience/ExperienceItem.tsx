@@ -150,11 +150,11 @@ const ExperienceItem = ({
           dragControls.start(event);
         }}
         className={cn(
-          "w-12 flex items-center justify-center border-r shrink-0 touch-none",
+          "transition duration-300 w-0 hidden items-center justify-center border-r shrink-0 touch-none",
           "border-gray-100 dark:border-neutral-800",
           expandedId === experience.id
             ? "cursor-not-allowed"
-            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50 group-hover:w-12 group-hover:flex"
         )}
       >
         <GripVertical

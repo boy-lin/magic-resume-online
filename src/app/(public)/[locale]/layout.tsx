@@ -51,6 +51,20 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* PWA 相关 meta 标签 */}
+        <meta name="application-name" content="ResumeX" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="ResumeX" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-TileImage" content="/icon.png" />
+
+        {/* 苹果设备图标 */}
+        <link rel="apple-touch-icon" href="/icon.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon2.png" />
+
         <Script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTAG_ID}`}

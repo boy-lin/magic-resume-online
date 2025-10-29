@@ -1,6 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
-import path from "path";
-import { fileURLToPath } from "url";
+import withPWA from "@ducanh2912/next-pwa";
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -20,4 +19,23 @@ const config = {
   output: "standalone",
 };
 
-export default withNextIntl(config);
+// 只在生产环境启用PWA
+const isProduction = process.env.NODE_ENV === "production";
+
+export default withNextIntl(
+  isProduction || process.env.NEXT_ENABLED_PWA === "true"
+    ? withPWA({
+        dest: "public",
+        register: true,
+        skipWaiting: true,
+        disable: false,
+        cacheOnFrontEndNav: true,
+        aggressiveFrontEndNavCaching: true,
+        reloadOnOnline: true,
+        swcMinify: true,
+        workboxOptions: {
+          disableDevLogs: true,
+        },
+      })(config)
+    : config
+);

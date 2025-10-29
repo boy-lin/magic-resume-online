@@ -1,12 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  Experience,
-  Education,
-  Project,
-  ResumeData,
-  MenuSectionId,
-  ResumeSection,
-} from "@/types/resume";
+import { ResumeData, MenuSectionId, ResumeSection } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import Base64Image from "@/components/photo/base64";
 import { motion } from "framer-motion";
@@ -29,6 +22,8 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
   const { colorScheme } = template;
 
   const [section1, ...otherSections] = data.menuSections;
+  const [name, title, photo, github, ...otherSection1Fields] = section1.content;
+
   const leftSection = otherSections.slice(
     0,
     Math.floor(otherSections.length / 2)
@@ -36,8 +31,6 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
   const rightSection = otherSections.slice(
     Math.floor(otherSections.length / 2)
   );
-  const [name, title, photo, github, ...otherSection1Fields] = section1.content;
-
   const useIconMode = globalSettings?.useIconMode ?? false;
   const getIcon = (iconName: string | undefined) => {
     const IconComponent = Icons[
@@ -48,16 +41,11 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
 
   const renderFiled = (item) => {
     if (item.type === "text") {
-      return (
-        <div className="text-sm" style={{ color: colorScheme.secondary }}>
-          {item.value}
-        </div>
-      );
+      return <div className="text-sm">{item.value}</div>;
     } else if (item.type === "textarea") {
       return (
         <div
           className="text-sm"
-          style={{ color: colorScheme.secondary }}
           dangerouslySetInnerHTML={{ __html: item.value }}
         />
       );
@@ -109,13 +97,19 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
         >
           {section.title}
         </h2>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {list.map((exp) => {
             return (
-              <>
-                {renderFiled(exp)}
+              <div
+                key={exp.id}
+                className={cn(
+                  "flex flex-wrap justify-between space-y-2",
+                  exp.visible ? "flex" : "hidden"
+                )}
+              >
+                <div className="w-full">{exp.value}</div>
                 {exp.fields.map((exp) => renderFiled(exp))}
-              </>
+              </div>
             );
           })}
         </div>
@@ -139,8 +133,11 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
         <div className="space-y-4">
           {list.map((edu) => {
             return (
-              <div key={edu.id}>
-                {renderFiled(edu)}
+              <div
+                key={edu.id}
+                className="flex flex-wrap justify-between space-y-2"
+              >
+                <div className="w-full">{edu.value}</div>
                 {edu.fields.map((edu) => renderFiled(edu))}
               </div>
             );
@@ -220,7 +217,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
     return (
       <div
         key={section.id}
-        className={cn("p-8")}
+        className={cn("p-4")}
         style={{
           borderColor: colorScheme.primary,
         }}
@@ -252,7 +249,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           {/* 姓名和职位 */}
           <div
             className={cn(
-              "flex h-full justify-around",
+              "flex h-full justify-around gap-2",
               section1.config?.layout === "center"
                 ? "flex-row gap-8"
                 : "flex-col",
@@ -266,7 +263,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
               {name.value}
             </h1>
             <div
-              className="text-white px-4 py-2 inline-block"
+              className="text-white px-4 py-2 inline-block whitespace-nowrap"
               style={{ backgroundColor: colorScheme.primary }}
             >
               <span className="text-sm font-medium tracking-wider">
@@ -276,7 +273,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           </div>
           {/* 联系方式 */}
           <motion.div
-            className="grid grid-cols-2 gap-x-8 gap-y-2 justify-start"
+            className="flex flex-wrap gap-x-8 gap-y-2 justify-start pl-2"
             style={{
               fontSize: `${globalSettings?.baseFontSize || 14}px`,
               color: colorScheme.text,
@@ -290,9 +287,6 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                 className={cn(
                   "flex items-center whitespace-nowrap overflow-hidden text-baseFont"
                 )}
-                style={{
-                  width: "100%",
-                }}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
                   {section1.config?.useIconMode ? (
@@ -300,9 +294,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   ) : (
                     <span>{item.label}:</span>
                   )}
-                  <span className="truncate" suppressHydrationWarning>
-                    {renderFiled(item)}
-                  </span>
+                  <span className="truncate">{renderFiled(item)}</span>
                 </div>
               </motion.div>
             ))}
