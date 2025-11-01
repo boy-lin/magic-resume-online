@@ -92,27 +92,43 @@ export const usePdfExport = (props) => {
 
       const { globalSettings, title } = props;
 
-      const response = await fetch(
-        "https://1255612844-0z3iovadu8.ap-chengdu.tencentscf.com/generate-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            content: clonedElement.outerHTML,
-            styles,
-            margin: globalSettings.pagePadding,
-          }),
-          // 允许跨域请求
-          mode: "cors",
-        }
-      );
+      // 检查是否启用调试模式（通过URL参数或localStorage）
+      const urlParams = new URLSearchParams(window.location.search);
+      const debugMode =
+        urlParams.get("pdfDebug") === "true" ||
+        localStorage.getItem("pdfDebug") === "true";
+
+      const response = await fetch("/api/pdf/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: clonedElement.outerHTML,
+          styles,
+          margin: globalSettings.pagePadding,
+          debug: debugMode, // 添加调试参数
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`PDF generation failed: ${response.status}`);
       }
 
+      // 调试模式：打开HTML预览页面
+      if (debugMode) {
+        const html = await response.text();
+        const previewWindow = window.open("", "_blank");
+        if (previewWindow) {
+          previewWindow.document.write(html);
+          previewWindow.document.close();
+        }
+        console.log(`Total export took ${performance.now() - exportStartTime}ms`);
+        toast.success("调试模式：HTML预览已在新窗口打开");
+        return;
+      }
+
+      // 正常模式：下载PDF
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
