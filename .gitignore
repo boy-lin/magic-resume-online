@@ -42,6 +42,9 @@ next-env.d.ts
 .history
 
 # PWA generated files
+
 /public/sw.*
+/public/swe*.js
 /public/workbox-*.js
 /public/fallback-*.js
+/public/**/*.map
