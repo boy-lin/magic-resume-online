@@ -12,7 +12,6 @@ export interface ImageProxyOptions {
   fit?: "cover" | "contain" | "fill" | "inside" | "outside";
   gravity?: "top" | "bottom" | "left" | "right" | "center";
   blur?: number;
-  sharpen?: number;
   rotate?: number;
   flip?: "horizontal" | "vertical";
   flop?: "horizontal" | "vertical";
@@ -46,7 +45,6 @@ export function buildImageProxyUrl(options: ImageProxyOptions): string {
   if (options.fit) params.set("fit", options.fit);
   if (options.gravity) params.set("g", options.gravity);
   if (options.blur) params.set("blur", options.blur.toString());
-  if (options.sharpen) params.set("sharpen", options.sharpen.toString());
   if (options.rotate) params.set("rotate", options.rotate.toString());
   if (options.flip) params.set("flip", options.flip);
   if (options.flop) params.set("flop", options.flop);
