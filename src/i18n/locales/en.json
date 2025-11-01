@@ -245,6 +245,10 @@
         "name": "Section Title Background",
         "description": "Distinctive section titles with background color"
       },
+      "twoColumn": {
+        "name": "Two Column",
+        "description": "Two-column layout, highlighting personal characteristics"
+      },
       "timeline": {
         "name": "Timeline Layout",
         "description": "Timeline style, emphasizing chronological order of experiences"

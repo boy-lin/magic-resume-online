@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui-lab/button";
 import { Badge } from "@/components/ui/badge";
 import { templateImages } from "@/app/constant/images";
-import { cn } from "@/lib/utils";
+import { cn, toCamelCase } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
 
@@ -47,7 +47,7 @@ export default function Template({
     manual: true,
   });
 
-  const templateKey = template.id === "left-right" ? "leftRight" : template.id;
+  const templateKey = toCamelCase(template.id);
 
   if (viewMode === "list") {
     return (

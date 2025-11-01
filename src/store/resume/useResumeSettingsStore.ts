@@ -92,11 +92,6 @@ export const useResumeSettingsStore = create<ResumeSettingsStore>()(
             paragraphSpacing: template.spacing.itemGap,
             pagePadding: template.spacing.contentPadding,
           },
-          basic: {
-            ...currentResume.basic,
-            layout: template.basic.layout,
-          },
-          isNeedSync: isNeedSync,
         };
 
         updateResume(activeResumeId, updatedResume, isNeedSync);

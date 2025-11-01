@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { CalendarIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -14,18 +14,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
 import RichTextEditor from "../../../shared/rich-editor/RichEditor";
 import AIPolishDialog from "../../../shared/ai/AIPolishDialog";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
 
-export type FieldType = "text" | "textarea" | "date" | "editor";
 interface FieldProps {
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  type?: FieldType;
+  type?: string;
   placeholder?: string;
   required?: boolean;
   className?: string;
@@ -40,9 +38,6 @@ const Field = ({
   required,
   className,
 }: FieldProps) => {
-  const [yearInput, setYearInput] = useState("");
-  const [displayMonth, setDisplayMonth] = useState<Date>(new Date());
-  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
   const [showPolishDialog, setShowPolishDialog] = useState(false);
   const router = useRouter();
   const {
@@ -58,27 +53,6 @@ const Field = ({
     () => (value ? new Date(value) : undefined),
     [value]
   );
-
-  useEffect(() => {
-    if (type === "date" && value) {
-      const date = new Date(value);
-      setYearInput(date.getFullYear().toString());
-      setDisplayMonth(date);
-    }
-  }, [type, value]);
-
-  useEffect(() => {
-    if (type === "date") {
-      if (!currentDate && fromDate) {
-        setFromDate(undefined);
-      } else if (
-        currentDate &&
-        (!fromDate || currentDate.getTime() !== fromDate.getTime())
-      ) {
-        setFromDate(currentDate);
-      }
-    }
-  }, [type, currentDate, fromDate]);
 
   const renderLabel = () => {
     if (!label) return null;
@@ -118,33 +92,6 @@ const Field = ({
       });
     };
 
-    const handleYearInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const year = e.target.value;
-      setYearInput(year);
-
-      if (year && /^\d{4}$/.test(year)) {
-        const newYear = parseInt(year);
-        if (newYear >= 1900 && newYear <= 2100) {
-          const newDate = currentDate
-            ? new Date(newYear, currentDate.getMonth(), currentDate.getDate())
-            : new Date(newYear, 0, 1);
-          setFromDate(newDate);
-          onChange(newDate.toISOString());
-        }
-      }
-    };
-
-    const handleYearChange = (year: number) => {
-      if (year >= 1900 && year <= 2100) {
-        const newDate = currentDate
-          ? new Date(year, currentDate.getMonth(), currentDate.getDate())
-          : new Date(year, 0, 1);
-        setFromDate(newDate);
-        setYearInput(year.toString());
-        onChange(newDate.toISOString());
-      }
-    };
-
     return (
       <div className="block">
         {renderLabel()}
@@ -166,57 +113,17 @@ const Field = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
-            <div className="p-3 border-b">
-              <div className="relative">
-                <Input
-                  type="number"
-                  placeholder={t("field.enterYear")}
-                  className="w-full pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  value={yearInput}
-                  onChange={handleYearInput}
-                  min={1900}
-                  max={2100}
-                />
-                <div className="absolute right-1 top-1 bottom-1 flex flex-col justify-center">
-                  <button
-                    type="button"
-                    className="h-4 flex items-center justify-center text-muted-foreground hover:text-primary"
-                    onClick={() => {
-                      const currentYear = yearInput ? parseInt(yearInput) : 0;
-                      handleYearChange(currentYear + 1);
-                    }}
-                  >
-                    <ChevronUpIcon className="h-3 w-3" />
-                  </button>
-                  <button
-                    type="button"
-                    className="h-4 flex items-center justify-center text-muted-foreground hover:text-primary"
-                    onClick={() => {
-                      const currentYear = yearInput ? parseInt(yearInput) : 0;
-                      handleYearChange(currentYear - 1);
-                    }}
-                  >
-                    <ChevronDownIcon className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
             <Calendar
               mode="single"
               selected={currentDate}
-              month={displayMonth}
-              onMonthChange={setDisplayMonth}
+              captionLayout="dropdown"
               onSelect={(date) => {
                 if (date) {
-                  setDisplayMonth(date);
                   onChange(date.toISOString());
-                  setYearInput(date.getFullYear().toString());
                 } else {
                   onChange("");
-                  setYearInput("");
                 }
               }}
-              initialFocus
             />
           </PopoverContent>
         </Popover>
@@ -226,7 +133,7 @@ const Field = ({
 
   if (type === "textarea") {
     return (
-      <label className="block">
+      <label className="block w-full">
         {renderLabel()}
         <motion.textarea
           value={value}
@@ -292,7 +199,7 @@ const Field = ({
   }
 
   return (
-    <label className="block">
+    <label className="block w-full">
       {renderLabel()}
       <motion.input
         type="text"

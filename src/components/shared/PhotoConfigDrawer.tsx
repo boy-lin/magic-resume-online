@@ -26,10 +26,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
-import { DEFAULT_AVATAR, IMAGE_PROXY_URL } from "@/constants";
+import { DEFAULT_AVATAR } from "@/constants";
 import { getImageBase64 } from "@/utils/imageProxy";
 import { useAppStore } from "@/store/useApp";
-console.log("DEFAULT_AVATAR", DEFAULT_AVATAR);
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -55,7 +54,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
   const [imageUrl, setImageUrl] = useState(photo || "");
   const drawerContentRef = useRef<HTMLInputElement>(null);
   const [config, setConfig] = useState<PhotoConfig>(
-    initialConfig || DEFAULT_CONFIG
+    initialConfig || DEFAULT_CONFIG,
   );
   const [isMobile, setIsMobile] = useState(false);
   const isRemoteMode = Boolean(useAppStore((state) => state.user?.id));
@@ -148,7 +147,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
       onError: (error) => {
         toast.error(error.message);
       },
-    }
+    },
   );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +174,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
           value: base64,
         });
       } else {
-        const proxyUrl = `${IMAGE_PROXY_URL}${encodeURIComponent(url)}`;
+        const proxyUrl = `/api/images/proxy?url=${encodeURIComponent(url)}`;
 
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -205,7 +204,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
       toast.error(
         t("upload.invalidUrl", {
           defaultMessage: "图片链接无效或无法访问，请尝试使用其他图片链接",
-        })
+        }),
       );
       handleRemovePhoto();
     }
@@ -275,7 +274,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    key: "width" | "height" | "customBorderRadius"
+    key: "width" | "height" | "customBorderRadius",
   ) => {
     const value = Number(e.target.value) > 200 ? 200 : e.target.value;
 
@@ -292,7 +291,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
 
   const handleInputBlur = (
     e: React.FocusEvent<HTMLInputElement>,
-    key: "width" | "height" | "customBorderRadius"
+    key: "width" | "height" | "customBorderRadius",
   ) => {
     const value = e.target.value;
     const numValue = value === "" ? 0 : Number(value);
@@ -324,7 +323,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
         className={cn(
           "relative overflow-hidden border-2 transition-all mx-auto",
           isDragging ? "border-blue-500 border-solid" : "border-dashed",
-          "dark:border-neutral-700 dark:hover:border-neutral-600 border-neutral-300 hover:border-neutral-400"
+          "dark:border-neutral-700 dark:hover:border-neutral-600 border-neutral-300 hover:border-neutral-400",
         )}
         style={{
           width: `${config.width}px`,
@@ -351,7 +350,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
             <div
               className={cn(
                 "absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity",
-                "group-hover:opacity-100"
+                "group-hover:opacity-100",
               )}
             >
               <Button
@@ -371,7 +370,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
             <Upload
               className={cn(
                 "w-6 h-6 mb-2",
-                "dark:text-neutral-400 text-neutral-500"
+                "dark:text-neutral-400 text-neutral-500",
               )}
             />
           </Button>
@@ -413,7 +412,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                   onBlur={(e) => handleInputBlur(e, "width")}
                   className={cn(
                     "h-9 pr-7",
-                    "dark:bg-neutral-800 dark:border-neutral-700"
+                    "dark:bg-neutral-800 dark:border-neutral-700",
                   )}
                   min={24}
                   max={200}
@@ -422,7 +421,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                 <div
                   className={cn(
                     "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
-                    "dark:text-neutral-400 text-neutral-500"
+                    "dark:text-neutral-400 text-neutral-500",
                   )}
                 >
                   W
@@ -435,7 +434,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                   onBlur={(e) => handleInputBlur(e, "height")}
                   className={cn(
                     "h-9 pr-7",
-                    "dark:bg-neutral-800 dark:border-neutral-700"
+                    "dark:bg-neutral-800 dark:border-neutral-700",
                   )}
                   min={24}
                   max={200}
@@ -444,7 +443,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                 <div
                   className={cn(
                     "absolute right-3 top-1/2 -translate-y-1/2 text-sm",
-                    "dark:text-neutral-400 text-neutral-500"
+                    "dark:text-neutral-400 text-neutral-500",
                   )}
                 >
                   H
@@ -467,7 +466,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                     onClick={() => {
                       if (ratio !== "custom") {
                         const height = Math.round(
-                          config.width * getRatioMultiplier(ratio)
+                          config.width * getRatioMultiplier(ratio),
                         );
                         handleConfigChange({ aspectRatio: ratio, height });
                       } else {
@@ -477,7 +476,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                   >
                     {ratio === "custom" ? t("config.ratios.custom") : ratio}
                   </Button>
-                )
+                ),
               )}
             </div>
           </div>
@@ -497,10 +496,10 @@ const PhotoConfigDrawer: React.FC<Props> = ({
                   {radius === "none"
                     ? t("config.borderRadius.none")
                     : radius === "medium"
-                    ? t("config.borderRadius.medium")
-                    : radius === "full"
-                    ? t("config.borderRadius.full")
-                    : t("config.borderRadius.custom")}
+                      ? t("config.borderRadius.medium")
+                      : radius === "full"
+                        ? t("config.borderRadius.full")
+                        : t("config.borderRadius.custom")}
                 </Button>
               ))}
               {config.borderRadius === "custom" && (
@@ -550,7 +549,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
           className={cn(
             "w-auto",
             "dark:bg-neutral-900 dark:text-white",
-            "md:border-none md:flex md:bottom-0 md:h-[93%] md:mx-[-1px] md:z-10 md:outline-none shadow shadow-blue-500/40"
+            "md:border-none md:flex md:bottom-0 md:h-[93%] md:mx-[-1px] md:z-10 md:outline-none shadow shadow-blue-500/40",
           )}
         >
           {renderContent()}

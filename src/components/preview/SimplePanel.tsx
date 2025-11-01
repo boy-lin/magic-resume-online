@@ -1,21 +1,21 @@
 "use client";
 import { motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
-import { GlobalSettings } from "@/types/resume";
+import { GlobalSettings, ResumeSection } from "@/types/resume";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 interface SkillSectionProps {
-  skill?: string;
+  section?: ResumeSection;
   globalSettings?: GlobalSettings;
   showTitle?: boolean;
 }
 
 const SkillSection = ({
-  skill,
+  section,
   globalSettings,
   showTitle = true,
 }: SkillSectionProps) => {
-  const { setActiveSection } = useResumeEditorStore();
+  const skill = section?.content?.[0]?.value;
 
   return (
     <motion.div
@@ -23,12 +23,9 @@ const SkillSection = ({
       style={{
         marginTop: `${globalSettings?.sectionSpacing || 24}px`,
       }}
-      onClick={() => {
-        setActiveSection("skills");
-      }}
     >
       {showTitle && (
-        <SectionTitle type="skills" globalSettings={globalSettings} />
+        <SectionTitle type={section.id} globalSettings={globalSettings} />
       )}
       <motion.div
         style={{
@@ -36,7 +33,6 @@ const SkillSection = ({
         }}
       >
         <motion.div
-          className="text-baseFont"
           layout="position"
           style={{
             fontSize: `${globalSettings?.baseFontSize || 14}px`,

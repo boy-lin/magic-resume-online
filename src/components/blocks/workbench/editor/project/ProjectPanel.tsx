@@ -40,10 +40,11 @@ const ProjectPanel = ({ section }: { section: ResumeSection }) => {
   };
   const handleCreateProject = () => {
     const newProject: ResumeSectionContent = {
-      id: generateUUID(),
       ...projectContentDefault,
+      id: generateUUID(),
     };
     addSectionProjects(newProject);
+    setExpandedId(newProject.id);
   };
 
   return (

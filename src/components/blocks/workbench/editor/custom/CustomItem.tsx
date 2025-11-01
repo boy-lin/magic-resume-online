@@ -7,55 +7,37 @@ import {
 } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { GripVertical, Eye, EyeOff, ChevronDown, Trash2 } from "lucide-react";
 import Field from "../Field";
 import ThemeModal from "@/components/shared/ThemeModal";
-import { CustomItem as CustomItemType } from "@/types/resume";
+import { ResumeSectionContent, FieldType } from "@/types/resume";
 
 const CustomItemEditor = ({
   item,
-  onSave,
+  updateCustomItem,
 }: {
-  item: CustomItemType;
-  onSave: (item: CustomItemType) => void;
+  item: ResumeSectionContent;
+  updateCustomItem: (item: ResumeSectionContent) => void;
 }) => {
-  const handleChange = (field: keyof CustomItemType, value: string) => {
-    onSave({ ...item, [field]: value });
+  const updateFiled = (it: FieldType) => {
+    updateCustomItem({
+      ...item,
+      fields: item.fields?.map((f) => (f.id === it.id ? { ...f, ...it } : f)),
+    });
   };
-
+  console.log("item.fields", item.fields);
   return (
     <div className="space-y-5">
-      <div className="grid gap-5">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-4">
+        {item.fields?.map((field) => (
           <Field
-            label="标题"
-            value={item.title}
-            onChange={(value) => handleChange("title", value)}
-            placeholder="标题"
+            key={field.id}
+            label={field.label}
+            value={field.value}
+            type={field.type}
+            onChange={(value) => updateFiled({ ...field, value })}
           />
-          <Field
-            label="副标题"
-            value={item.subtitle}
-            onChange={(value) => handleChange("subtitle", value)}
-            placeholder="副标题"
-          />
-        </div>
-
-        <Field
-          label="时间范围"
-          value={item.dateRange}
-          onChange={(value) => handleChange("dateRange", value)}
-          placeholder="例如: 2023.01 - 2024.01"
-        />
-
-        <Field
-          label="详细描述"
-          value={item.description}
-          onChange={(value) => handleChange("description", value)}
-          type="editor"
-          placeholder="请输入详细描述..."
-        />
+        ))}
       </div>
     </div>
   );
@@ -63,12 +45,13 @@ const CustomItemEditor = ({
 
 const CustomItem = ({
   item,
-  sectionId,
+  updateCustomItem,
+  removeCustomItem,
 }: {
-  item: CustomItemType;
-  sectionId: string;
+  item: ResumeSectionContent;
+  removeCustomItem: (id: string) => void;
+  updateCustomItem: (item: ResumeSectionContent) => void;
 }) => {
-  const { updateCustomItem, removeCustomItem } = useResumeEditorStore();
   const dragControls = useDragControls();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -80,11 +63,11 @@ const CustomItem = ({
 
       setIsUpdating(true);
       setTimeout(() => {
-        updateCustomItem(sectionId, item.id, { visible: !item.visible });
+        updateCustomItem({ ...item, visible: !item.visible });
         setIsUpdating(false);
       }, 10);
     },
-    [item, updateCustomItem, isUpdating, sectionId]
+    [item, updateCustomItem, isUpdating]
   );
 
   return (
@@ -138,7 +121,7 @@ const CustomItem = ({
                 "dark:text-neutral-200"
               )}
             >
-              {item.title || "未命名模块"}
+              {item.value}
             </h3>
             {item.subtitle && (
               <p
@@ -181,10 +164,10 @@ const CustomItem = ({
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={item.title}
+              title={item.value}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
-                removeCustomItem(sectionId, item.id);
+                removeCustomItem(item.id);
                 setExpandedId(null);
                 setDeleteDialogOpen(false);
               }}
@@ -226,9 +209,7 @@ const CustomItem = ({
                 />
                 <CustomItemEditor
                   item={item}
-                  onSave={(updatedItem) => {
-                    updateCustomItem(sectionId, item.id, updatedItem);
-                  }}
+                  updateCustomItem={updateCustomItem}
                 />
               </div>
             </motion.div>

@@ -48,8 +48,6 @@ export function InitDataProvider({ children }: Props) {
     getUserAsync();
   }, []);
 
-  console.debug("aa Providers memoizedValue state", state);
-
   // if (state.userLoading !== 2)
   //   return (
   //     <div className="flex items-center justify-center h-screen">

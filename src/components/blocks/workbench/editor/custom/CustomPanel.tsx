@@ -4,34 +4,55 @@ import { cn } from "@/lib/utils";
 import { Reorder } from "framer-motion";
 import { PlusCircle } from "lucide-react";
 import CustomItem from "./CustomItem";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { customSectionContentDefault } from "@/config";
+
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
-import { CustomItem as CustomItemType } from "@/types/resume";
+import { ResumeSection, ResumeSectionContent } from "@/types/resume";
+
 import { InputName } from "../basic/input-name";
+import { generateUUID } from "@/utils/uuid";
 
 const CustomPanel = memo(
   ({
     id,
+    section,
     handleDeleteSection,
   }: {
     id: string;
+    section: ResumeSection;
     handleDeleteSection: () => void;
   }) => {
-    const { activeResume } = useResumeListStore();
-    const { updateMenuSections } = useResumeEditorStore();
-    const { menuSections = [] } = activeResume || {};
-    const section = menuSections.find((s) => s.id === id);
-    const items = section?.content?.[0]?.value || [];
+    const { updateSectionById } = useResumeEditorStore();
+    const items = section?.content || [];
 
-    const handleTitleChange = (title: string) => {
-      updateMenuSections(
-        menuSections.map((s) => {
-          if (s.id === id) {
-            return { ...s, title };
-          }
-          return s;
-        })
-      );
+    const handleTitleChange = (title) => {
+      updateSectionById(id, { title });
+    };
+
+    const addCustomItem = (id: string) => {
+      updateSectionById(id, {
+        content: [
+          ...section.content,
+          {
+            ...customSectionContentDefault,
+            id: generateUUID(),
+          },
+        ],
+      });
+    };
+
+    const updateCustomItem = (item: ResumeSectionContent) => {
+      updateSectionById(id, {
+        content: section.content.map((c) =>
+          c.id !== item.id ? c : { ...c, ...item }
+        ),
+      });
+    };
+
+    const removeCustomItem = (id: string) => {
+      updateSectionById(id, {
+        content: section.content.filter((c) => c.id !== id),
+      });
     };
 
     return (
@@ -42,10 +63,7 @@ const CustomPanel = memo(
         )}
       >
         <div className="space-y-2">
-          <InputName
-            value={menuSections.find((s) => s.id === id)?.title || ""}
-            onChange={handleTitleChange}
-          />
+          <InputName value={section.title} onChange={handleTitleChange} />
         </div>
         <Reorder.Group
           axis="y"
@@ -53,12 +71,22 @@ const CustomPanel = memo(
           onReorder={(newOrder) => {}}
           className="space-y-3"
         >
-          {(Array.isArray(items) ? items : []).map((item: CustomItemType) => (
-            <CustomItem key={item.id} item={item} sectionId={id} />
+          {items.map((item: ResumeSectionContent) => (
+            <CustomItem
+              key={item.id}
+              item={item}
+              removeCustomItem={removeCustomItem}
+              updateCustomItem={updateCustomItem}
+            />
           ))}
         </Reorder.Group>
 
-        <Button onClick={() => {}} className={cn("w-full")}>
+        <Button
+          onClick={() => {
+            addCustomItem(id);
+          }}
+          className={cn("w-full")}
+        >
           <PlusCircle className="w-4 h-4 mr-2" />
           添加
         </Button>

@@ -44,12 +44,10 @@ export function EditPanel({
         { "rounded-lg shadow-lg overflow-hidden": editPanelCollapsed }
       )}
       onPointerEnter={() => {
-        console.log("edit panel onPointerEnter");
         if (!editPanelCollapsed) return;
         setEditPanelShow(true);
       }}
       onPointerLeave={() => {
-        console.log("edit panel onPointerLeave");
         if (!editPanelCollapsed) return;
         setEditPanelShow(false);
       }}

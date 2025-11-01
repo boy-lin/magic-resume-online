@@ -7,15 +7,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { useResumeListStore } from "@/store/resume/useResumeListStore";
 
 import { DialogProps } from "@radix-ui/react-dialog";
-import { MenuSection } from "@/types/resume";
+import { ResumeSection } from "@/types/resume";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -48,14 +46,14 @@ type UpsertSectionFormData = z.infer<typeof upsertSectionSchema>;
 
 interface UpsertSectionProps extends DialogProps {
   title?: string;
-  onSuccess?: (section: MenuSection) => void;
+  onSuccess?: (section: ResumeSection) => void;
   onCancel?: () => void;
 }
 
 export function UpsertSection(props: UpsertSectionProps) {
   const { activeResume } = useResumeListStore();
   const menuSections = activeResume?.menuSections || [];
-  const { updateMenuSections, addCustomData } = useResumeEditorStore();
+  const { updateMenuSections } = useResumeEditorStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 使用 react-hook-form 和 zod 验证
@@ -72,17 +70,17 @@ export function UpsertSection(props: UpsertSectionProps) {
     try {
       setIsSubmitting(true);
       const sectionId = uuidv4();
-      const newSection: MenuSection = {
+      const newSection: ResumeSection = {
         id: sectionId,
         title: data.title,
         enabled: true,
+        content: [],
+        config: {},
+        visible: true,
         order: menuSections.length,
-        icon: "➕",
-        description: data.description || "",
       };
 
       updateMenuSections([...menuSections, newSection]);
-      addCustomData(sectionId);
 
       // 重置表单
       form.reset();

@@ -30,7 +30,7 @@ function isRemoteUser() {
 
 async function withDataMode<T>(
   remoteFn: () => Promise<T>,
-  localFn: () => Promise<T>
+  localFn: () => Promise<T>,
 ): Promise<T> {
   const remote = isRemoteUser();
   const { userLoading } = useAppStore.getState();
@@ -75,7 +75,7 @@ interface ResumeListStore {
   updateResume: (
     resumeId: string,
     data: Partial<ResumeData>,
-    isNeedSync?: boolean
+    isNeedSync?: boolean,
   ) => void;
   updateResumeTitle: (title: string) => Promise<void>;
   updateResumeAsync: (resume: ResumeData) => Promise<any>;
@@ -129,7 +129,7 @@ export const useResumeListStore = create(
           isNeedSync: isRemoteUser(),
           title: `${locale === "en" ? "New Resume" : "新建简历"} ${id.slice(
             0,
-            6
+            6,
           )}`,
           globalSettings: {
             ...initialResumeData.globalSettings,
@@ -143,11 +143,11 @@ export const useResumeListStore = create(
 
         await withDataMode(
           async () => upsertResumeByIdApi(newResume),
-          async () => localUpsertResume(newResume)
+          async () => localUpsertResume(newResume),
         );
 
         await localUpsertResume(newResume).catch((error) =>
-          logger.error("Failed to cache resume in local DB:", error)
+          logger.error("Failed to cache resume in local DB:", error),
         );
 
         set((state) => ({
@@ -175,7 +175,7 @@ export const useResumeListStore = create(
         };
 
         localUpsertResume(updatedResume).catch((error) =>
-          logger.error("Failed to persist resume locally:", error)
+          logger.error("Failed to persist resume locally:", error),
         );
 
         set((state) => ({
@@ -215,10 +215,14 @@ export const useResumeListStore = create(
           ...nextResume,
           isNeedSync: !synced && isRemoteUser(),
         }).catch((error) =>
-          logger.error("Failed to persist resume locally:", error)
+          logger.error("Failed to persist resume locally:", error),
         );
 
-        get().updateResume(activeResumeId, nextResume, !synced && isRemoteUser());
+        get().updateResume(
+          activeResumeId,
+          nextResume,
+          !synced && isRemoteUser(),
+        );
 
         return res;
       },
@@ -248,10 +252,14 @@ export const useResumeListStore = create(
             ...updated,
             isNeedSync: !synced && isRemoteUser(),
           }).catch((error) =>
-            logger.error("Failed to persist resume title locally:", error)
+            logger.error("Failed to persist resume title locally:", error),
           );
 
-          get().updateResume(activeResumeId, { title }, !synced && isRemoteUser());
+          get().updateResume(
+            activeResumeId,
+            { title },
+            !synced && isRemoteUser(),
+          );
         }
       },
 
@@ -267,7 +275,7 @@ export const useResumeListStore = create(
         }
 
         await localDeleteResumeById(resumeId).catch((error) =>
-          logger.error("Failed to delete local resume:", error)
+          logger.error("Failed to delete local resume:", error),
         );
 
         set((state) => {
@@ -330,7 +338,7 @@ export const useResumeListStore = create(
           }));
 
           localUpsertResume(duplicatedResume).catch((error) =>
-            logger.error("Failed to persist duplicated resume locally:", error)
+            logger.error("Failed to persist duplicated resume locally:", error),
           );
 
           return newId;
@@ -359,7 +367,7 @@ export const useResumeListStore = create(
               localGetResumeList({
                 current,
                 pageSize,
-              })
+              }),
           );
 
           if (!data) return [];
@@ -399,7 +407,7 @@ export const useResumeListStore = create(
               throw new Error("Resume not found");
             }
             return resume;
-          }
+          },
         );
 
         const newResume: ResumeData = {
@@ -409,7 +417,7 @@ export const useResumeListStore = create(
         };
 
         await localUpsertResume(newResume).catch((error) =>
-          logger.error("Failed to cache full resume locally:", error)
+          logger.error("Failed to cache full resume locally:", error),
         );
 
         set((state) => ({
@@ -444,14 +452,14 @@ export const useResumeListStore = create(
             } catch (error) {
               logger.error(`Failed to sync local resume ${resume.id}:`, error);
             }
-          })
+          }),
         );
       },
     }),
     {
       name: "resume-list-store", // 持久化存储名称
-    }
-  )
+    },
+  ),
 );
 
 export default useResumeListStore; // By Cursor

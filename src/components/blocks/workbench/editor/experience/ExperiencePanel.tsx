@@ -13,13 +13,7 @@ import { useState } from "react";
 import { InputName } from "../basic/input-name";
 import { experienceContentDefault } from "@/config";
 
-const ExperiencePanel = ({
-  id,
-  section,
-}: {
-  id: string;
-  section: ResumeSection;
-}) => {
+const ExperiencePanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.experiencePanel");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const { updateSectionExperience } = useResumeEditorStore();
@@ -46,10 +40,12 @@ const ExperiencePanel = ({
     });
   };
   const handleCreateProject = () => {
+    const newId = generateUUID();
     addSectionExperience({
       ...experienceContentDefault,
-      id: generateUUID(),
+      id: newId,
     });
+    setExpandedId(newId);
   };
 
   return (
@@ -89,7 +85,6 @@ const ExperiencePanel = ({
               expandedId={expandedId}
               setExpandedId={setExpandedId}
               deleteExperience={deleteExperience}
-              updateSectionExperience={updateSectionExperience}
               updateSectionExperienceContent={updateSectionExperienceContent}
             />
           ))}
