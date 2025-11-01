@@ -1,5 +1,5 @@
 import { FieldType } from "@/types/resume";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 export const FieldComponent = ({
   item,
@@ -30,16 +30,35 @@ export const FieldComponent = ({
         href={`mailto:${item.value}`}
         className={cn(className, "underline")}
         style={style}
+        target="_blank"
       >
         {item.value}
       </a>
     );
   } else if (item.type === "link") {
     return (
-      <a href={item.value} className={cn(className, "underline")} style={style}>
+      <a
+        href={item.value}
+        target="_blank"
+        className={cn(className, "underline")}
+        style={style}
+      >
         {item.value}
       </a>
     );
+  } else if (item.type === "phone") {
+    return (
+      <a
+        href={`tel:${item.value}`}
+        className={cn(className, "underline")}
+        style={style}
+        target="_blank"
+      >
+        {item.value}
+      </a>
+    );
+  } else if (item.type === "date") {
+    return <span style={style}>{formatDate(new Date(item.value))}</span>;
   }
   return <span style={style}>{item.value}</span>;
 };

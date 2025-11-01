@@ -5,8 +5,7 @@ import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -83,15 +82,6 @@ const Field = ({
   );
 
   if (type === "date") {
-    const formatDate = (date: Date | undefined) => {
-      if (!date) return "";
-      return date.toLocaleDateString(["zh-CN", "en-US"], {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
-    };
-
     return (
       <div className="block">
         {renderLabel()}

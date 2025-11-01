@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -15,5 +15,14 @@ export function cn(...inputs: ClassValue[]) {
  * toCamelCase("modern") // "modern"
  */
 export function toCamelCase(str: string): string {
-  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }
+
+export const formatDate = (date: Date | undefined) => {
+  if (!date) return "";
+  return date.toLocaleDateString(["zh-CN", "en-US"], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};

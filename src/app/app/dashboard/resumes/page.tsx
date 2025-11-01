@@ -64,8 +64,43 @@ const ResumeCard: React.FC<{
   onView: (id: string) => void;
   onDownload: (id: string) => void;
 }> = ({ id, resume, viewMode, onEdit, onDelete, onView, onDownload }) => {
-  const t = useTranslations();
-
+  const renderOptions = () => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="opacity-0 group-hover:opacity-100"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="bottom">
+          <DropdownMenuItem onClick={() => onView(id)}>
+            <Eye className="mr-2 h-4 w-4" />
+            预览
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onEdit(id)}>
+            <Edit className="mr-2 h-4 w-4" />
+            编辑
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onDownload(id)}>
+            <Download className="mr-2 h-4 w-4" />
+            下载
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => onDelete(resume)}
+            className="text-red-600 focus:text-red-600"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            删除
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
   if (viewMode === "list") {
     return (
       <Card className="group border transition-all duration-200 hover:shadow-md">
@@ -87,39 +122,7 @@ const ResumeCard: React.FC<{
                 </CardDescription>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="opacity-0 group-hover:opacity-100"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onView(id)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  预览
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onEdit(id)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  编辑
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDownload(id)}>
-                  <Download className="mr-2 h-4 w-4" />
-                  下载
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => onDelete(resume)}
-                  className="text-red-600 focus:text-red-600"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  删除
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {renderOptions()}
           </div>
         </CardHeader>
         <CardContent className="pt-0">
@@ -162,11 +165,12 @@ const ResumeCard: React.FC<{
   return (
     <Card
       className={cn(
-        "group border transition-all duration-200 h-[280px] flex flex-col",
+        "group border transition-all duration-200 h-[280px] flex flex-col relative",
         "hover:border-primary/50 hover:shadow-md",
         "dark:hover:border-primary dark:hover:bg-primary/5"
       )}
     >
+      <div className="absolute top-4 right-4 z-10">{renderOptions()}</div>
       <CardContent className="relative flex-1 pt-6 text-center flex flex-col items-center">
         <motion.div
           className="mb-4 p-4 rounded-full bg-primary/10"
@@ -197,26 +201,22 @@ const ResumeCard: React.FC<{
       </CardContent>
       <CardFooter className="pt-0 pb-4 px-4">
         <div className="grid grid-cols-2 gap-2 w-full">
-          <TransitionSpringScale>
-            <Button
-              variant="outline"
-              className="w-full text-sm"
-              size="sm"
-              onClick={() => onEdit(id)}
-            >
-              编辑
-            </Button>
-          </TransitionSpringScale>
-          <TransitionSpringScale>
-            <Button
-              variant="outline"
-              className="w-full text-sm"
-              size="sm"
-              onClick={() => onView(id)}
-            >
-              预览
-            </Button>
-          </TransitionSpringScale>
+          <Button
+            variant="outline"
+            className="w-full text-sm"
+            size="sm"
+            onClick={() => onEdit(id)}
+          >
+            编辑
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full text-sm"
+            size="sm"
+            onClick={() => onView(id)}
+          >
+            预览
+          </Button>
         </div>
       </CardFooter>
     </Card>
