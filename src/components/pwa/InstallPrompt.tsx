@@ -3,20 +3,71 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Download } from "lucide-react";
 
+const STORAGE_KEY = "pwa_install_prompt_dismissed";
+const EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000; // 1个月（30天）
+
+/**
+ * 检查是否应该显示安装提示
+ */
+function shouldShowPrompt(): boolean {
+  // 检查是否已经安装
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia("(display-mode: standalone)").matches
+  ) {
+    return false;
+  }
+
+  // 检查localStorage中是否有关闭记录
+  if (typeof window === "undefined") {
+    return true;
+  }
+
+  const dismissedTime = localStorage.getItem(STORAGE_KEY);
+  if (!dismissedTime) {
+    return true; // 没有关闭记录，可以显示
+  }
+
+  const dismissedTimestamp = parseInt(dismissedTime, 10);
+  const now = Date.now();
+  const timeSinceDismissed = now - dismissedTimestamp;
+
+  // 如果超过1个月，清除记录并显示
+  if (timeSinceDismissed > EXPIRE_TIME) {
+    localStorage.removeItem(STORAGE_KEY);
+    return true;
+  }
+
+  // 1个月内关闭过，不显示
+  return false;
+}
+
+/**
+ * 记录关闭时间
+ */
+function recordDismissal(): void {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, Date.now().toString());
+  }
+}
+
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
-    // 检查是否已经安装
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    // 检查是否应该显示
+    if (!shouldShowPrompt()) {
       return;
     }
 
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowInstallPrompt(true);
+      // 再次检查是否应该显示（防止在监听器设置后用户关闭了）
+      if (shouldShowPrompt()) {
+        setShowInstallPrompt(true);
+      }
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -26,15 +77,27 @@ export function InstallPrompt() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showInstallPrompt) return;
+
+    const timer = setTimeout(() => {
+      setShowInstallPrompt(false);
+      recordDismissal(); // 自动关闭时也记录
+    }, 10000); // 10秒后自动关闭
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showInstallPrompt]);
+
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === "accepted") {
-      setShowInstallPrompt(false);
-    }
+    setShowInstallPrompt(false);
+    recordDismissal(); // 点击安装后也记录，不再弹出
 
     setDeferredPrompt(null);
   };
@@ -52,7 +115,10 @@ export function InstallPrompt() {
           </p>
         </div>
         <button
-          onClick={() => setShowInstallPrompt(false)}
+          onClick={() => {
+            setShowInstallPrompt(false);
+            recordDismissal(); // 记录关闭时间
+          }}
           className="text-muted-foreground hover:text-foreground flex-shrink-0"
         >
           <X className="w-4 h-4" />

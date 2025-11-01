@@ -2,10 +2,10 @@ import React from "react";
 import BaseInfo from "../preview/BaseInfo";
 import ExperienceSection from "../preview/ExperienceSection";
 import EducationSection from "../preview/EducationSection";
-import SkillSection from "../preview/SkillPanel";
+import SkillSection from "../preview/SimplePanel";
 import ProjectSection from "../preview/ProjectSection";
 import CustomSection from "../preview/CustomSection";
-import { ResumeData } from "@/types/resume";
+import { ResumeData, ResumeSection } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 
 interface ModernTemplateProps {
@@ -15,70 +15,59 @@ interface ModernTemplateProps {
 
 const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, template }) => {
   const { colorScheme } = template;
-  const enabledSections = data.menuSections.filter(
-    (section) => section.enabled
-  );
-  const sortedSections = [...enabledSections].sort((a, b) => a.order - b.order);
+  const sortedSections = data.menuSections.sort((a, b) => a.order - b.order);
 
-  const renderSection = (sectionId: string) => {
-    switch (sectionId) {
+  const renderSection = (section: ResumeSection) => {
+    switch (section.id) {
       case "basic":
         return (
           <BaseInfo
-            basic={data.basic}
+            section={section}
             globalSettings={data.globalSettings}
-            template={template}
+            layout="center"
           />
         );
       case "experience":
         return (
           <ExperienceSection
-            experiences={data.experience}
+            section={section}
             globalSettings={data.globalSettings}
           />
         );
       case "education":
         return (
           <EducationSection
-            education={data.education}
+            section={section}
             globalSettings={data.globalSettings}
           />
         );
+      case "introduction":
       case "skills":
         return (
           <SkillSection
-            skill={data.skillContent}
+            section={section}
             globalSettings={data.globalSettings}
           />
         );
       case "projects":
         return (
           <ProjectSection
-            projects={data.projects}
+            section={section}
             globalSettings={data.globalSettings}
           />
         );
       default:
-        if (sectionId in data.customData) {
-          const sectionTitle = data.menuSections.find(s => s.id === sectionId)?.title || sectionId;
-          return (
-            <CustomSection
-              title={sectionTitle}
-              key={sectionId}
-              sectionId={sectionId}
-              items={data.customData[sectionId]}
-              globalSettings={data.globalSettings}
-            />
-          );
-        }
-        return null;
+        console.log("CustomSection", section);
+        return (
+          <CustomSection
+            section={section}
+            globalSettings={data.globalSettings}
+          />
+        );
     }
   };
 
-  const basicSection = sortedSections.find((section) => section.id === "basic");
-  const otherSections = sortedSections.filter(
-    (section) => section.id !== "basic"
-  );
+  const [basicSection, ...otherSections] = sortedSections;
 
   return (
     <div className="grid grid-cols-3 w-full">
@@ -90,7 +79,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, template }) => {
           paddingTop: data.globalSettings.sectionSpacing,
         }}
       >
-        {basicSection && renderSection(basicSection.id)}
+        {basicSection && renderSection(basicSection)}
       </div>
 
       <div
@@ -100,9 +89,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, template }) => {
           color: colorScheme.text,
         }}
       >
-        {otherSections.map((section) => (
-          <div key={section.id}>{renderSection(section.id)}</div>
-        ))}
+        {otherSections.map((section) => renderSection(section))}
       </div>
     </div>
   );

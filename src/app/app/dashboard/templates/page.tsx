@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { cn } from "@/lib/utils";
+import { cn, toCamelCase } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
 import Template from "@/components/blocks/templates/template";
@@ -37,11 +37,6 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
 };
 
 // 模板标签数据
@@ -82,8 +77,7 @@ const TemplatesPage = () => {
   // 筛选和搜索逻辑
   const filteredTemplates = useMemo(() => {
     return DEFAULT_TEMPLATES.filter((template) => {
-      const templateKey =
-        template.id === "left-right" ? "leftRight" : template.id;
+      const templateKey = toCamelCase(template.id);
       const templateName = t(`${templateKey}.name`).toLowerCase();
       const templateDesc = t(`${templateKey}.description`).toLowerCase();
       const searchLower = searchQuery.toLowerCase();

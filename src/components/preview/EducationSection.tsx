@@ -1,25 +1,25 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Education, GlobalSettings } from "@/types/resume";
+import { GlobalSettings, ResumeSection } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 import { useLocale } from "next-intl";
 
 interface EducationSectionProps {
-  education?: Education[];
+  section?: ResumeSection;
   globalSettings?: GlobalSettings;
   showTitle?: boolean;
 }
 
 const EducationSection = ({
-  education,
+  section,
   globalSettings,
   showTitle = true,
 }: EducationSectionProps) => {
   const { setActiveSection } = useResumeEditorStore();
   const locale = useLocale();
-  const visibleEducation = education?.filter((edu) => edu.visible);
+
   return (
     <motion.div
       className="
@@ -43,66 +43,76 @@ const EducationSection = ({
         showTitle={showTitle}
       ></SectionTitle>
       <AnimatePresence mode="popLayout">
-        {visibleEducation?.map((edu) => (
-          <motion.div
-            layout="position"
-            key={edu.id}
-            style={{
-              marginTop: `${globalSettings?.paragraphSpacing}px`,
-            }}
-          >
+        {section?.content?.map((item) => {
+          const school = {
+            value: item.value,
+            id: "school",
+            type: "text",
+          };
+          const [major, degree, startDate, endDate, description] =
+            item.fields || [];
+          return (
             <motion.div
               layout="position"
-              className={`grid grid-cols-${
-                globalSettings?.centerSubtitle ? "3" : "2"
-              } gap-2 items-center justify-items-start [&>*:last-child]:justify-self-end`}
+              key={item.id}
+              style={{
+                marginTop: `${globalSettings?.paragraphSpacing}px`,
+              }}
             >
-              <div
-                className="font-bold"
-                style={{
-                  fontSize: `${globalSettings?.subheaderSize || 16}px`,
-                }}
+              <motion.div
+                layout="position"
+                className={`grid grid-cols-${
+                  globalSettings?.centerSubtitle ? "3" : "2"
+                } gap-2 items-center justify-items-start [&>*:last-child]:justify-self-end`}
               >
-                <span>{edu.school}</span>
-              </div>
+                <div
+                  className="font-bold"
+                  style={{
+                    fontSize: `${globalSettings?.subheaderSize || 16}px`,
+                  }}
+                >
+                  <span>{school.value}</span>
+                </div>
 
-              {globalSettings?.centerSubtitle && (
-                <motion.div layout="position" className="text-subtitleFont">
-                  {[edu.major, edu.degree].filter(Boolean).join(" · ")}
-                  {edu.gpa && ` · GPA ${edu.gpa}`}
+                {globalSettings?.centerSubtitle && (
+                  <motion.div layout="position" className="text-subtitleFont">
+                    {[major.value, degree.value].filter(Boolean).join(" · ")}
+                  </motion.div>
+                )}
+
+                <span
+                  className="text-subtitleFont shrink-0"
+                  suppressHydrationWarning
+                >
+                  {`${new Date(startDate.value).toLocaleDateString(
+                    locale
+                  )} - ${new Date(endDate.value).toLocaleDateString(locale)}`}
+                </span>
+              </motion.div>
+
+              {!globalSettings?.centerSubtitle && (
+                <motion.div
+                  layout="position"
+                  className="text-subtitleFont mt-1"
+                >
+                  {[major.value, degree.value].filter(Boolean).join(" · ")}
                 </motion.div>
               )}
 
-              <span
-                className="text-subtitleFont shrink-0"
-                suppressHydrationWarning
-              >
-                {`${new Date(edu.startDate).toLocaleDateString(
-                  locale
-                )} - ${new Date(edu.endDate).toLocaleDateString(locale)}`}
-              </span>
+              {description.value && (
+                <motion.div
+                  layout="position"
+                  className="mt-2"
+                  style={{
+                    fontSize: `${globalSettings?.baseFontSize || 14}px`,
+                    lineHeight: globalSettings?.lineHeight || 1.6,
+                  }}
+                  dangerouslySetInnerHTML={{ __html: description.value }}
+                />
+              )}
             </motion.div>
-
-            {!globalSettings?.centerSubtitle && (
-              <motion.div layout="position" className="text-subtitleFont mt-1">
-                {[edu.major, edu.degree].filter(Boolean).join(" · ")}
-                {edu.gpa && ` · GPA ${edu.gpa}`}
-              </motion.div>
-            )}
-
-            {edu.description && (
-              <motion.div
-                layout="position"
-                className="mt-2 text-baseFont"
-                style={{
-                  fontSize: `${globalSettings?.baseFontSize || 14}px`,
-                  lineHeight: globalSettings?.lineHeight || 1.6,
-                }}
-                dangerouslySetInnerHTML={{ __html: edu.description }}
-              />
-            )}
-          </motion.div>
-        ))}
+          );
+        })}
       </AnimatePresence>
     </motion.div>
   );

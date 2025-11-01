@@ -24,11 +24,9 @@ import {
   ResumeSectionContent,
 } from "@/types/resume";
 import { Textarea } from "@/components/ui/textarea";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
-import { DEFAULT_AVATAR, IMAGE_PROXY_URL } from "@/constants";
-console.log("DEFAULT_AVATAR", DEFAULT_AVATAR);
+import { DEFAULT_AVATAR } from "@/constants";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -147,7 +145,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     }
 
     try {
-      const proxyUrl = `${IMAGE_PROXY_URL}${encodeURIComponent(url)}`;
+      const proxyUrl = `/api/images/proxy?url=${encodeURIComponent(url)}`;
 
       const img = new Image();
       img.crossOrigin = "anonymous";
@@ -170,7 +168,7 @@ const PhotoConfigDrawer: React.FC<Props> = ({
 
       setPreviewUrl(proxyUrl);
       onPhotoChange({
-        value: proxyUrl,
+        value: url,
       });
     } catch (error) {
       toast.error(

@@ -13,6 +13,7 @@ export interface ResumeSectionContent {
   visible?: boolean;
   icon?: string;
   label?: string;
+  subtitle?: string;
   config?: Record<string, any>;
   fields?: FieldType[];
 }
@@ -81,43 +82,6 @@ export interface CustomFieldType {
   custom?: boolean;
 }
 
-export interface Education {
-  id: string;
-  school: string;
-  major: string;
-  degree: string;
-  startDate: string;
-  endDate: string;
-  gpa?: string;
-  description?: string;
-  visible?: boolean;
-}
-
-export interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  date: string;
-  details: string;
-  visible?: boolean;
-}
-
-export interface Skill {
-  id: string;
-  name: string;
-  level: number;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  role: string;
-  date: string;
-  description: string;
-  visible: boolean;
-  link?: string;
-}
-
 export type GlobalSettings = {
   themeColor?: string | undefined;
   fontFamily?: string | undefined;
@@ -136,15 +100,6 @@ export interface ResumeTheme {
   id: string;
   name: string;
   color: string;
-}
-
-export interface CustomItem {
-  id: string;
-  title: string;
-  subtitle: string;
-  dateRange: string;
-  description: string;
-  visible: boolean;
 }
 
 export const THEME_COLORS = [

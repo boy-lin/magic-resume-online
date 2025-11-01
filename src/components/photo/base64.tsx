@@ -2,7 +2,6 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { IMAGE_PROXY_URL } from "@/constants";
 import { getImageBase64 } from "@/utils/imageProxy";
 
 interface PropsType {

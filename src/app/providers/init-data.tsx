@@ -29,19 +29,15 @@ export function InitDataProvider({ children }: Props) {
     if (userRef.current !== null) return;
     userRef.current = true;
 
-    console.debug("aa Providers useLayoutEffect");
     async function getUserAsync() {
       setUserLoading(1);
       const user = await getUser(createClient());
       setUserLoading(2);
-      console.debug("aa Providers setUser", user);
       setUser(user);
     }
 
     getUserAsync();
   }, []);
-
-  console.debug("aa Providers memoizedValue state", state);
 
   // if (state.userLoading !== 2)
   //   return (

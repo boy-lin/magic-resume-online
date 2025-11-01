@@ -67,7 +67,7 @@ const basicDefault: ResumeSection = {
     },
     {
       id: "phone",
-      type: "text",
+      type: "tel",
       label: "电话",
       value: "138xxxx5678",
       visible: true,
@@ -90,10 +90,10 @@ const basicDefault: ResumeSection = {
       icon: "CalendarRange",
     },
     {
-      id: "personal",
+      id: "website",
       type: "link",
       label: "个人网站",
-      value: "https://zhangsan.dev",
+      value: "https://youdomain.dev",
       icon: "Globe",
       visible: true,
     },
@@ -127,13 +127,6 @@ const skillsDefault: ResumeSection = {
 <ul class="custom-list">
 <li>前端框架：熟悉 React、Vue.js，熟悉 Next.js、Nuxt.js 等 SSR 框架</li>
 <li>开发语言：TypeScript、JavaScript(ES6+)、HTML5、CSS3</li>
-<li>UI/样式：熟悉 TailwindCSS、Sass/Less、CSS Module、Styled-components</li>
-<li>状态管理：Redux、Vuex、Zustand、Jotai、React Query</li>
-<li>工程化工具：Webpack、Vite、Rollup、Babel、ESLint</li>
-<li>测试工具：Jest、React Testing Library、Cypress</li>
-<li>性能优化：熟悉浏览器渲染原理、性能指标监控、代码分割、懒加载等优化技术</li>
-<li>版本控制：Git、SVN</li>
-<li>技术管理：具备团队管理经验，主导过多个大型项目的技术选型和架构设计</li>
 </ul>
 </div>`,
     },
@@ -143,9 +136,13 @@ const skillsDefault: ResumeSection = {
 export const experienceContentDefault: ResumeSectionContent = {
   id: "1",
   type: "experience",
-  value: "字节跳动",
   visible: true,
   fields: [
+    {
+      id: "company",
+      type: "text",
+      value: "字节跳动",
+    },
     {
       id: "position",
       type: "text",
@@ -176,13 +173,12 @@ const experienceDefault: ResumeSection = {
 export const projectContentDefault: ResumeSectionContent = {
   id: "p1",
   type: "project",
-  value: "抖音创作者中台",
   visible: true,
   fields: [
     {
-      id: "position",
+      id: "name",
       type: "text",
-      value: "前端负责人",
+      value: "抖音创作者中台",
     },
     {
       id: "role",
@@ -255,6 +251,31 @@ const educationDefault: ResumeSection = {
   content: [educationContentDefault],
 };
 
+export const customSectionContentDefault: ResumeSectionContent = {
+  id: "",
+  type: "custom",
+  value: "自定义模块",
+  visible: true,
+  fields: [
+    { id: "title", type: "text", value: "", label: "标题" },
+    { id: "subtitle", type: "text", value: "", label: "副标题" },
+    {
+      id: "dateRange",
+      type: "text",
+      value: "2013-09 - 2017-06",
+      label: "时间范围",
+    },
+    { id: "description", type: "textarea", value: "", label: "描述" },
+  ],
+};
+
+export const customSectionDefault: ResumeSection = {
+  id: "",
+  title: "自定义模块",
+  enabled: true,
+  content: [customSectionContentDefault],
+};
+
 export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
   {
     id: "classic",
@@ -275,11 +296,11 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
     },
     menuSections: [
       basicDefault,
-      introductionDefault,
       skillsDefault,
       experienceDefault,
       projectsDefault,
       educationDefault,
+      introductionDefault,
     ],
   },
   {
@@ -301,11 +322,11 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
     },
     menuSections: [
       basicDefault,
-      introductionDefault,
       skillsDefault,
       experienceDefault,
       projectsDefault,
       educationDefault,
+      introductionDefault,
     ],
   },
   {
@@ -327,11 +348,11 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
     },
     menuSections: [
       basicDefault,
-      introductionDefault,
       skillsDefault,
       experienceDefault,
       projectsDefault,
       educationDefault,
+      introductionDefault,
     ],
   },
   {
@@ -353,11 +374,11 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
     },
     menuSections: [
       basicDefault,
-      introductionDefault,
       skillsDefault,
       experienceDefault,
       projectsDefault,
       educationDefault,
+      introductionDefault,
     ],
   },
   {

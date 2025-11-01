@@ -62,7 +62,6 @@ const SidebarInner: React.FC = () => {
   const pathname = usePathname();
   const { resumes } = useResumeListStore();
   const { open } = useUISidebar(); // 使用UI库的useSidebar Hook
-  console.log("resumes:", resumes);
   // 状态管理
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [focusedItem, setFocusedItem] = useState<string | null>(null);

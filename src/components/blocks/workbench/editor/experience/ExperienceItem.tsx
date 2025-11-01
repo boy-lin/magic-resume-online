@@ -10,15 +10,13 @@ import {
 import { ChevronDown, Eye, EyeOff, GripVertical, Trash2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import Field from "../Field";
-import { Experience, FieldType as ResumeFieldType } from "@/types/resume";
+import { FieldType as ResumeFieldType } from "@/types/resume";
 import ThemeModal from "@/components/shared/ThemeModal";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
-import { Education, ResumeSection, ResumeSectionContent } from "@/types/resume";
+import { ResumeSectionContent } from "@/types/resume";
 import { useTranslations } from "next-intl";
 
 interface ProjectEditorProps {
   experience: ResumeSectionContent;
-  updateSectionExperience: (it: Record<string, any>) => void;
   updateSectionExperienceContent: (it: ResumeSectionContent) => void;
   onDelete: () => void;
   onCancel: () => void;
@@ -26,11 +24,10 @@ interface ProjectEditorProps {
 
 const ProjectEditor: React.FC<ProjectEditorProps> = ({
   experience,
-  updateSectionExperience,
   updateSectionExperienceContent,
 }) => {
   const t = useTranslations("workbench.experienceItem");
-  const [position, date, description] = experience.fields || [];
+  const [company, position, date, description] = experience.fields || [];
 
   const handleChange = (field: ResumeFieldType) => {
     updateSectionExperienceContent({
@@ -48,10 +45,10 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.company")}
-            value={experience.value}
+            value={company.value}
             onChange={(value) => {
-              updateSectionExperienceContent({
-                ...experience,
+              handleChange({
+                ...company,
                 value,
               });
             }}
@@ -101,15 +98,13 @@ const ExperienceItem = ({
   experience,
   expandedId,
   setExpandedId,
-  updateSectionExperience,
   updateSectionExperienceContent,
   deleteExperience,
 }: {
   experience: ResumeSectionContent;
   expandedId: string | null;
   setExpandedId: (id: string | null) => void;
-  updateSectionExperience: (it: Record<string, any>) => void;
-  updateSectionExperienceContent: (it: ResumeSectionContent) => void;
+  updateSectionExperienceContent: (it: Partial<ResumeSectionContent>) => void;
   deleteExperience;
 }) => {
   const dragControls = useDragControls();
@@ -129,7 +124,7 @@ const ExperienceItem = ({
     },
     [experience, updateSectionExperienceContent, isUpdating]
   );
-
+  const companyTitle = experience.fields[0].value;
   return (
     <Reorder.Item
       id={experience.id}
@@ -150,11 +145,11 @@ const ExperienceItem = ({
           dragControls.start(event);
         }}
         className={cn(
-          "transition duration-300 w-0 hidden items-center justify-center border-r shrink-0 touch-none",
+          "transition duration-300 w-12 invisible items-center justify-center border-r shrink-0 touch-none pointer-events-none",
           "border-gray-100 dark:border-neutral-800",
           expandedId === experience.id
             ? "cursor-not-allowed"
-            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50 group-hover:w-12 group-hover:flex"
+            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50 group-hover:pointer-events-auto group-hover:flex group-hover:visible"
         )}
       >
         <GripVertical
@@ -189,7 +184,7 @@ const ExperienceItem = ({
                 "text-gray-700 dark:text-neutral-200"
               )}
             >
-              {experience.value || "-"}
+              {companyTitle}
             </h3>
           </div>
           <div className="flex items-center gap-2 ml-4 shrink-0">
@@ -228,7 +223,7 @@ const ExperienceItem = ({
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={experience.value}
+              title={companyTitle}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
                 deleteExperience(experience.id);
@@ -273,7 +268,6 @@ const ExperienceItem = ({
                 />
                 <ProjectEditor
                   experience={experience}
-                  updateSectionExperience={updateSectionExperience}
                   updateSectionExperienceContent={
                     updateSectionExperienceContent
                   }

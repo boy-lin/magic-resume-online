@@ -95,7 +95,7 @@ const ProjectItem = ({
       visible: !project.visible,
     });
   };
-
+  const projectName = project.fields[0].value;
   return (
     <Reorder.Item
       id={project.id}
@@ -165,7 +165,7 @@ const ProjectItem = ({
                 "text-gray-700 dark:text-neutral-200"
               )}
             >
-              {project.value}
+              {projectName}
             </h3>
           </div>
           <div className="flex items-center gap-2 ml-4 shrink-0">
@@ -202,7 +202,7 @@ const ProjectItem = ({
             </Button>
             <ThemeModal
               isOpen={deleteDialogOpen}
-              title={project.value}
+              title={projectName}
               onClose={() => setDeleteDialogOpen(false)}
               onConfirm={() => {
                 deleteProjects(project.id);

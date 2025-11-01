@@ -4,32 +4,33 @@ import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  BasicInfo,
   getBorderRadiusValue,
   GlobalSettings,
+  ResumeSection,
 } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 
 import Base64 from "@/components/photo/base64";
+import { FieldComponent } from "../templates/components/Filed";
+import GithubContribution from "../shared/GithubContribution";
 
 interface BaseInfoProps {
-  basic: BasicInfo | undefined;
-  globalSettings: GlobalSettings | undefined;
+  section?: ResumeSection;
+  globalSettings?: GlobalSettings;
   template?: ResumeTemplate;
-  showTitle?: boolean;
+  layout: "left" | "right" | "center";
 }
 
 const BaseInfo = ({
-  basic = {} as BasicInfo,
+  section,
   globalSettings,
   template,
+  layout,
 }: BaseInfoProps) => {
-  const t = useTranslations("workbench");
-  const locale = useLocale();
   const { setActiveSection } = useResumeEditorStore();
   const useIconMode = globalSettings?.useIconMode ?? false;
-  const layout = basic?.layout || "left";
+  const [name, title, photo, github, ...otherSection1Fields] = section.content;
 
   const getIcon = (iconName: string | undefined) => {
     const IconComponent = Icons[
@@ -40,90 +41,16 @@ const BaseInfo = ({
 
   const isModernTemplate = React.useMemo(() => {
     return template?.layout === "modern";
-  }, [template]);
+  }, [template?.layout]);
 
-  const getOrderedFields = React.useMemo(() => {
-    if (!basic.fieldOrder) {
-      return [
-        {
-          key: "email",
-          value: basic.email,
-          icon: basic.icons?.email || "Mail",
-          label: "电子邮箱",
-          visible: true,
-          custom: false,
-        },
-      ].filter((item) => Boolean(item.value && item.visible));
-    }
-
-    return basic.fieldOrder
-      .filter(
-        (field) =>
-          field.visible !== false &&
-          field.key !== "name" &&
-          field.key !== "title"
-      )
-      .map((field) => ({
-        key: field.key,
-        value:
-          field.key === "birthDate" && basic[field.key]
-            ? new Date(basic[field.key] as string).toLocaleDateString(locale)
-            : (basic[field.key] as string),
-        icon: basic.icons?.[field.key] || "User",
-        label: field.label,
-        visible: field.visible,
-        custom: field.custom,
-      }))
-      .filter((item) => Boolean(item.value));
-  }, [basic]);
-
-  const allFields = [
-    ...getOrderedFields,
-    ...(basic.customFields
-      ?.filter((field) => field.visible !== false)
-      .map((field) => ({
-        key: field.id,
-        value: field.value,
-        icon: field.icon,
-        label: field.label,
-        visible: true,
-        custom: true,
-      })) || []),
-  ];
-
-  const getNameField = () => {
-    const nameField = basic.fieldOrder?.find(
-      (field) => field.key === "name"
-    ) || {
-      key: "name",
-      label: "姓名",
-      visible: true,
-    };
-    return nameField.visible !== false ? nameField : null;
-  };
-
-  const getTitleField = () => {
-    const titleField = basic.fieldOrder?.find(
-      (field) => field.key === "title"
-    ) || {
-      key: "title",
-      label: "职位",
-      visible: true,
-    };
-    return titleField.visible !== false ? titleField : null;
-  };
-
-  const nameField = getNameField();
-  const titleField = getTitleField();
-
-  const PhotoComponent = basic.photo && basic.photoConfig?.visible && (
+  const PhotoComponent = photo.value && photo.config?.visible && (
     <motion.div layout="position">
       <div
         style={{
-          width: `${basic.photoConfig?.width || 100}px`,
-          height: `${basic.photoConfig?.height || 100}px`,
+          width: `${photo.config?.width || 100}px`,
+          height: `${photo.config?.height || 100}px`,
           borderRadius: getBorderRadiusValue(
-            basic.photoConfig || {
+            photo.config || {
               borderRadius: "none",
               customBorderRadius: 0,
             }
@@ -133,8 +60,8 @@ const BaseInfo = ({
       >
         <Base64
           imageAttributes={{
-            src: basic.photo,
-            alt: `${basic.name}'s photo`,
+            src: photo.value,
+            alt: `${name.value}'s photo`,
             className: "w-full h-full object-cover",
           }}
           className="w-full h-full"
@@ -148,14 +75,14 @@ const BaseInfo = ({
     "hover:cursor-pointer hover:outline hover:outline-2 hover:outline-primary rounded-md transition-all ease-in-out hover:shadow-md";
   const baseFieldsClass = "";
   const baseFieldItemClass =
-    "flex items-center whitespace-nowrap overflow-hidden text-baseFont";
+    "flex items-center whitespace-nowrap overflow-hidden";
   const baseNameTitleClass = "flex flex-col";
 
   // 左对齐布局样式
   const leftLayoutStyles = {
     container: "flex items-center justify-between gap-6",
     leftContent: "flex  items-center gap-6 ",
-    fields: "grid grid-cols-2 gap-x-8 gap-y-2 justify-start",
+    fields: "grid grid-cols-2 gap-x-8 gap-y-2 justify-start min-w-[55%]",
     nameTitle: "text-left",
   };
 
@@ -163,7 +90,7 @@ const BaseInfo = ({
   const rightLayoutStyles = {
     container: "flex items-center justify-between gap-6 flex-row-reverse",
     leftContent: "flex justify-end items-center gap-6 ",
-    fields: "grid grid-cols-2 gap-x-8 gap-y-2 justify-start",
+    fields: "grid grid-cols-2 gap-x-8 gap-y-2 justify-start min-w-[55%]",
     nameTitle: "text-right",
   };
 
@@ -196,7 +123,7 @@ const BaseInfo = ({
 
   const NameTitleComponent = (
     <div className={nameTitleClass}>
-      {nameField && basic[nameField.key] && (
+      {name.value && (
         <motion.h1
           layout="position"
           className="font-bold"
@@ -204,17 +131,17 @@ const BaseInfo = ({
             fontSize: `30px`,
           }}
         >
-          {basic[nameField.key] as string}
+          {name.value as string}
         </motion.h1>
       )}
-      {titleField && basic[titleField.key] && (
+      {title.value && (
         <motion.h2
           layout="position"
           style={{
             fontSize: "18px",
           }}
         >
-          {basic[titleField.key] as string}
+          {title.value}
         </motion.h2>
       )}
     </div>
@@ -226,53 +153,43 @@ const BaseInfo = ({
       className={fieldsContainerClass}
       style={{
         fontSize: `${globalSettings?.baseFontSize || 14}px`,
-        color: isModernTemplate ? "#fff" : "rgb(75, 85, 99)",
         maxWidth: layout === "center" ? "none" : "600px",
       }}
     >
-      {allFields.map((item) => (
+      {otherSection1Fields.map((item) => (
         <motion.div
-          key={item.key}
+          key={item.id}
           className={cn(baseFieldItemClass, isModernTemplate && "text-[#fff]")}
           style={{
             width: isModernTemplate ? "100%" : "",
           }}
         >
-          {useIconMode ? (
-            <div className="flex items-center gap-1">
-              {getIcon(item.icon)}
-              {item.key === "email" ? (
-                <a href={`mailto:${item.value}`} className="underline">
-                  {item.value}
-                </a>
-              ) : (
-                <span>{item.value}</span>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 overflow-hidden">
-              {!item.custom && (
-                <span>{t(`basicPanel.basicFields.${item.key}`)}:</span>
-              )}
-              {item.custom && <span>{item.label}:</span>}
-              <span className="truncate" suppressHydrationWarning>
-                {item.value}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {useIconMode ? getIcon(item.icon) : <span>{item.label}:</span>}
+            <FieldComponent item={item} className="text-sm" />
+          </div>
         </motion.div>
       ))}
     </motion.div>
   );
 
   return (
-    <div className={containerClass} onClick={() => setActiveSection("basic")}>
-      <div className={leftContentClass}>
-        {PhotoComponent}
-        {NameTitleComponent}
+    <>
+      <div className={containerClass} onClick={() => setActiveSection("basic")}>
+        <div className={leftContentClass}>
+          {PhotoComponent}
+          {NameTitleComponent}
+        </div>
+        {FieldsComponent}
       </div>
-      {FieldsComponent}
-    </div>
+      {github.value && github.visible && (
+        <GithubContribution
+          className="mt-2"
+          githubKey={github.config?.githubKey}
+          username={github.config?.githubUseName}
+        />
+      )}
+    </>
   );
 };
 

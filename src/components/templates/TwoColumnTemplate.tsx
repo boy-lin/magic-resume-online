@@ -4,9 +4,10 @@ import { ResumeTemplate } from "@/types/template";
 import Base64Image from "@/components/photo/base64";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import * as Icons from "lucide-react";
 import { getFlexDirection } from "./utils";
+import { FieldComponent } from "./components/Filed";
 
 interface TwoColumnTemplateProps {
   data: ResumeData;
@@ -39,33 +40,6 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
     return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
   };
 
-  const renderFiled = (item) => {
-    if (item.type === "text") {
-      return <div className="text-sm">{item.value}</div>;
-    } else if (item.type === "textarea") {
-      return (
-        <div
-          className="text-sm"
-          dangerouslySetInnerHTML={{ __html: item.value }}
-        />
-      );
-    } else if (item.type === "email") {
-      return (
-        <a href={`mailto:${item.value}`} className="underline">
-          {item.value}
-        </a>
-      );
-    } else if (item.type === "link") {
-      return (
-        <a href={item.value} className="underline">
-          {item.value}
-        </a>
-      );
-    }
-
-    return item?.value || "";
-  };
-
   const renderIntroduction = (section: ResumeSection) => {
     const list = section.content;
     return (
@@ -79,7 +53,11 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
         >
           {section.title}
         </h2>
-        <div>{list.map((it) => renderFiled(it))}</div>
+        <div>
+          {list.map((it) => (
+            <FieldComponent item={it} className="text-sm" />
+          ))}
+        </div>
       </>
     );
   };
@@ -108,7 +86,9 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                 )}
               >
                 <div className="w-full">{exp.value}</div>
-                {exp.fields.map((exp) => renderFiled(exp))}
+                {exp.fields.map((exp) => (
+                  <FieldComponent item={exp} className="text-sm" />
+                ))}
               </div>
             );
           })}
@@ -138,7 +118,9 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                 className="flex flex-wrap justify-between space-y-2"
               >
                 <div className="w-full">{edu.value}</div>
-                {edu.fields.map((edu) => renderFiled(edu))}
+                {edu.fields.map((edu) => (
+                  <FieldComponent item={edu} className="text-sm" />
+                ))}
               </div>
             );
           })}
@@ -160,7 +142,11 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
         >
           {section.title}
         </h2>
-        <div>{list.map((it) => renderFiled(it))}</div>
+        <div>
+          {list.map((it) => (
+            <FieldComponent item={it} className="text-sm" />
+          ))}
+        </div>
       </>
     );
   };
@@ -182,8 +168,10 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           {list.map((pj) => {
             return (
               <div key={pj.id}>
-                {renderFiled(pj)}
-                {pj.fields.map((pj) => renderFiled(pj))}
+                <FieldComponent item={pj} className="text-sm" />
+                {pj.fields.map((pj) => (
+                  <FieldComponent item={pj} className="text-sm" />
+                ))}
               </div>
             );
           })}
@@ -285,7 +273,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
               <motion.div
                 key={item.id}
                 className={cn(
-                  "flex items-center whitespace-nowrap overflow-hidden text-baseFont"
+                  "flex items-center whitespace-nowrap overflow-hidden"
                 )}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -294,7 +282,9 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   ) : (
                     <span>{item.label}:</span>
                   )}
-                  <span className="truncate">{renderFiled(item)}</span>
+                  <span className="truncate">
+                    <FieldComponent item={item} className="text-sm" />
+                  </span>
                 </div>
               </motion.div>
             ))}

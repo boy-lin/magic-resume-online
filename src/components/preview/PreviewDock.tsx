@@ -95,8 +95,6 @@ const PreviewDock = ({ viewerRef }) => {
   const { setResumeView, resumeView } = useResumeSettingsStore();
   const viewScale = resumeView?.zoomX ? [resumeView.zoomX * 100] : [100];
 
-  console.log("viewScale:", viewScale);
-
   const handleCopyResume = useCallback(() => {
     if (!activeResumeId) return;
     try {

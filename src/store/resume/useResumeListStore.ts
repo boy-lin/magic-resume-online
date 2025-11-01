@@ -99,7 +99,6 @@ export const useResumeListStore = create(
           },
           menuSections: template.menuSections,
         };
-
         await upsertResumeById(createClient(), newResume);
         set((state) => ({
           resumes: {
@@ -266,6 +265,7 @@ export const useResumeListStore = create(
       getResumeFullById: async (id) => {
         const client = createClient();
         const resumeData = await getResumeById(client, id);
+        // const resumeData = require("../../../mock/index").resumeData;
         const newResume: ResumeData = {
           activeSection: "basic",
           draggingProjectId: null,

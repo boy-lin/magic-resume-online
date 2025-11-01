@@ -21,20 +21,10 @@ const SectionTitle = ({
   const { activeResume } = useResumeListStore();
   const { menuSections, templateId = "default" } = activeResume || {};
 
-  // 确保 menuSections 是数组
-  const safeMenuSections = Array.isArray(menuSections)
-    ? menuSections
-    : menuSections && typeof menuSections === "object"
-    ? Object.values(menuSections)
-    : [];
-
   const renderTitle = useMemo(() => {
-    if (type === "custom") {
-      return title;
-    }
-    const sectionConfig = safeMenuSections.find((s) => s.id === type);
+    const sectionConfig = menuSections.find((s) => s.id === type);
     return sectionConfig?.title;
-  }, [safeMenuSections, type, title]);
+  }, [type, title]);
 
   const config =
     templateConfigs[templateId as string] || templateConfigs["default"];

@@ -17,6 +17,19 @@ const config = {
     ignoreBuildErrors: true,
   },
   output: "standalone",
+  webpack: (cfg) => {
+    // Silence noisy warning from @supabase/realtime-js dynamic requires
+    cfg.ignoreWarnings = [
+      ...(cfg.ignoreWarnings || []),
+      (warning) =>
+        typeof warning === "object" &&
+        warning?.message?.includes(
+          "Critical dependency: the request of a dependency is an expression"
+        ) &&
+        /@supabase\/realtime-js/.test(warning?.module?.resource || ""),
+    ];
+    return cfg;
+  },
 };
 
 // 只在生产环境启用PWA

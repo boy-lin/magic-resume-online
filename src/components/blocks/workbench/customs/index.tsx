@@ -19,16 +19,17 @@ import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import CustomPanel from "../editor/custom/CustomPanel";
 import { UpsertSection } from "./upsert-section";
 import TextareaPanel from "./section-panel/textarea";
+import { ResumeSection } from "@/types/resume";
 
 export default function Customs() {
   const { activeResume } = useResumeListStore();
   const menuSections = activeResume?.menuSections || [];
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState<string>("");
   const { updateMenuSections } = useResumeEditorStore();
   const [open, setOpen] = useState(false);
 
   const handleDeleteSection = () => {
-    const index = menuSections.findIndex((s) => s.id === activeTab);
+    const index = menuSections.findIndex((it) => it.id === activeTab);
     menuSections.splice(index, 1);
     updateMenuSections(menuSections);
     setActiveTab(menuSections[index - 1].id);
@@ -41,23 +42,22 @@ export default function Customs() {
     }
   }, [menuSections]);
 
-  const renderFields = (id) => {
-    const currentSection = menuSections.find((s) => s.id === id);
-    switch (id) {
+  const renderFields = (section: ResumeSection) => {
+    switch (section.id) {
       case "basic":
-        return <BasicPanel section={currentSection} />;
+        return <BasicPanel section={section} />;
       case "projects":
-        return <ProjectPanel section={currentSection} />;
+        return <ProjectPanel section={section} />;
       case "education":
-        return <EducationPanel section={currentSection} />;
+        return <EducationPanel section={section} />;
       case "experience":
-        return <ExperiencePanel id={id} section={currentSection} />;
+        return <ExperiencePanel section={section} />;
       case "introduction":
       case "skills":
         return (
           <TextareaPanel
-            id={id}
-            section={currentSection}
+            id={section.id}
+            section={section}
             placeholder="描述你的技能、专长等..."
           />
         );
@@ -73,22 +73,19 @@ export default function Customs() {
         return <SettingLayout />;
       default:
         return (
-          // <TextareaPanel
-          //   id={id}
-          //   content={currentSection?.content || ""}
-          //   menuSections={menuSections}
-          //   placeholder=""
-          //   onChange={(value) => {
-          //     updateSectionContentById(id, value);
-          //   }}
-          // />
-          <CustomPanel id={id} handleDeleteSection={handleDeleteSection} />
+          <CustomPanel
+            id={section.id}
+            section={section}
+            handleDeleteSection={handleDeleteSection}
+          />
         );
     }
   };
-  if (!menuSections) {
+  if (!menuSections || !activeTab) {
     return null;
   }
+
+  const activeSection = menuSections.find((it) => it.id === activeTab) || null;
 
   return (
     <div className="h-full">
@@ -129,7 +126,7 @@ export default function Customs() {
         </div>
       </div>
 
-      <div className="flex-1">{renderFields(activeTab)}</div>
+      <div className="flex-1">{renderFields(activeSection)}</div>
     </div>
   );
 }

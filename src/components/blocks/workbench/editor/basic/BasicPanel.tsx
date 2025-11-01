@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import PhotoUpload from "@/components/shared/PhotoSelector";
 import IconSelector from "../IconSelector";
 import AlignSelector from "./AlignSelector";
-import Field, { FieldType } from "../Field";
+import Field from "../Field";
 import { cn } from "@/lib/utils";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import {
@@ -42,7 +42,6 @@ const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
 
   const renderBasicField = (field: ResumeFieldType) => {
     const selectedIcon = section.config?.useIconMode ? field.icon : field.label;
-    console.log("field", field);
     return (
       <Reorder.Item
         value={field}
@@ -99,7 +98,7 @@ const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
                   })
                 }
                 placeholder={`请输入${field.label}`}
-                type={field.type as FieldType}
+                type={field.type}
               />
             </div>
           </div>
@@ -200,79 +199,116 @@ const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
         <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
           {t("basicField")}
         </h3>
-        <Reorder.Group
-          axis="y"
-          as="div"
-          values={otherFields}
-          onReorder={(fields) =>
-            updateSectionBasic({
-              content: [name, title, photo, github, ...fields],
-            })
-          }
-          className="space-y-2"
-        >
-          {otherFields.map((field) => renderBasicField(field))}
-        </Reorder.Group>
-      </TransitionOpacity>
-      <TransitionOpacity className="space-y-2">
         <div>
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
-              {t("githubContributions")}
-            </h3>
+          <div className="flex items-center gap-2 p-2">
+            <div className=" w-[80px] ml-[4px] text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              {t(`basicFields.${name.id}`)}
+            </div>
+            <Field
+              className="flex-1"
+              label=""
+              value={name.value}
+              onChange={(value) =>
+                updateSectionBasicContent({
+                  ...name,
+                  value,
+                })
+              }
+              placeholder={`请输入${name.label}`}
+              type={name.type}
+            />
+          </div>
+          <div className="flex items-center gap-2 p-2">
+            <div className=" w-[80px] ml-[4px] text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              {t(`basicFields.${title.id}`)}
+            </div>
+            <Field
+              className="flex-1"
+              label=""
+              value={title.value}
+              onChange={(value) =>
+                updateSectionBasicContent({
+                  ...title,
+                  value,
+                })
+              }
+              placeholder={`请输入${title.label}`}
+              type={title.type}
+            />
+          </div>
 
-            <Switch
-              checked={github?.config?.githubContributionsVisible}
-              onCheckedChange={(checked) =>
+          <Reorder.Group
+            axis="y"
+            as="div"
+            values={otherFields}
+            onReorder={(fields) =>
+              updateSectionBasic({
+                content: [name, title, photo, github, ...fields],
+              })
+            }
+            className="space-y-2"
+          >
+            {otherFields.map((field) => renderBasicField(field))}
+          </Reorder.Group>
+        </div>
+      </TransitionOpacity>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium text-neutral-900 dark:text-neutral-200 px-1">
+            {t("githubContributions")}
+          </h3>
+
+          <Switch
+            checked={github?.config?.githubContributionsVisible}
+            onCheckedChange={(checked) =>
+              updateSectionBasicContent({
+                ...github,
+                config: {
+                  ...github.config,
+                  githubContributionsVisible: checked,
+                },
+              })
+            }
+          />
+        </div>
+
+        <div className="mt-4">
+          <div className="flex items-center ml-3 space-x-2">
+            <div className=" w-[110px]">Access Token</div>
+            <Input
+              placeholder="请输入github access token"
+              className="flex-1"
+              value={github.config?.githubKey}
+              onChange={(e) =>
                 updateSectionBasicContent({
                   ...github,
                   config: {
                     ...github.config,
-                    githubContributionsVisible: checked,
+                    githubKey: e.target.value,
                   },
                 })
               }
             />
           </div>
-
-          <div className="mt-4">
-            <div className="flex items-center ml-3 space-x-2">
-              <div className=" w-[110px]">Access Token</div>
-              <Input
-                placeholder="请输入github access token"
-                className="flex-1"
-                value={github.config?.githubKey}
-                onChange={(e) =>
-                  updateSectionBasicContent({
-                    ...github,
-                    config: {
-                      ...github.config,
-                      githubKey: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-            <div className="flex items-center ml-3 mt-4 space-x-2">
-              <div className="w-[110px]">UseName</div>
-              <Input
-                className="flex-1"
-                placeholder="请输入github username"
-                value={github.config?.githubUseName}
-                onChange={(e) =>
-                  updateSectionBasicContent({
-                    ...github,
-                    config: {
-                      ...github.config,
-                      githubUseName: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
+          <div className="flex items-center ml-3 mt-4 space-x-2">
+            <div className="w-[110px]">UseName</div>
+            <Input
+              className="flex-1"
+              placeholder="请输入github username"
+              value={github.config?.githubUseName}
+              onChange={(e) =>
+                updateSectionBasicContent({
+                  ...github,
+                  config: {
+                    ...github.config,
+                    githubUseName: e.target.value,
+                  },
+                })
+              }
+            />
           </div>
         </div>
-      </TransitionOpacity>
+      </div>
     </div>
   );
 };

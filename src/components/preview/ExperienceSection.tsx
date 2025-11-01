@@ -1,18 +1,24 @@
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Experience, GlobalSettings } from "@/types/resume";
+import {
+  GlobalSettings,
+  ResumeSection,
+  ResumeSectionContent,
+} from "@/types/resume";
 import SectionTitle from "./SectionTitle";
 import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { FieldComponent } from "../templates/components/Filed";
+import { cn } from "@/lib/utils";
 
 interface ExperienceSectionProps {
-  experiences?: Experience[];
+  section?: ResumeSection;
   globalSettings?: GlobalSettings;
   showTitle?: boolean;
 }
 
 interface ExperienceItemProps {
-  experience: Experience;
+  experience: ResumeSectionContent;
   globalSettings?: GlobalSettings;
 }
 
@@ -20,14 +26,19 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
   ({ experience, globalSettings }, ref) => {
     const centerSubtitle = globalSettings?.centerSubtitle;
     const gridColumns = centerSubtitle ? 3 : 2;
-
+    const [company, position, date, description] = experience.fields || [];
     return (
       <motion.div
-        style={{ marginTop: `${globalSettings?.paragraphSpacing}px` }}
         layout="position"
+        style={{
+          marginTop: `${globalSettings?.paragraphSpacing}px`,
+        }}
       >
         <motion.div
-          className={`grid grid-cols-${gridColumns} gap-2 items-center justify-items-start [&>*:last-child]:justify-self-end`}
+          layout="position"
+          className={`grid grid-cols-${
+            globalSettings?.centerSubtitle ? "3" : "2"
+          } gap-2 items-center justify-items-start [&>*:last-child]:justify-self-end`}
         >
           <div
             className="font-bold"
@@ -35,29 +46,36 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
               fontSize: `${globalSettings?.subheaderSize || 16}px`,
             }}
           >
-            {experience.company}
+            <span>{company.value}</span>
           </div>
-          {centerSubtitle && (
-            <motion.div className="text-subtitleFont">
-              {experience.position}
+
+          {globalSettings?.centerSubtitle && (
+            <motion.div layout="position" className="text-subtitleFont">
+              {position.value}
             </motion.div>
           )}
-          <div className="text-subtitleFont">{experience.date}</div>
+
+          <span className="text-subtitleFont shrink-0" suppressHydrationWarning>
+            {date.value}
+          </span>
         </motion.div>
-        {experience.position && !centerSubtitle && (
-          <motion.div className="text-subtitleFont">
-            {experience.position}
+
+        {!globalSettings?.centerSubtitle && (
+          <motion.div layout="position" className="text-subtitleFont mt-1">
+            {date.value}
           </motion.div>
         )}
-        {experience.details && (
+
+        {description.value && (
           <motion.div
-            className="mt-2 text-baseFont"
-            dangerouslySetInnerHTML={{ __html: experience.details }}
+            layout="position"
+            className="mt-2"
             style={{
               fontSize: `${globalSettings?.baseFontSize || 14}px`,
               lineHeight: globalSettings?.lineHeight || 1.6,
             }}
-          ></motion.div>
+            dangerouslySetInnerHTML={{ __html: description.value }}
+          />
         )}
       </motion.div>
     );
@@ -67,15 +85,13 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
 ExperienceItem.displayName = "ExperienceItem";
 
 const ExperienceSection: React.FC<ExperienceSectionProps> = ({
-  experiences,
+  section,
   globalSettings,
   showTitle = true,
 }) => {
   const { setActiveSection } = useResumeEditorStore();
 
-  const visibleExperiences = experiences?.filter(
-    (experience) => experience.visible
-  );
+  const visibleExperiences = section?.content?.filter((item) => item.visible);
 
   return (
     <motion.div
@@ -91,15 +107,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({
         <SectionTitle type="experience" globalSettings={globalSettings} />
       )}
       <div>
-        <AnimatePresence mode="popLayout">
-          {visibleExperiences?.map((experience) => (
-            <ExperienceItem
-              key={experience.id}
-              experience={experience}
-              globalSettings={globalSettings}
-            />
-          ))}
-        </AnimatePresence>
+        {visibleExperiences?.map((item) => (
+          <ExperienceItem
+            key={item.id}
+            experience={item}
+            globalSettings={globalSettings}
+          />
+        ))}
       </div>
     </motion.div>
   );
