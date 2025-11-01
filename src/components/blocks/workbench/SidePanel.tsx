@@ -95,7 +95,6 @@ export function SidePanel({
             {customSection.title}
           </span>
         </button>
-        <div className="border-t border-gray-200 w-4/5"></div>
 
         <div className="border-t border-gray-200 w-4/5"></div>
 
