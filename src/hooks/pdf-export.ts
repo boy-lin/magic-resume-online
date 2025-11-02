@@ -93,6 +93,24 @@ export const usePdfExport = (props) => {
       pageBreakLines.forEach((line) => {
         line.style.display = "none";
       });
+
+      // 为需要避免分页的元素添加 CSS 样式
+      const avoidBreakElements = [
+        ...Array.from(clonedElement.querySelectorAll("img")),
+        ...Array.from(clonedElement.querySelectorAll("h1, h2, h3, h4, h5, h6")),
+        ...Array.from(clonedElement.querySelectorAll("p")),
+        ...Array.from(clonedElement.querySelectorAll("li")),
+        ...Array.from(
+          clonedElement.querySelectorAll(
+            ".experience-item, .project-item, .education-item, .skill-item"
+          )
+        ),
+        ...Array.from(clonedElement.querySelectorAll("[data-section]")),
+      ];
+      avoidBreakElements.forEach((el) => {
+        (el as HTMLElement).style.pageBreakInside = "avoid";
+        (el as HTMLElement).style.breakInside = "avoid";
+      });
       const { globalSettings, title } = props;
 
       // 检查是否启用调试模式（通过URL参数或localStorage）
@@ -154,6 +172,7 @@ export const usePdfExport = (props) => {
       clonedElement.style.maxWidth = "210mm";
       clonedElement.style.overflow = "visible";
       clonedElement.style.position = "relative";
+      clonedElement.style.padding = `${globalSettings?.pagePadding}px`;
       tempContainer.appendChild(clonedElement);
       document.body.appendChild(tempContainer);
 
@@ -173,7 +192,25 @@ export const usePdfExport = (props) => {
             orientation: "portrait",
           },
           pagebreak: {
-            mode: ["avoid-all", "css", "css-paged"],
+            mode: ["css", "css-paged"], //"avoid-all"
+            autoPaging: "text",
+            // 避免在以下元素内部分页
+            avoid: [
+              "img", // 图片不应被分页
+              "h1",
+              "h2",
+              "h3",
+              "h4",
+              "h5",
+              "h6", // 标题不应与内容分离
+              "p", // 段落尽量不分页
+              "li", // 列表项尽量保持完整
+              "[data-section]", // 所有带 data-section 属性的元素
+            ],
+            // 在以下元素之后分页（如果可能）
+            after: [".page-break-after"],
+            // 在以下元素之前分页（如果可能）
+            before: [".page-break-before"],
           },
         };
 
