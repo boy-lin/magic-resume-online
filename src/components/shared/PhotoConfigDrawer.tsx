@@ -315,7 +315,12 @@ const PhotoConfigDrawer: React.FC<Props> = ({
             <img
               src={previewUrl}
               alt="Profile"
-              className="w-full h-full object-cover"
+              width={config.width}
+              height={config.height}
+              style={{
+                width: `${config.width}px`,
+                height: `${config.height}px`,
+              }}
             />
             <div
               className={cn(

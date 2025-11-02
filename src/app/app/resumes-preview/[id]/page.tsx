@@ -239,10 +239,10 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
       <div
         ref={resumeContentRef}
         id="resume-preview"
+        className="bg-white shadow-lg relative w-[210mm] min-w-[210mm] min-h-[297mm]"
         style={{
           padding: `${activeResume.globalSettings?.pagePadding}px`,
         }}
-        className="bg-white shadow-lg box-content w-[210mm] min-w-[210mm] min-h-[297mm] relative"
       >
         <ResumeTemplateComponent data={activeResume} template={template} />
         {/* 分页线 */}

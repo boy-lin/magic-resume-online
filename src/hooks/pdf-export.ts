@@ -1,77 +1,85 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-const getOptimizedStyles = () => {
-  const styleCache = new Map();
-  const startTime = performance.now();
+// html2pdf 类型声明
+declare global {
+  interface Window {
+    html2pdf: any;
+  }
+}
 
-  const styles = Array.from(document.styleSheets)
-    .map((sheet) => {
-      try {
-        return Array.from(sheet.cssRules)
-          .filter((rule) => {
-            const ruleText = rule.cssText;
-            if (styleCache.has(ruleText)) return false;
-            styleCache.set(ruleText, true);
+// 加载 html2pdf.js 脚本的函数
+const loadHtml2Pdf = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    // 检查是否已经加载
+    if (window.html2pdf) {
+      resolve();
+      return;
+    }
 
-            if (rule instanceof CSSFontFaceRule) return false;
-            if (ruleText.includes("font-family")) return false;
-            if (ruleText.includes("@keyframes")) return false;
-            if (ruleText.includes("animation")) return false;
-            if (ruleText.includes("transition")) return false;
-            if (ruleText.includes("hover")) return false;
-            return true;
-          })
-          .map((rule) => rule.cssText)
-          .join("\n");
-      } catch (e) {
-        console.warn("Style processing error:", e);
-        return "";
+    // 检查脚本是否正在加载
+    const existingScript = document.querySelector(
+      'script[src="/javascript/html2pdf.bundle.min.js"]'
+    );
+    if (existingScript) {
+      // 等待脚本加载完成
+      existingScript.addEventListener("load", () => {
+        if (window.html2pdf) {
+          resolve();
+        } else {
+          reject(new Error("html2pdf not available after script load"));
+        }
+      });
+      existingScript.addEventListener("error", reject);
+      return;
+    }
+
+    // 创建并加载脚本
+    const script = document.createElement("script");
+    script.src = "/javascript/html2pdf.bundle.min.js";
+    script.async = true;
+    script.onload = () => {
+      if (window.html2pdf) {
+        resolve();
+      } else {
+        reject(new Error("html2pdf not available after script load"));
       }
-    })
-    .join("\n");
-
-  console.log(`Style processing took ${performance.now() - startTime}ms`);
-  return styles;
-};
-
-const optimizeImages = async (element: HTMLElement) => {
-  const startTime = performance.now();
-  const images = element.getElementsByTagName("img");
-
-  const imagePromises = Array.from(images)
-    .filter((img) => !img.src.startsWith("data:"))
-    .map(async (img) => {
-      try {
-        const response = await fetch(img.src);
-        const blob = await response.blob();
-        return new Promise<void>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            img.src = reader.result as string;
-            resolve();
-          };
-          reader.readAsDataURL(blob);
-        });
-      } catch (error) {
-        console.error("Image conversion error:", error);
-        return Promise.resolve();
-      }
-    });
-
-  await Promise.all(imagePromises);
-  console.log(`Image processing took ${performance.now() - startTime}ms`);
+    };
+    script.onerror = () => {
+      reject(new Error("Failed to load html2pdf script"));
+    };
+    document.head.appendChild(script);
+  });
 };
 
 export const usePdfExport = (props) => {
   const [isExporting, setIsExporting] = useState(false);
+  const [html2PdfLoaded, setHtml2PdfLoaded] = useState(false);
   const t = useTranslations("share.pdf");
+
+  // 在组件挂载时预加载 html2pdf.js
+  useEffect(() => {
+    loadHtml2Pdf()
+      .then(() => {
+        setHtml2PdfLoaded(true);
+      })
+      .catch((error) => {
+        console.error("Failed to load html2pdf:", error);
+      });
+  }, []);
+
   const handleExport = async () => {
     const exportStartTime = performance.now();
     setIsExporting(true);
 
     try {
+      // 确保 html2pdf 已加载
+      if (!window.html2pdf) {
+        await loadHtml2Pdf();
+        setHtml2PdfLoaded(true);
+      }
+
       const pdfElement = document.querySelector<HTMLElement>("#resume-preview");
       if (!pdfElement) {
         throw new Error("PDF element not found");
@@ -79,65 +87,105 @@ export const usePdfExport = (props) => {
 
       const clonedElement = pdfElement.cloneNode(true) as HTMLElement;
 
+      // 隐藏分页线
       const pageBreakLines =
         clonedElement.querySelectorAll<HTMLElement>(".page-break-line");
       pageBreakLines.forEach((line) => {
         line.style.display = "none";
       });
-
-      const [styles] = await Promise.all([
-        getOptimizedStyles(),
-        optimizeImages(clonedElement),
-      ]);
-
       const { globalSettings, title } = props;
 
       // 检查是否启用调试模式（通过URL参数或localStorage）
       const urlParams = new URLSearchParams(window.location.search);
-      const debugMode =
-        urlParams.get("pdfDebug") === "true" ||
-        localStorage.getItem("pdfDebug") === "true";
-
-      const response = await fetch("/api/pdf/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: clonedElement.outerHTML,
-          styles,
-          margin: globalSettings.pagePadding,
-          debug: debugMode, // 添加调试参数
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`PDF generation failed: ${response.status}`);
-      }
+      const debugMode = urlParams.get("pdfDebug") === "true";
 
       // 调试模式：打开HTML预览页面
       if (debugMode) {
-        const html = await response.text();
+        const html = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <title>PDF Debug Preview</title>
+              <style>
+                ${Array.from(document.styleSheets)
+                  .map((sheet) => {
+                    try {
+                      return Array.from(sheet.cssRules)
+                        .map((rule) => rule.cssText)
+                        .join("\n");
+                    } catch (e) {
+                      return "";
+                    }
+                  })
+                  .join("\n")}
+              </style>
+            </head>
+            <body>
+              ${clonedElement.outerHTML}
+            </body>
+          </html>
+        `;
         const previewWindow = window.open("", "_blank");
         if (previewWindow) {
           previewWindow.document.write(html);
           previewWindow.document.close();
         }
-        console.log(`Total export took ${performance.now() - exportStartTime}ms`);
+        console.log(
+          `Total export took ${performance.now() - exportStartTime}ms`
+        );
         toast.success("调试模式：HTML预览已在新窗口打开");
+        setIsExporting(false);
         return;
       }
 
-      // 正常模式：下载PDF
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${title}.pdf`;
-      link.click();
+      // 为了确保 html2pdf 能正确处理，将克隆元素临时添加到 DOM（但隐藏）
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "fixed";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.top = "0";
+      tempContainer.style.width = "210mm"; // A4 宽度
+      tempContainer.style.overflow = "visible";
+      tempContainer.style.zIndex = "-1";
 
-      window.URL.revokeObjectURL(url);
-      console.log(`Total export took ${performance.now() - exportStartTime}ms`);
+      // 确保克隆元素有正确的宽度和样式，防止内容被截断
+      clonedElement.style.width = "210mm";
+      clonedElement.style.minWidth = "210mm";
+      clonedElement.style.maxWidth = "210mm";
+      clonedElement.style.overflow = "visible";
+      clonedElement.style.position = "relative";
+      tempContainer.appendChild(clonedElement);
+      document.body.appendChild(tempContainer);
+
+      try {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        // 配置 html2pdf 选项
+        const options = {
+          margin: 1,
+          filename: `${title}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            logging: false,
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+          },
+          pagebreak: {
+            mode: ["css-paged"],
+          },
+        };
+
+        // 使用 html2pdf 生成 PDF（从克隆的元素）
+        await window.html2pdf().set(options).from(clonedElement).save();
+      } finally {
+        // 清理临时 DOM 元素
+        if (document.body.contains(tempContainer)) {
+          document.body.removeChild(tempContainer);
+        }
+      }
       toast.success(t("toast.success"));
     } catch (error) {
       console.error("Export error:", error);
@@ -150,13 +198,14 @@ export const usePdfExport = (props) => {
   return {
     isExporting,
     handleExport,
+    html2PdfLoaded,
   };
 };
 
 export const useHtmlPrint = (globalSettings) => {
   const printFrameRef = useRef<HTMLIFrameElement>(null);
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!printFrameRef.current) {
       console.error("Print frame not found");
       return;
@@ -167,14 +216,6 @@ export const useHtmlPrint = (globalSettings) => {
       console.error("Resume content not found");
       return;
     }
-
-    const actualContent = resumeContent.parentElement;
-    if (!actualContent) {
-      console.error("Actual content not found");
-      return;
-    }
-
-    console.log("Found content:", actualContent);
 
     const pagePadding = globalSettings?.pagePadding;
     const iframeWindow = printFrameRef.current.contentWindow;
@@ -220,7 +261,6 @@ export const useHtmlPrint = (globalSettings) => {
               }
 
               #resume-preview {
-                padding: 0 !important;
                 margin: 0 !important;
                 font-family: "MiSans VF", sans-serif !important;
               }
@@ -262,7 +302,7 @@ export const useHtmlPrint = (globalSettings) => {
           </head>
           <body>
             <div id="print-content">
-              ${actualContent.innerHTML}
+              ${resumeContent.innerHTML}
             </div>
           </body>
         </html>
@@ -270,15 +310,11 @@ export const useHtmlPrint = (globalSettings) => {
 
       iframeWindow.document.write(htmlContent);
       iframeWindow.document.close();
-
-      setTimeout(() => {
-        try {
-          iframeWindow.focus();
-          iframeWindow.print();
-        } catch (error) {
-          console.error("Error  print:", error);
-        }
-      }, 1000);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      iframeWindow.focus();
+      iframeWindow.print();
     } catch (error) {
       console.error("Error setting up print:", error);
     }
