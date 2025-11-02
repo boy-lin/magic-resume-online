@@ -161,7 +161,6 @@ export const usePdfExport = (props) => {
         await new Promise((resolve) => requestAnimationFrame(resolve));
         // 配置 html2pdf 选项
         const options = {
-          margin: 1,
           filename: `${title}.pdf`,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {
@@ -174,7 +173,7 @@ export const usePdfExport = (props) => {
             orientation: "portrait",
           },
           pagebreak: {
-            mode: ["css-paged"],
+            mode: ["avoid-all", "css", "css-paged"],
           },
         };
 

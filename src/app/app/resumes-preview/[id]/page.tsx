@@ -222,15 +222,15 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     <div className="">
       <div className="fixed ml-2 left-1/2 translate-x-[105mm]">
         <div className="sticky top-8 flex flex-col gap-2 transform translate-x-[50%]">
-          <DownloadBtn
-            className="hover:bg-primary hover:text-primary-foreground"
-            activeResume={activeResume}
-          />
           <PrintBtn
             className="hover:bg-primary hover:text-primary-foreground"
             activeResume={activeResume}
           />
           <ImageBtn
+            className="hover:bg-primary hover:text-primary-foreground"
+            activeResume={activeResume}
+          />
+          <DownloadBtn
             className="hover:bg-primary hover:text-primary-foreground"
             activeResume={activeResume}
           />

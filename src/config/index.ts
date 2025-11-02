@@ -290,9 +290,9 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
       text: "#1f2937",
     },
     spacing: {
-      sectionGap: 24,
+      sectionGap: 20,
       itemGap: 16,
-      contentPadding: 32,
+      contentPadding: 28,
     },
     menuSections: [
       basicDefault,
@@ -342,9 +342,9 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
       text: "#374151",
     },
     spacing: {
-      sectionGap: 24,
+      sectionGap: 20,
       itemGap: 16,
-      contentPadding: 32,
+      contentPadding: 28,
     },
     menuSections: [
       basicDefault,
@@ -394,9 +394,9 @@ export const DEFAULT_TEMPLATES: ResumeTemplate[] = [
       text: "#111827",
     },
     spacing: {
-      sectionGap: 24,
+      sectionGap: 20,
       itemGap: 16,
-      contentPadding: 24,
+      contentPadding: 28,
     },
     menuSections: [
       basicDefault,
