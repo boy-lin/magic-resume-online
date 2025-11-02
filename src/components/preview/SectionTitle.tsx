@@ -89,7 +89,7 @@ const SectionTitle = ({
       case "classic":
         return (
           <h3
-            className={cn("pb-2 border-b")}
+            className={cn("pb-1 border-b")}
             style={{
               ...baseStyles,
               color: themeColor,

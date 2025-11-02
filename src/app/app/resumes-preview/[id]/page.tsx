@@ -237,20 +237,24 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
         </div>
       </div>
       <div
-        ref={resumeContentRef}
-        id="resume-preview"
-        className="bg-white shadow-lg relative w-[210mm] min-w-[210mm] min-h-[297mm]"
+        className="bg-white shadow-lg relative rounded-lg"
         style={{
           padding: `${activeResume.globalSettings?.pagePadding}px`,
         }}
       >
-        <ResumeTemplateComponent data={activeResume} template={template} />
-        {/* 分页线 */}
-        <PageBreakLines
-          contentHeight={contentHeight}
-          pageHeightPx={pageHeightPx}
-          pageBreakCount={pageBreakCount}
-        />
+        <div
+          ref={resumeContentRef}
+          id="resume-preview"
+          className="w-[210mm] min-w-[210mm] min-h-[297mm]"
+        >
+          <ResumeTemplateComponent data={activeResume} template={template} />
+          {/* 分页线 */}
+          <PageBreakLines
+            contentHeight={contentHeight}
+            pageHeightPx={pageHeightPx}
+            pageBreakCount={pageBreakCount}
+          />
+        </div>
       </div>
     </div>
   );
