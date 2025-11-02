@@ -45,7 +45,7 @@ const PhotoSelector: React.FC<Props> = ({ className, photo, updatePhoto }) => {
             <Image
               src={photo.value}
               alt="Selected"
-              className="w-[48px] h-[48px] object-cover rounded"
+              className="w-[48px] h-[48px] rounded"
               width={48}
               height={48}
             />

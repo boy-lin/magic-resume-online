@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,30 +43,23 @@ const BaseInfo = ({
   }, [template?.layout]);
 
   const PhotoComponent = photo.value && photo.config?.visible && (
-    <motion.div layout="position">
-      <div
-        style={{
-          width: `${photo.config?.width || 100}px`,
-          height: `${photo.config?.height || 100}px`,
-          borderRadius: getBorderRadiusValue(
-            photo.config || {
-              borderRadius: "none",
-              customBorderRadius: 0,
-            }
-          ),
-          overflow: "hidden",
-        }}
-      >
-        <Base64
-          imageAttributes={{
-            src: photo.value,
-            alt: `${name.value}'s photo`,
-            className: "w-full h-full object-cover",
-          }}
-          className="w-full h-full"
-        />
-      </div>
-    </motion.div>
+    <Base64
+      imageAttributes={{
+        src: photo.value,
+        alt: `${name.value}'s photo`,
+        width: photo.config?.width || 100,
+        height: photo.config?.height || 100,
+      }}
+      style={{
+        borderRadius: getBorderRadiusValue(
+          photo.config || {
+            borderRadius: "none",
+            customBorderRadius: 0,
+          }
+        ),
+        overflow: "hidden",
+      }}
+    />
   );
 
   // 基础样式
