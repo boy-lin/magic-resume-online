@@ -59,7 +59,6 @@ const ListItem = React.forwardRef<
 ListItem.displayName = "ListItem";
 
 export default function LandingHeader() {
-  const user = useAppStore((state) => state.user);
   const t = useTranslations("home");
   const tc = useTranslations("common");
   const pathname = usePathname();

@@ -80,35 +80,13 @@ export default async function LocaleLayout({
 `,
           }}
         />
-        {/* Google tag (gtag.js) */}
-        {/* <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}');
-          `,
-          }}
-        /> */}
       </head>
       <body className={inter.className}>
-        {/* <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-MV8PQJ49"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript> */}
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
               <LandingHeader />
-              <main className="px-4 pt-16">{children}</main>
+              <main>{children}</main>
               <Footer />
             </div>
           </Providers>

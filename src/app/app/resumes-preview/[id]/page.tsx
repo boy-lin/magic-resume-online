@@ -45,7 +45,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     const data = await getResumeById(createClient(), params.id);
     const newResume = {
       activeSection: "basic",
-      draggingProjectId: null,
       ...data,
     };
     setActiveResume(newResume);

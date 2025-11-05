@@ -59,6 +59,7 @@ const LayoutHeader: React.FC = () => {
       clearLocalStorage();
       toast.success("已成功退出登录");
     } catch (error) {
+      console.error(error);
       toast.error("退出登录失败");
     }
   };

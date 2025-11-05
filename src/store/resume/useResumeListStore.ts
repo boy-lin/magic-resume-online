@@ -82,7 +82,6 @@ export const useResumeListStore = create(
           id,
           ...initialResumeData,
           activeSection: "basic",
-          draggingProjectId: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           templateId: template?.id,
@@ -268,7 +267,6 @@ export const useResumeListStore = create(
         // const resumeData = require("../../../mock/index").resumeData;
         const newResume: ResumeData = {
           activeSection: "basic",
-          draggingProjectId: null,
           ...resumeData,
         };
         set((state) => ({

@@ -58,6 +58,11 @@
     --text-letter-head: 228 84% 4.9%;
     /* --paper: */
     --paper: 0 0% 100%;
+    --color-1: 0 100% 63%;
+    --color-2: 270 100% 63%;
+    --color-3: 210 100% 63%;
+    --color-4: 195 100% 63%;
+    --color-5: 90 100% 63%;
   }
   /* 通用滚动条样式 */
   ::-webkit-scrollbar {
@@ -155,6 +160,9 @@
     --text-letter-head: 215, 15%, 97%;
     /* --paper: */
     --paper: 240 5.9% 10%;
+  }
+  .theme {
+    --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
   }
 }
 
@@ -284,4 +292,31 @@
 .scrollbar-hidden::-webkit-scrollbar {
   width: 0px;
   height: 0;
+}
+
+@theme inline {
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 200%;
+    }
+  }
+}
+
+/* From Uiverse.io by sekaiking */
+.b-shadow {
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 0 0;
+}
+
+.b-shadow:hover {
+  transform: translateY(-4px) translateX(-2px);
+  box-shadow: 2px 5px 0 0 var(--tw-shadow-color);
+}
+
+.b-shadow:active {
+  transform: translateY(2px) translateX(1px);
+  box-shadow: 0 0 0 0 var(--tw-shadow-color);
 }

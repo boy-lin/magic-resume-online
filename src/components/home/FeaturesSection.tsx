@@ -274,14 +274,14 @@ export default function FeaturesSection() {
 
                   <div
                     key={activeFeatures[0]}
-                    className="animate-fade-in w-full h-full"
+                    className="animate-fade-in w-full h-full p-8"
                   >
                     <Image
                       src={features[0].items[activeFeatures[0]].image}
                       alt={t(features[0].items[activeFeatures[0]].title)}
                       fill
                       className="object-cover z-1 transition-transform duration-300 ease-in-out"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, 45vw"
                     />
                   </div>
                 </div>
@@ -374,14 +374,14 @@ export default function FeaturesSection() {
 
                   <div
                     key={activeFeatures[1]}
-                    className="animate-fade-in w-full h-full"
+                    className="animate-fade-in w-full h-full p-8"
                   >
                     <Image
                       src={features[1].items[activeFeatures[1]].image}
                       alt={t(features[1].items[activeFeatures[1]].title)}
                       fill
                       className="object-cover z-1 transition-transform duration-300 ease-in-out"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, 45vw"
                     />
                   </div>
                 </div>

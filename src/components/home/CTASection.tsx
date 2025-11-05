@@ -20,9 +20,14 @@ export default function CTASection() {
               {t("cta.description")}
             </p>
             <GoDashboard>
-              <Button type="submit" size="lg" className="gap-2 text-lg px-12">
+              <Button
+                type="submit"
+                size="lg"
+                variant="outline"
+                className="b-shadow shadow-black gap-2 text-lg px-8 rounded-full py-6"
+              >
                 {t("cta.button")}
-                <ArrowRight className="w-5 h-5" />
+                {/* <ArrowRight className="w-5 h-5" /> */}
               </Button>
             </GoDashboard>
           </div>

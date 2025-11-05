@@ -12,9 +12,9 @@ export async function handleRequest(
   router: AppRouterInstance | null = null
 ): Promise<boolean | void> {
   // Prevent default form submission refresh
-  e.preventDefault();
+  e?.preventDefault?.();
 
-  const formData = new FormData(e.currentTarget);
+  const formData = new FormData(e?.currentTarget);
   const redirectUrl: string = await requestFunc(formData);
 
   if (router) {

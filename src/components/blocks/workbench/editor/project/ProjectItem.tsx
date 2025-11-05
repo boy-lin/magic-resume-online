@@ -84,7 +84,6 @@ const ProjectItem = ({
   deleteProjects;
   updateSectionProjectsContent: (item: ResumeSectionContent) => void;
 }) => {
-  const { setDraggingProjectId } = useResumeEditorStore();
   const dragControls = useDragControls();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -102,9 +101,6 @@ const ProjectItem = ({
       value={project}
       dragListener={false}
       dragControls={dragControls}
-      onDragEnd={() => {
-        setDraggingProjectId(null);
-      }}
       className={cn(
         "rounded-lg border overflow-hidden flex group",
         "bg-white hover:border-primary",
@@ -117,13 +113,6 @@ const ProjectItem = ({
         onPointerDown={(event) => {
           if (expandedId === project.id) return;
           dragControls.start(event);
-          setDraggingProjectId(project.id);
-        }}
-        onPointerUp={() => {
-          setDraggingProjectId(null);
-        }}
-        onPointerCancel={() => {
-          setDraggingProjectId(null);
         }}
         className={cn(
           "w-12 flex items-center justify-center border-r shrink-0 touch-none",
