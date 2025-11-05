@@ -410,7 +410,7 @@ const ResumeWorkbench = () => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/app/resumes-preview/${id}`);
+    router.push(`/app/preview/${id}`);
   };
 
   const handleDownload = (id: string) => {

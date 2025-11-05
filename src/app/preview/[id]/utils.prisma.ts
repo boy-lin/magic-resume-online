@@ -41,4 +41,3 @@ export async function getResumeByIdPrismaApi(id: string) {
 
   return localResume;
 }
-

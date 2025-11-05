@@ -31,13 +31,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/app/(public)/[locale]/[...path]/page.tsx",
-    "src/app/(public)/[locale]/page.tsx",
-    "src/app/(public)/[locale]/[...path]/route.ts.bak",
-    "src/app/(public)/[locale]/route",
-    "src/app/(public)/[locale]/docs/layout.tsx.bak",
-    "src/app/app/resumes-preview/layout.tsx"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
