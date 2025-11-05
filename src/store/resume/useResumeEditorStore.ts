@@ -11,7 +11,6 @@ import { generateUUID } from "@/utils/uuid";
 interface ResumeEditorStore {
   // 编辑器状态
   activeSection: string;
-  draggingProjectId: string | null;
 
   updateSectionBasic: (data: Record<string, any>) => void;
   updateSectionEducation: (data: Record<string, any>) => void;
@@ -19,9 +18,6 @@ interface ResumeEditorStore {
   updateSectionProjects: (data: Record<string, any>) => void;
 
   updateEducationBatch: (educations: ResumeSectionContent[]) => void;
-
-  // 项目经验编辑
-  setDraggingProjectId: (id: string | null) => void;
 
   updateSectionById: (sectionId: string, vals: Partial<ResumeSection>) => void;
 
@@ -37,7 +33,6 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
   persist(
     (set, get) => ({
       activeSection: "basic",
-      draggingProjectId: null,
 
       updateSectionById: (sectionId, data) => {
         const { activeResumeId, resumes, updateResume } =
@@ -117,19 +112,6 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
             s.id === "projects" ? { ...s, ...project } : s
           ),
         });
-      },
-
-      setDraggingProjectId: (id) => {
-        const { activeResumeId, updateResume } = useResumeListStore.getState();
-        if (activeResumeId) {
-          updateResume(
-            activeResumeId,
-            {
-              draggingProjectId: id,
-            },
-            false
-          );
-        }
       },
 
       reorderSections: (newOrder) => {
@@ -216,7 +198,6 @@ export const useResumeEditorStore = create<ResumeEditorStore>()(
       name: "resume-editor-store",
       partialize: (state) => ({
         activeSection: state.activeSection,
-        draggingProjectId: state.draggingProjectId,
       }),
     }
   )

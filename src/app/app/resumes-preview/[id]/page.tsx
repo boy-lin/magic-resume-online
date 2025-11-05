@@ -44,7 +44,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     const data = await getResumeByIdPrismaApi(params.id as string);
     const newResume = {
       activeSection: "basic",
-      draggingProjectId: null,
       ...data,
     };
     setActiveResume(newResume);

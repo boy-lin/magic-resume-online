@@ -32,6 +32,7 @@ const PaginationLab = (props: PaginationLabProps) => {
             variant="ghost"
             disabled={disabledPrev}
             onClick={() => onChangeCurrent(current - 1)}
+            className="cursor-pointer"
           >
             <ArrowLeft />
             <span>{t("prev")}</span>
@@ -47,6 +48,7 @@ const PaginationLab = (props: PaginationLabProps) => {
             variant="ghost"
             disabled={disabledNext}
             onClick={() => onChangeCurrent(current + 1)}
+            className="cursor-pointer"
           >
             <span>{t("next")}</span>
             <ArrowRight />

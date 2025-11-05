@@ -133,7 +133,6 @@ export interface ResumeData {
   updatedAt: string;
   templateId: string | null | undefined;
   activeSection: string;
-  draggingProjectId: string | null;
   menuSections: ResumeSection[];
   globalSettings: GlobalSettings;
   isNeedSync?: boolean;

@@ -122,9 +122,8 @@ export const useResumeListStore = create(
           id,
           ...initialResumeData,
           activeSection: "basic",
-          draggingProjectId: null,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           templateId: template?.id,
           isNeedSync: isRemoteUser(),
           title: `${locale === "en" ? "New Resume" : "新建简历"} ${id.slice(
@@ -412,7 +411,6 @@ export const useResumeListStore = create(
 
         const newResume: ResumeData = {
           activeSection: "basic",
-          draggingProjectId: null,
           ...resumeData,
         };
 
