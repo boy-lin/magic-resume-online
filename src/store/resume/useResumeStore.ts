@@ -111,7 +111,6 @@ export const useResumeStore = create<ResumeStore>()(
           isNeedSync,
           menuSections: data.menuSections ?? resume.menuSections,
         };
-
         set((state) => ({
           activeResume:
             state.activeResumeId === resumeId
@@ -198,11 +197,13 @@ export const useResumeStore = create<ResumeStore>()(
           activeSection: "basic",
           ...resumeData,
         };
+
         set((state) => ({
           activeResumeId: id,
           activeResume: newResume,
         }));
-        return resumeData;
+
+        return newResume;
       },
 
       updateSectionById: (sectionId, data) => {

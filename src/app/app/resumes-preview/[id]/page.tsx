@@ -32,30 +32,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ShowError from "@/components/error/show";
+import useResumeStore from "@/store/resume/useResumeStore";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
   const params = useParams();
-
-  const [activeResume, setActiveResume] = useState(null);
+  const { getResumeFullById } = useResumeStore();
   const [password, setPassword] = useState("");
 
-  const { loading, error } = useRequest(async () => {
-    const data = await getResumeById(createClient(), params.id);
-    const newResume = {
-      activeSection: "basic",
-      ...data,
-    };
-    setActiveResume(newResume);
+  const {
+    loading,
+    error,
+    data: resumeData,
+  } = useRequest(async () => {
+    const res = await getResumeFullById(params.id as string);
+    return res;
   });
 
   const template = useMemo(() => {
     return (
-      DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||
+      DEFAULT_TEMPLATES.find((t) => t.id === resumeData?.templateId) ||
       DEFAULT_TEMPLATES[0]
     );
-  }, [activeResume?.templateId]);
+  }, [resumeData?.templateId]);
 
   const resumeContentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
@@ -104,19 +104,19 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   }, []);
 
   useEffect(() => {
-    if (activeResume) {
+    if (resumeData) {
       const timer = setTimeout(updateContentHeight, 300);
       return () => clearTimeout(timer);
     }
-  }, [activeResume]);
+  }, [resumeData]);
 
   const { pageHeightPx, pageBreakCount } = useMemo(() => {
     const MM_TO_PX = 3.78;
     const A4_HEIGHT_MM = 297;
 
     let pagePaddingMM = 0;
-    if (activeResume?.globalSettings?.pagePadding) {
-      pagePaddingMM = activeResume.globalSettings.pagePadding / MM_TO_PX;
+    if (resumeData?.globalSettings?.pagePadding) {
+      pagePaddingMM = resumeData.globalSettings.pagePadding / MM_TO_PX;
     }
 
     const CONTENT_HEIGHT_MM = A4_HEIGHT_MM - pagePaddingMM;
@@ -129,7 +129,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     const pageCount = Math.max(1, Math.ceil(contentHeight / pageHeightPx));
     const pageBreakCount = Math.max(0, pageCount - 1);
     return { pageHeightPx, pageBreakCount };
-  }, [contentHeight, activeResume?.globalSettings?.pagePadding]);
+  }, [contentHeight, resumeData?.globalSettings?.pagePadding]);
 
   const formSchema = React.useMemo(
     () =>
@@ -151,11 +151,13 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     setPassword(values.password);
   }
 
-  if (loading || !activeResume) return <SkeletonCard />;
+  console.log("resumeData", resumeData);
+
+  if (loading || !resumeData) return <SkeletonCard />;
 
   if (error) return <ShowError error={error} />;
 
-  if (!activeResume || !activeResume.isPublic) {
+  if (!resumeData || !resumeData.isPublic) {
     return (
       <div className="w-full h-full p-4">
         <div className="flex flex-col space-y-3">
@@ -169,9 +171,9 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   }
 
   if (
-    activeResume.isPublic &&
-    activeResume.publicPassword &&
-    password !== activeResume.publicPassword
+    resumeData.isPublic &&
+    resumeData.publicPassword &&
+    password !== resumeData.publicPassword
   ) {
     return (
       <div className="w-full h-full p-4">
@@ -217,28 +219,30 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     );
   }
 
+  console.log("resumeData", resumeData);
+
   return (
     <div className="">
       <div className="fixed ml-2 left-1/2 translate-x-[105mm]">
         <div className="sticky top-8 flex flex-col gap-2 transform translate-x-[50%]">
           <PrintBtn
             className="hover:bg-primary hover:text-primary-foreground"
-            activeResume={activeResume}
+            activeResume={resumeData}
           />
           <ImageBtn
             className="hover:bg-primary hover:text-primary-foreground"
-            activeResume={activeResume}
+            activeResume={resumeData}
           />
           <DownloadBtn
             className="hover:bg-primary hover:text-primary-foreground"
-            activeResume={activeResume}
+            activeResume={resumeData}
           />
         </div>
       </div>
       <div
         className="bg-white shadow-lg relative rounded-lg"
         style={{
-          padding: `${activeResume.globalSettings?.pagePadding}px`,
+          padding: `${resumeData.globalSettings?.pagePadding}px`,
         }}
       >
         <div
@@ -246,7 +250,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
           id="resume-preview"
           className="w-[210mm] min-w-[210mm] min-h-[297mm]"
         >
-          <ResumeTemplateComponent data={activeResume} template={template} />
+          <ResumeTemplateComponent data={resumeData} template={template} />
           {/* 分页线 */}
           <PageBreakLines
             contentHeight={contentHeight}
