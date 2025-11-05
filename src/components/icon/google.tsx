@@ -5,7 +5,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
 }
 
-const SvgIcon = ({ size = 24, className = "", ...props }: IconProps) => {
+const GoogleIcon = ({ size = 24, className = "", ...props }: IconProps) => {
   return (
     <svg
       width={size}
@@ -42,4 +42,4 @@ const SvgIcon = ({ size = 24, className = "", ...props }: IconProps) => {
   );
 };
 
-export default SvgIcon;
+export default GoogleIcon;

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 import { motion } from "framer-motion";
@@ -23,7 +23,7 @@ const fontOptions = [
 ];
 
 export function TypographySetting() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { updateGlobalSettings } = useResumeSettingsStore();
   const { globalSettings = {} } = activeResume || {};
   const t = useTranslations("workbench.sidePanel");

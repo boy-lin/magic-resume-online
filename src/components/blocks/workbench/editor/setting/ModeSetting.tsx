@@ -1,11 +1,11 @@
 import { Switch } from "@/components/ui-lab/switch";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "next-intl";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 export function ModeSetting() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { updateGlobalSettings } = useResumeSettingsStore();
   const { globalSettings = {} } = activeResume || {};
   const t = useTranslations("workbench.sidePanel");

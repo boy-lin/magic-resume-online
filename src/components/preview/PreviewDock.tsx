@@ -1,13 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
-import {
-  Edit2,
-  PanelRightClose,
-  PanelRightOpen,
-  SpellCheck2,
-  Home,
-  Copy,
-} from "lucide-react";
+import { SpellCheck2, Home, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -22,15 +15,12 @@ import { cn } from "@/lib/utils";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { AI_MODEL_CONFIGS } from "@/config/ai";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
-
 import { Slider } from "@/components/ui/slider";
-import { useDebounceFn, useThrottleFn } from "ahooks";
+import { useThrottleFn } from "ahooks";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
-
-interface PreviewDockProps {}
 
 const PreviewDock = ({ viewerRef }) => {
   const router = useRouter();
@@ -91,7 +81,7 @@ const PreviewDock = ({ viewerRef }) => {
     t,
   ]);
 
-  const { duplicateResume, activeResumeId } = useResumeListStore();
+  const { duplicateResume, activeResumeId } = useResumeStore();
   const { setResumeView, resumeView } = useResumeSettingsStore();
   const viewScale = resumeView?.zoomX ? [resumeView.zoomX * 100] : [100];
 

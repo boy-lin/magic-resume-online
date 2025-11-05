@@ -35,7 +35,7 @@ export default function HeroSection() {
                       {t("hero.badge")}
                     </span>
                   </div>
-                  <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4">
+                  <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4 text-foreground">
                     {t("hero.title")}
                   </h1>
                   <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
@@ -45,7 +45,7 @@ export default function HeroSection() {
                     <GoDashboard type="templates">
                       <RainbowButton
                         type="submit"
-                        className="gap-2 text-base px-6 py-5 rounded-full"
+                        className="gap-2 text-base px-6 py-5 rounded-full text-background"
                       >
                         {t("hero.cta")}
                         {/* <ArrowRight className="w-5 h-5" /> */}
@@ -57,7 +57,7 @@ export default function HeroSection() {
                         type="submit"
                         size="lg"
                         variant="outline"
-                        className="py-[21px] gap-2 text-base px-6 rounded-full"
+                        className="py-[21px] gap-2 text-base px-6 rounded-full text-foreground"
                       >
                         {t("hero.secondary")}
                       </Button>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import ProjectItem from "./ProjectItem";
 import { ResumeSection, ResumeSectionContent } from "@/types/resume";
 import { projectContentDefault } from "@/config";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
 import { InputName } from "../basic/input-name";
@@ -15,7 +15,7 @@ import { InputName } from "../basic/input-name";
 const ProjectPanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.projectPanel");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const { updateSectionProjects } = useResumeEditorStore();
+  const { updateSectionProjects } = useResumeStore();
   const updateSectionProjectsContent = (item) => {
     updateSectionProjects({
       ...section,

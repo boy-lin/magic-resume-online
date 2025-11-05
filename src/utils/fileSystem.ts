@@ -35,7 +35,7 @@ const initDB = (): Promise<void> => {
 
 export const storeFileHandle = async (
   key: string,
-  handle: FileSystemHandle
+  handle: FileSystemHandle,
 ): Promise<void> => {
   await initDB();
   if (!db) throw new Error("Database not initialized");
@@ -51,7 +51,7 @@ export const storeFileHandle = async (
 };
 
 export const getFileHandle = async (
-  key: string
+  key: string,
 ): Promise<FileSystemHandle | null> => {
   await initDB();
   if (!db) throw new Error("Database not initialized");
@@ -96,7 +96,7 @@ export const getConfig = async (key: string): Promise<any> => {
 
 export const verifyPermission = async (
   handle: FileSystemHandle,
-  mode = "readwrite"
+  mode = "readwrite",
 ): Promise<boolean> => {
   if (!handle) {
     return false;

@@ -9,8 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import { DialogProps } from "@radix-ui/react-dialog";
 import { ResumeSection } from "@/types/resume";
@@ -51,9 +50,9 @@ interface UpsertSectionProps extends DialogProps {
 }
 
 export function UpsertSection(props: UpsertSectionProps) {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const menuSections = activeResume?.menuSections || [];
-  const { updateMenuSections } = useResumeEditorStore();
+  const { updateMenuSections } = useResumeStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 使用 react-hook-form 和 zod 验证

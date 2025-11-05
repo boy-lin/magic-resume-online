@@ -35,9 +35,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import Logo from "@/components/shared/Logo";
 import { useTranslations } from "next-intl";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import {
   getSidebarMenuItems,
   getSidebarFooterLinks,
@@ -60,7 +59,6 @@ const SidebarInner: React.FC = () => {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const pathname = usePathname();
-  const { resumes } = useResumeListStore();
   const { open } = useUISidebar(); // 使用UI库的useSidebar Hook
   // 状态管理
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -78,10 +76,7 @@ const SidebarInner: React.FC = () => {
   );
 
   // 侧边栏菜单项配置
-  const sidebarItems = useMemo(
-    () => getSidebarMenuItems(t, resumes),
-    [t, resumes]
-  );
+  const sidebarItems = useMemo(() => getSidebarMenuItems(t), [t]);
 
   const sidebarState = useGlobalSidebar();
 

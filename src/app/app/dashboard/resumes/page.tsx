@@ -52,7 +52,9 @@ import { TransitionSpringScale } from "@/components/transition/spring-scale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import PaginationLab from "@/components/ui-lab/pagination";
-import useResumeListStore from "@/store/resume/useResumeListStore";
+import { createClient } from "@/utils/supabase/client";
+import { getResumesByUserId, deleteResumeById } from "@/utils/supabase/queries";
+import type { ResumeData } from "@/types/resume";
 
 // 简历卡片组件
 const ResumeCard: React.FC<{
@@ -167,7 +169,7 @@ const ResumeCard: React.FC<{
       className={cn(
         "group border transition-all duration-200 h-[280px] flex flex-col relative",
         "hover:border-primary/50 hover:shadow-md",
-        "dark:hover:border-primary dark:hover:bg-primary/5"
+        "dark:hover:border-primary dark:hover:bg-primary/5",
       )}
     >
       <div className="absolute top-4 right-4 z-10">{renderOptions()}</div>
@@ -262,7 +264,7 @@ const CreateResumeCard: React.FC<{
       <Card
         className={cn(
           "relative border border-dashed cursor-pointer h-[280px] transition-all duration-200",
-          "hover:border-primary/50 hover:bg-primary/5"
+          "hover:border-primary/50 hover:bg-primary/5",
         )}
       >
         <CardContent className="flex-1 pt-6 text-center flex flex-col items-center justify-center">
@@ -286,8 +288,7 @@ const CreateResumeCard: React.FC<{
 const ResumeWorkbench = () => {
   const t = useTranslations();
   const router = useRouter();
-  const { deleteResume, getResumeList } = useResumeListStore();
-  const { resumes } = useResumeListStore();
+  const [resumes, setResumes] = useState<Record<string, ResumeData | any>>({});
 
   // 状态管理
   const [searchQuery, setSearchQuery] = useState("");
@@ -295,12 +296,48 @@ const ResumeWorkbench = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const { error, loading, pagination, mutate } = usePagination(getResumeList, {
-    defaultPageSize: 12,
-    onError: (e) => {
-      toast.error(e.message);
+  const getResumeListLocal = async ({
+    current,
+    pageSize,
+  }: {
+    current: number;
+    pageSize: number;
+  }) => {
+    const client = createClient();
+    const { data, error, count } = await getResumesByUserId(client, {
+      current,
+      pageSize,
+    });
+    if (error) throw error;
+    const safeData = data || [];
+
+    const resumesMap: Record<string, any> = {};
+    safeData.forEach((it: any) => {
+      resumesMap[it.id] = {
+        id: it.id,
+        title: it.title,
+        createdAt: it.created_at,
+        updatedAt: it.updated_at,
+        templateId: it.template_id,
+        isPublic: it.is_public,
+      };
+    });
+    setResumes((prev) => ({ ...prev, ...resumesMap }));
+    return {
+      list: safeData,
+      total: typeof count === "number" ? count : safeData.length,
+    } as any;
+  };
+
+  const { error, loading, pagination, mutate } = usePagination(
+    getResumeListLocal,
+    {
+      defaultPageSize: 12,
+      onError: (e) => {
+        toast.error(e.message);
+      },
     },
-  });
+  );
 
   // 过滤和排序简历列表
   const filteredResumes = useMemo(() => {
@@ -311,7 +348,7 @@ const ResumeWorkbench = () => {
       filtered = filtered.filter(
         ([id, resume]) =>
           resume.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          resume.templateId?.toLowerCase().includes(searchQuery.toLowerCase())
+          resume.templateId?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -357,14 +394,18 @@ const ResumeWorkbench = () => {
   };
 
   const handleDelete = async (resume: any) => {
-    if (confirm("确定要删除这个简历吗？")) {
-      try {
-        await deleteResume(resume);
-        toast.success("简历已删除");
-        mutate();
-      } catch (error: any) {
-        toast.error(error?.message || "删除失败");
-      }
+    if (!confirm("确定要删除这个简历吗？")) return;
+    try {
+      const client = createClient();
+      await deleteResumeById(client, resume.id);
+      setResumes((prev) => {
+        const next = { ...prev } as Record<string, any>;
+        delete next[resume.id];
+        return next;
+      });
+      toast.success("简历已删除");
+    } catch (e: any) {
+      toast.error(e?.message || "删除失败");
     }
   };
 
@@ -473,7 +514,7 @@ const ResumeWorkbench = () => {
               "gap-4",
               viewMode === "grid"
                 ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
-                : "flex flex-col space-y-4"
+                : "flex flex-col space-y-4",
             )}
           >
             {loading ? (
@@ -483,7 +524,7 @@ const ResumeWorkbench = () => {
                   key={i}
                   className={cn(
                     "rounded-lg",
-                    viewMode === "grid" ? "h-[280px]" : "h-[120px]"
+                    viewMode === "grid" ? "h-[280px]" : "h-[120px]",
                   )}
                 />
               ))

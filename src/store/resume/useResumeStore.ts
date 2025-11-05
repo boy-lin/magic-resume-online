@@ -1,5 +1,6 @@
 ﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { ResumeSection, ResumeSectionContent } from "@/types/resume";
 import { ResumeData } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
 import {
@@ -8,13 +9,12 @@ import {
   upsertResumeByIdApi,
   deleteResumeByIdApi,
 } from "@/store/resume/utils.prisma";
-import { getFileHandle, verifyPermission } from "@/utils/fileSystem";
 import {
   initialResumeState,
   initialResumeStateEn,
 } from "@/config/initialResumeData";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { validateResume, logger } from "./utils";
+import { logger } from "./utils";
 import { useAppStore } from "@/store/useApp";
 import {
   localDeleteResumeById,
@@ -56,46 +56,47 @@ async function withDataMode<T>(
 }
 
 /**
- * 简历列表状态管理
- * 负责简历的增删改查和列表管理
+ * 简历编辑器状态管理
+ * 负责简历内容的编辑和更新
  */
-interface ResumeListStore {
-  // 状态
-  resumes: Record<string, ResumeData>;
+interface ResumeStore {
+  // 编辑器状态
+  activeSection: string;
   activeResumeId: string | null;
   activeResume: ResumeData | null;
 
-  // 简历管理
-  createResume: (templateId: string | null) => Promise<string>;
-  deleteResume: (resume: ResumeData) => Promise<void>;
-  duplicateResume: (resumeId: string) => string;
-  setActiveResume: (resumeId: string) => void;
-
-  // 简历更新
+  createResume: (templateId: string) => Promise<string>;
   updateResume: (
     resumeId: string,
     data: Partial<ResumeData>,
     isNeedSync?: boolean,
   ) => void;
-  updateResumeTitle: (title: string) => Promise<void>;
   updateResumeAsync: (resume: ResumeData) => Promise<any>;
-
-  // 数据获取
-  getResumeList: ({
-    current,
-    pageSize,
-  }: {
-    current: number;
-    pageSize: number;
-  }) => Promise<any>;
+  updateResumeTitle: (title: string) => Promise<void>;
+  deleteResume: (resume: ResumeData) => Promise<void>;
+  duplicateResume: (resumeId: string) => string;
   getResumeFullById: (id: string) => Promise<any>;
   syncLocalResumesToRemote: () => Promise<void>;
+  updateSectionById: (sectionId: string, data: Partial<ResumeSection>) => void;
+  deleteSectionById: (sectionId: string) => void;
+  addCustomSection: (section: ResumeSection) => void;
+  updateSectionBasic: (section: ResumeSection) => void;
+  updateSectionEducation: (section: ResumeSection) => void;
+  updateEducationBatch: (educations: ResumeSectionContent[]) => void;
+  updateSectionExperience: (vals: Partial<ResumeSection>) => void;
+  updateSectionProjects: (project: Partial<ResumeSection>) => void;
+  reorderSections: (newOrder: ResumeSection[]) => void;
+  toggleSectionVisibility: (sectionId: string) => void;
+  setActiveSection: (sectionId: string) => void;
+  updateMenuSections: (sections: ResumeSection[]) => void;
+  addMenuSection: () => void;
 }
 
-export const useResumeListStore = create(
-  persist<ResumeListStore>(
+export const useResumeStore = create<ResumeStore>()(
+  persist(
     (set, get) => ({
-      resumes: {},
+      activeSection: "basic",
+
       activeResumeId: null,
       activeResume: null,
 
@@ -150,10 +151,6 @@ export const useResumeListStore = create(
         );
 
         set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [id]: newResume,
-          },
           activeResumeId: id,
           activeResume: newResume,
         }));
@@ -161,7 +158,7 @@ export const useResumeListStore = create(
       },
 
       updateResume: (resumeId, data, isNeedSync) => {
-        const resume = validateResume(resumeId, get().resumes);
+        const resume = get().activeResume;
         const shouldSync = isNeedSync ?? isRemoteUser();
         const updatedAt = new Date().toISOString();
 
@@ -178,10 +175,6 @@ export const useResumeListStore = create(
         );
 
         set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [resumeId]: updatedResume,
-          },
           activeResume:
             state.activeResumeId === resumeId
               ? updatedResume
@@ -227,9 +220,9 @@ export const useResumeListStore = create(
       },
 
       updateResumeTitle: async (title) => {
-        const { activeResumeId, resumes } = get();
+        const { activeResumeId, activeResume } = get();
         if (activeResumeId) {
-          const current = resumes[activeResumeId];
+          const current = activeResume;
           if (!current) return;
           const updated = {
             ...current,
@@ -278,30 +271,17 @@ export const useResumeListStore = create(
         );
 
         set((state) => {
-          const { [resumeId]: _, activeResume, ...rest } = state.resumes;
           return {
-            resumes: rest,
             activeResumeId: null,
             activeResume: null,
           };
         });
-
-        try {
-          const handle = await getFileHandle("syncDirectory");
-          if (!handle) return;
-          const hasPermission = await verifyPermission(handle);
-          if (!hasPermission) return;
-          const dirHandle = handle as FileSystemDirectoryHandle;
-          await dirHandle.removeEntry(`${resume.title}.json`);
-        } catch (error) {
-          console.error("Error deleting resume file:", error);
-        }
       },
 
       duplicateResume: (resumeId) => {
         try {
           const newId = generateUUID();
-          const originalResume = validateResume(resumeId, get().resumes);
+          const originalResume = get().activeResume;
 
           const locale =
             typeof document !== "undefined"
@@ -328,10 +308,6 @@ export const useResumeListStore = create(
           };
 
           set((state) => ({
-            resumes: {
-              ...state.resumes,
-              [newId]: duplicatedResume,
-            },
             activeResumeId: newId,
             activeResume: duplicatedResume,
           }));
@@ -348,7 +324,7 @@ export const useResumeListStore = create(
       },
 
       setActiveResume: (resumeId) => {
-        const resume = get().resumes[resumeId];
+        const resume = get().activeResume;
         if (resume) {
           set({ activeResume: resume, activeResumeId: resumeId });
         }
@@ -382,14 +358,6 @@ export const useResumeListStore = create(
               isPublic: Boolean(it.is_public),
             };
           });
-
-          set((state) => ({
-            resumes: {
-              ...state.resumes,
-              ...resumesMap,
-            },
-          }));
-
           return data;
         } catch (error) {
           logger.error("Failed to get resume list:", error);
@@ -419,10 +387,6 @@ export const useResumeListStore = create(
         );
 
         set((state) => ({
-          resumes: {
-            ...state.resumes,
-            [newResume.id]: newResume,
-          },
           activeResumeId: id,
           activeResume: newResume,
         }));
@@ -453,6 +417,167 @@ export const useResumeListStore = create(
           }),
         );
       },
+
+      updateSectionById: (sectionId, data) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+
+        if (!activeResumeId) return;
+        if (!activeResume) return;
+
+        console.log("data", sectionId, data);
+        updateResume(activeResumeId, {
+          ...activeResume,
+          menuSections: activeResume?.menuSections.map((s) =>
+            s.id === sectionId ? { ...s, ...data } : s,
+          ),
+        });
+      },
+      deleteSectionById: (sectionId: string) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+        if (!activeResumeId) return;
+
+        if (!activeResume) return;
+        updateResume(activeResumeId, {
+          menuSections: activeResume?.menuSections.filter(
+            (s) => s.id !== sectionId,
+          ),
+        });
+      },
+      addCustomSection: (section: ResumeSection) => {
+        const { activeResume } = get();
+        if (!activeResume) return;
+        get().updateResume(activeResume.id, {
+          menuSections: [...activeResume.menuSections, section],
+        });
+      },
+      // 基础信息编辑
+      updateSectionBasic: (section: ResumeSection) => {
+        const { activeResume } = get();
+        if (!activeResume) return;
+        get().updateResume(activeResume.id, {
+          menuSections: activeResume?.menuSections.map((s) =>
+            s.id === "basic" ? { ...s, ...section } : s,
+          ),
+        });
+      },
+      // 教育经历编辑
+      updateSectionEducation: (section: ResumeSection) => {
+        const { activeResume } = get();
+        if (!activeResume) return;
+        get().updateResume(activeResume.id, {
+          menuSections: activeResume?.menuSections.map((s) =>
+            s.id === "education" ? { ...s, ...section } : s,
+          ),
+        });
+      },
+
+      updateEducationBatch: (educations: ResumeSectionContent[]) => {
+        const { activeResume } = get();
+        if (!activeResume) return;
+        get().updateSectionById("education", { content: educations });
+      },
+
+      // 工作经验编辑
+      updateSectionExperience: (vals) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+
+        if (!activeResumeId) return;
+        if (!activeResume) return;
+
+        updateResume(activeResumeId, {
+          menuSections: activeResume.menuSections.map((s) =>
+            s.id === "experience" ? { ...s, ...vals } : s,
+          ),
+        });
+      },
+
+      updateSectionProjects: (project) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+
+        if (!activeResumeId) return;
+        if (!activeResume) return;
+
+        updateResume(activeResumeId, {
+          menuSections: activeResume.menuSections.map((s) =>
+            s.id === "projects" ? { ...s, ...project } : s,
+          ),
+        });
+      },
+
+      reorderSections: (newOrder) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+
+        if (!activeResumeId) return;
+        if (!activeResume) return;
+
+        const basicInfoSection = activeResume.menuSections.find(
+          (section) => section.id === "basic",
+        );
+        const reorderedSections = [
+          basicInfoSection,
+          ...newOrder.filter((section) => section.id !== "basic"),
+        ].map((section, index) => ({
+          ...section,
+          order: index,
+        }));
+
+        updateResume(activeResumeId, {
+          menuSections: reorderedSections,
+        });
+      },
+
+      toggleSectionVisibility: (sectionId) => {
+        const { activeResumeId, activeResume, updateResume } = get();
+        if (!activeResumeId) return;
+
+        if (!activeResume) return;
+
+        const updatedSections = activeResume.menuSections.map((section) =>
+          section.id === sectionId
+            ? { ...section, enabled: !section.enabled }
+            : section,
+        );
+
+        updateResume(activeResumeId, {
+          menuSections: updatedSections,
+        });
+      },
+
+      setActiveSection: (sectionId) => {
+        const { activeResumeId, updateResume } = get();
+        if (activeResumeId) {
+          updateResume(activeResumeId, {
+            activeSection: sectionId,
+          });
+        }
+      },
+
+      updateMenuSections: (sections) => {
+        const { activeResumeId, updateResume } = get();
+
+        if (activeResumeId) {
+          updateResume(activeResumeId, {
+            menuSections: sections,
+          });
+        }
+      },
+
+      addMenuSection: () => {
+        const { activeResumeId, updateResume, activeResume } = get();
+        const newSection = {
+          id: generateUUID(),
+          title: "未命名",
+          icon: "➕",
+          enabled: true,
+          order: activeResume.menuSections.length,
+        };
+
+        if (activeResumeId) {
+          updateResume(activeResumeId, {
+            menuSections: [...(activeResume.menuSections || []), newSection],
+          });
+        }
+      },
     }),
     {
       name: "resume-list-store", // 持久化存储名称
@@ -460,4 +585,4 @@ export const useResumeListStore = create(
   ),
 );
 
-export default useResumeListStore; // By Cursor
+export default useResumeStore;

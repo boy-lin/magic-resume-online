@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 import { templateImages } from "@/app/constant/images";
 
 const SwitchTemplate = () => {
   const t = useTranslations("templates");
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { setTemplate } = useResumeSettingsStore();
   const currentTemplate =
     DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||

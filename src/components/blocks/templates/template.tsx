@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import { Eye, Play, Star, Users } from "lucide-react";
 
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui-lab/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ export default function Template({
 }: TemplateProps) {
   const t = useTranslations("dashboard.templates");
   const router = useRouter();
-  const { createResume } = useResumeListStore();
+  const { createResume } = useResumeStore();
 
   const createResumeAsync = async (templateId: string) => {
     const template = DEFAULT_TEMPLATES.find((t) => t.id === templateId);

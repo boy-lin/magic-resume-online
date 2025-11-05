@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import ExperienceItem from "./ExperienceItem";
 import { ResumeSection, ResumeSectionContent } from "@/types/resume";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import { generateUUID } from "@/utils/uuid";
 import { useState } from "react";
@@ -16,7 +16,7 @@ import { experienceContentDefault } from "@/config";
 const ExperiencePanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.experiencePanel");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const { updateSectionExperience } = useResumeEditorStore();
+  const { updateSectionExperience } = useResumeStore();
   const updateSectionExperienceContent = (item) => {
     updateSectionExperience({
       ...section,

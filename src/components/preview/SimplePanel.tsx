@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings, ResumeSection } from "@/types/resume";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 interface SkillSectionProps {
   section?: ResumeSection;

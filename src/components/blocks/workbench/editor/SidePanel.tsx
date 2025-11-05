@@ -17,8 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import LayoutSetting from "./layout/LayoutSetting";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 import { cn } from "@/lib/utils";
@@ -256,9 +255,9 @@ function ThemeColorSelector({
  * 提供简历编辑的各种设置选项
  */
 export function SidePanel() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { updateGlobalSettings, setThemeColor } = useResumeSettingsStore();
-  const { addMenuSection } = useResumeEditorStore();
+  const { addMenuSection } = useResumeStore();
   const { globalSettings = {} } = activeResume || {};
   const { themeColor = THEME_COLORS[0] } = globalSettings;
   const t = useTranslations("workbench.sidePanel");

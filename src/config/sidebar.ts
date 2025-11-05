@@ -106,17 +106,11 @@ export const SIDEBAR_CONFIG = {
 };
 
 // 获取菜单项的工具函数
-export const getSidebarMenuItems = (
-  t: (key: string) => string,
-  resumes: Record<string, any> = {}
-) => {
+export const getSidebarMenuItems = (t: (key: string) => string) => {
   return SIDEBAR_MENU_ITEMS.map((item) => ({
     ...item,
     title: t(`sidebar.${item.id}`),
-    badge:
-      item.id === "resumes"
-        ? () => Object.keys(resumes).length.toString()
-        : item.badge,
+    badge: "0",
   })).filter((item) => !item.hidden);
 };
 

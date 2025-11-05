@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { GlobalSettings } from "@/types/resume";
-import { useResumeListStore } from "./useResumeListStore";
+import { useResumeStore } from "./useResumeStore";
 import { DEFAULT_TEMPLATES } from "@/config";
 
 /**
@@ -36,15 +36,14 @@ export const useResumeSettingsStore = create<ResumeSettingsStore>()(
       },
 
       updateGlobalSettings: (settings) => {
-        const { activeResumeId, updateResume } = useResumeListStore.getState();
-        if (!activeResumeId) return;
+        const { activeResumeId, updateResume, activeResume } =
+          useResumeStore.getState();
 
-        const currentResume =
-          useResumeListStore.getState().resumes[activeResumeId];
-        if (!currentResume) return;
+        if (!activeResumeId) return;
+        if (!activeResume) return;
 
         const updatedSettings = {
-          ...currentResume.globalSettings,
+          ...activeResume.globalSettings,
           ...settings,
         };
 
@@ -54,11 +53,10 @@ export const useResumeSettingsStore = create<ResumeSettingsStore>()(
       },
 
       setThemeColor: (color) => {
-        const { activeResumeId, updateResume } = useResumeListStore.getState();
+        const { activeResumeId, updateResume } = useResumeStore.getState();
         if (!activeResumeId) return;
 
-        const currentResume =
-          useResumeListStore.getState().resumes[activeResumeId];
+        const currentResume = useResumeStore.getState().activeResume;
         if (!currentResume) return;
 
         const updatedSettings = {
@@ -72,21 +70,20 @@ export const useResumeSettingsStore = create<ResumeSettingsStore>()(
       },
 
       setTemplate: (templateId, isNeedSync = true) => {
-        const { activeResumeId, resumes, updateResume } =
-          useResumeListStore.getState();
+        const { activeResumeId, activeResume, updateResume } =
+          useResumeStore.getState();
         if (!activeResumeId) return;
 
         const template = DEFAULT_TEMPLATES.find((t) => t.id === templateId);
         if (!template) return;
 
-        const currentResume = resumes[activeResumeId];
-        if (!currentResume) return;
+        if (!activeResume) return;
 
         const updatedResume = {
-          ...currentResume,
+          ...activeResume,
           templateId,
           globalSettings: {
-            ...currentResume.globalSettings,
+            ...activeResume.globalSettings,
             themeColor: template.colorScheme.primary,
             sectionSpacing: template.spacing.sectionGap,
             paragraphSpacing: template.spacing.itemGap,

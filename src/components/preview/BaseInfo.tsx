@@ -8,7 +8,7 @@ import {
   ResumeSection,
 } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import Base64 from "@/components/photo/base64";
 import { FieldComponent } from "../templates/components/Filed";
@@ -27,7 +27,7 @@ const BaseInfo = ({
   template,
   layout,
 }: BaseInfoProps) => {
-  const { setActiveSection } = useResumeEditorStore();
+  const { setActiveSection } = useResumeStore();
   const useIconMode = globalSettings?.useIconMode ?? false;
   const [name, title, photo, github, ...otherSection1Fields] = section.content;
 
