@@ -31,13 +31,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ShowError from "@/components/error/show";
+import useResumeStore from "@/store/resume/useResumeStore";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
   const params = useParams();
-
-  const [activeResume, setActiveResume] = useState(null);
+  const { setActiveResume, activeResume } = useResumeStore();
   const [password, setPassword] = useState("");
 
   const { loading, error } = useRequest(async () => {
@@ -135,7 +135,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
       z.object({
         password: z.string().min(5, { message: "密码错误" }),
       }),
-    []
+    [],
   );
 
   const form = useForm<z.infer<typeof formSchema>>({

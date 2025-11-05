@@ -90,6 +90,7 @@ interface ResumeStore {
   setActiveSection: (sectionId: string) => void;
   updateMenuSections: (sections: ResumeSection[]) => void;
   addMenuSection: () => void;
+  setActiveResume: (resumeId: string) => void;
 }
 
 export const useResumeStore = create<ResumeStore>()(
