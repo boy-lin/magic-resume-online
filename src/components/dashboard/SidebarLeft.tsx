@@ -206,7 +206,7 @@ const SidebarInner: React.FC = () => {
                   )}
 
                   {/* 徽章 */}
-                  {badgeValue && (
+                  {badgeValue && badgeValue !== "0" && (
                     <Badge
                       variant={
                         badgeValue === "NEW" ? "destructive" : "secondary"

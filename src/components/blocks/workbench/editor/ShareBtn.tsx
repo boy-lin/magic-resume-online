@@ -49,7 +49,7 @@ const ShareBtn = () => {
   const onCopyLink = async () => {
     try {
       setLoading(true);
-      let target = `${window.origin}/app/resumes-preview/${activeResume.id}`;
+      let target = `${window.origin}/app/preview/${activeResume.id}`;
 
       if (openPassword) {
         // 换行符 \n 空格符 \s
