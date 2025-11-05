@@ -193,8 +193,8 @@ export default function FeaturesSection() {
         </AnimatedFeature>
 
         <div className="space-y-24 md:space-y-32">
-          <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-center">
-            <div className="w-full md:w-[400px] space-y-6 md:mr-16">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="w-full md:w-[45%] space-y-6">
               <div className="flex flex-col items-center md:items-start gap-2">
                 <span className="text-xs font-semibold text-white px-2 py-1 rounded-full bg-blue-500">
                   {features[0].badge}
@@ -267,8 +267,11 @@ export default function FeaturesSection() {
                 })}
               </ul>
             </div>
-            <div className="flex-1 w-full md:w-auto relative">
-              <AnimatedFeature key={`feature-${activeFeatures[0]}`}>
+            <div className="w-full md:w-[45%] relative">
+              <AnimatedFeature
+                key={`feature-${activeFeatures[0]}`}
+                direction="right"
+              >
                 <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl group">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-600/15 z-10"></div>
 
@@ -293,8 +296,8 @@ export default function FeaturesSection() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row-reverse gap-8 md:gap-16 items-center">
-            <div className="w-full md:w-[400px] space-y-6">
+          <div className="flex flex-col md:flex-row-reverse items-center justify-between">
+            <div className="w-full md:w-[45%] space-y-6">
               <div className="flex flex-col items-center md:items-start gap-2">
                 <span className="text-xs font-semibold text-white px-2 py-1 rounded-full bg-green-500">
                   {features[1].badge}
@@ -367,8 +370,11 @@ export default function FeaturesSection() {
                 })}
               </ul>
             </div>
-            <div className="flex-1 w-full md:w-auto relative">
-              <AnimatedFeature key={`feature-storage-${activeFeatures[1]}`}>
+            <div className="w-full md:w-[45%] relative">
+              <AnimatedFeature
+                key={`feature-storage-${activeFeatures[1]}`}
+                direction="left"
+              >
                 <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl group">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-green-600/15 z-10"></div>
 

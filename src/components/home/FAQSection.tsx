@@ -18,7 +18,12 @@ export default function FAQSection() {
           <h2 className="text-3xl font-bold text-center mb-12 dark:text-white">
             {t("title")}
           </h2>
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full"
+            defaultValue="item-0"
+          >
             {faqItems.map(
               (item: { question: string; answer: string }, index: number) => (
                 <AccordionItem key={index} value={`item-${index}`}>
