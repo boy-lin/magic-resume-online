@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import { Printer } from "lucide-react";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { useHtmlPrint } from "@/hooks/pdf-export";
 import { Button } from "@/components/ui-lab/button";
 import { cn } from "@/lib/utils";

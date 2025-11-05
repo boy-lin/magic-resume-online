@@ -6,7 +6,7 @@ import { PlusCircle } from "lucide-react";
 import CustomItem from "./CustomItem";
 import { customSectionContentDefault } from "@/config";
 
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { ResumeSection, ResumeSectionContent } from "@/types/resume";
 
 import { InputName } from "../basic/input-name";
@@ -22,7 +22,7 @@ const CustomPanel = memo(
     section: ResumeSection;
     handleDeleteSection: () => void;
   }) => {
-    const { updateSectionById } = useResumeEditorStore();
+    const { updateSectionById } = useResumeStore();
     const items = section?.content || [];
 
     const handleTitleChange = (title) => {

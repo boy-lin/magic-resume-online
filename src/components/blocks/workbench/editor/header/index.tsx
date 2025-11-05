@@ -4,7 +4,7 @@ import { AlertCircle, RefreshCcwDot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "../../../../shared/ThemeToggle";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { toast } from "sonner";
 import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import {
@@ -22,8 +22,8 @@ interface EditorHeaderProps {
 }
 
 export function EditorHeader({ isMobile }: EditorHeaderProps) {
-  const { activeResume } = useResumeListStore();
-  const { updateResumeAsync } = useResumeListStore();
+  const { activeResume } = useResumeStore();
+  const { updateResumeAsync } = useResumeStore();
   const router = useRouter();
   const t = useTranslations("common");
   const timer = useRef<NodeJS.Timeout | null>(null);

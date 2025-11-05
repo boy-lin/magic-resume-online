@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/moving-border";
 import ScrollBackground from "./client/ScrollBackground";
 import AnimatedFeature from "./client/AnimatedFeature";
 import GoDashboard from "./GoDashboard";
+import { SparklesText } from "../ui/sparkles-text";
 
 export default function CTASection() {
   const t = useTranslations("home");
@@ -15,16 +14,16 @@ export default function CTASection() {
       <div className="mx-auto max-w-[1200px] px-4 relative">
         <AnimatedFeature>
           <div className="text-center">
-            <h2 className="text-4xl font-bold mb-6">{t("cta.title")}</h2>
+            <h2 className="text-4xl font-bold mb-6">
+              <SparklesText text={t("cta.title")} />
+            </h2>
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
               {t("cta.description")}
             </p>
             <GoDashboard>
               <Button
                 type="submit"
-                size="lg"
-                variant="outline"
-                className="b-shadow shadow-black gap-2 text-lg px-8 rounded-full py-6"
+                className="bg-background text-foreground font-medium border-foreground"
               >
                 {t("cta.button")}
                 {/* <ArrowRight className="w-5 h-5" /> */}

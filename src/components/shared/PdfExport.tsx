@@ -9,7 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
-import useResumeListStore from "@/store/resume/useResumeListStore";
+import useResumeStore from "@/store/resume/useResumeStore";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,7 +22,7 @@ import { usePdfExport, useHtmlPrint } from "@/hooks/pdf-export";
 const PdfExport = () => {
   const t = useTranslations("share.pdf");
   const [isExportingJson, setIsExportingJson] = useState(false);
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { globalSettings = {}, title } = activeResume || {};
   const { isExporting, handleExport } = usePdfExport(activeResume);
   const { printFrameRef, handlePrint } = useHtmlPrint(globalSettings);

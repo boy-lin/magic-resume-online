@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { throttle } from "lodash";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { cn } from "@/lib/utils";
-import useResumeListStore from "@/store/resume/useResumeListStore";
+import useResumeStore from "@/store/resume/useResumeStore";
 import ResumeTemplateComponent from "../templates";
 
 import PageBreakLines from "@/components/preview/PageBreakLines";
@@ -12,7 +12,7 @@ import PageBreakLines from "@/components/preview/PageBreakLines";
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const template = useMemo(() => {
     return (
       DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||

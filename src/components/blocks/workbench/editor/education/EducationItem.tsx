@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { Education, ResumeSection, ResumeSectionContent } from "@/types/resume";
 import {
   useDragControls,

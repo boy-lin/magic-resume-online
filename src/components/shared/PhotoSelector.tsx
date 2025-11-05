@@ -4,10 +4,8 @@ import { Settings2, Image as ImageIcon, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import PhotoConfigDrawer from "./PhotoConfigDrawer";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { PhotoConfig, ResumeSectionContent } from "@/types/resume";
 import { useTranslations } from "next-intl";
-import useResumeListStore from "@/store/resume/useResumeListStore";
 import Image from "next/image";
 
 interface Props {

@@ -9,7 +9,8 @@ import {
 import { locales } from "@/i18n/config";
 import { Providers } from "@/app/providers";
 import LandingHeader from "@/components/home/LandingHeader";
-import Footer from "@/components/home/Footer";
+import FooterSection from "@/components/ui/footer-section";
+
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Metadata } from "next";
@@ -87,7 +88,7 @@ export default async function LocaleLayout({
             <div className="relative bg-gradient-to-b from-[#f8f9fb] to-white dark:from-gray-900 dark:to-gray-800">
               <LandingHeader />
               <main>{children}</main>
-              <Footer />
+              <FooterSection />
             </div>
           </Providers>
         </NextIntlClientProvider>

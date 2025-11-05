@@ -1,26 +1,4 @@
 /**
- * 状态管理工具函数
- * 用于错误处理和验证
- */
-
-/**
- * 验证简历是否存在
- * @param resumeId - 简历ID
- * @param resumes - 简历列表
- * @returns 简历数据或抛出错误
- */
-export const validateResume = (
-  resumeId: string,
-  resumes: Record<string, any>
-) => {
-  const resume = resumes[resumeId];
-  if (!resume) {
-    throw new Error(`Resume with id ${resumeId} not found`);
-  }
-  return resume;
-};
-
-/**
  * 验证活跃简历是否存在
  * @param activeResumeId - 活跃简历ID
  * @param resumes - 简历列表
@@ -110,7 +88,6 @@ export const logger = {
 };
 
 export default {
-  validateResume,
   validateActiveResume,
   validateApiResponse,
   validateDirectResponse,

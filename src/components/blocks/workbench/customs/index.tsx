@@ -2,7 +2,7 @@ import {
   ScrollableTabs,
   ScrollableTabsTrigger,
 } from "@/components/ui/scrollable-tabs";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useEffect, useState } from "react";
 import { SquarePlus } from "lucide-react";
 
@@ -15,17 +15,16 @@ import { ModeSetting } from "../editor/setting/ModeSetting";
 import SwitchTemplate from "../editor/setting/SwitchTemplate";
 import SettingLayout from "../editor/setting/Layout";
 import BasicPanel from "../editor/basic/BasicPanel";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import CustomPanel from "../editor/custom/CustomPanel";
 import { UpsertSection } from "./upsert-section";
 import TextareaPanel from "./section-panel/textarea";
 import { ResumeSection } from "@/types/resume";
 
 export default function Customs() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const menuSections = activeResume?.menuSections || [];
   const [activeTab, setActiveTab] = useState<string>("");
-  const { updateMenuSections } = useResumeEditorStore();
+  const { updateMenuSections } = useResumeStore();
   const [open, setOpen] = useState(false);
 
   const handleDeleteSection = () => {

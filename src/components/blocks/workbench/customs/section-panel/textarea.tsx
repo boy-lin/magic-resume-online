@@ -1,10 +1,9 @@
 "use client";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import { cn } from "@/lib/utils";
 import Field from "../../editor/Field";
 import { InputName } from "../../editor/basic/input-name";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
 import { ResumeSection } from "@/types/resume";
 
 const TextareaPanel = ({
@@ -16,8 +15,8 @@ const TextareaPanel = ({
   section: ResumeSection;
   placeholder: string;
 }) => {
-  const { updateMenuSections } = useResumeEditorStore();
-  const { activeResume } = useResumeListStore();
+  const { updateMenuSections } = useResumeStore();
+  const { activeResume } = useResumeStore();
   const { menuSections = [] } = activeResume || {};
 
   const handleTitleChange = (title: string) => {

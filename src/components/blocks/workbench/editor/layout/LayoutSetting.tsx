@@ -1,8 +1,7 @@
 "use client";
 import { Reorder } from "framer-motion";
 import LayoutItem from "./LayoutItem";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 const LayoutSetting = () => {
   const {
@@ -10,8 +9,8 @@ const LayoutSetting = () => {
     toggleSectionVisibility,
     updateMenuSections,
     reorderSections,
-  } = useResumeEditorStore();
-  const { activeResume } = useResumeListStore();
+    activeResume,
+  } = useResumeStore();
 
   const { menuSections, activeSection: rawActiveSection } = activeResume;
 

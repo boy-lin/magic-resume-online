@@ -1,8 +1,8 @@
 import React from "react";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 const PageBreakLine = React.memo(({ pageNumber }: { pageNumber: number }) => {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { globalSettings } = activeResume || {};
   if (!globalSettings?.pagePadding) return null;
 

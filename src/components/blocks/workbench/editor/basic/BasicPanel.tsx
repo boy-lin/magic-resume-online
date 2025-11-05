@@ -11,7 +11,7 @@ import IconSelector from "../IconSelector";
 import AlignSelector from "./AlignSelector";
 import Field from "../Field";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import {
   ResumeSectionContent,
   FieldType as ResumeFieldType,
@@ -28,7 +28,7 @@ const itemAnimations = {
 };
 
 const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
-  const { updateSectionBasic } = useResumeEditorStore();
+  const { updateSectionBasic } = useResumeStore();
   const [name, title, photo, github, ...otherFields] = section.content;
   const t = useTranslations("workbench.basicPanel");
 

@@ -27,7 +27,7 @@ import { cn, toCamelCase } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { useRequest } from "ahooks";
 import Template from "@/components/blocks/templates/template";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 const container = {
   hidden: { opacity: 0 },
@@ -50,7 +50,7 @@ const templateTags = {
 const TemplatesPage = () => {
   const t = useTranslations("dashboard.templates");
   const router = useRouter();
-  const { createResume } = useResumeListStore();
+  const { createResume } = useResumeStore();
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     open: boolean;

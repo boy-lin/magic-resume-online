@@ -1,7 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { GlobalSettings } from "@/types/resume";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { cn } from "@/lib/utils";
 import { templateConfigs } from "@/config/templates";
 
@@ -18,7 +18,7 @@ const SectionTitle = ({
   globalSettings,
   showTitle = true,
 }: SectionTitleProps) => {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { menuSections, templateId = "default" } = activeResume || {};
 
   const renderTitle = useMemo(() => {

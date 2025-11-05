@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings, ResumeSection } from "@/types/resume";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 interface CustomSectionProps {
   section: ResumeSection;
@@ -10,7 +10,7 @@ interface CustomSectionProps {
 }
 
 const CustomSection = ({ section, globalSettings }: CustomSectionProps) => {
-  const { setActiveSection } = useResumeEditorStore();
+  const { setActiveSection } = useResumeStore();
   const visibleItems = section?.content;
   const centerSubtitle = globalSettings?.centerSubtitle;
   const gridColumns = centerSubtitle ? 3 : 2;

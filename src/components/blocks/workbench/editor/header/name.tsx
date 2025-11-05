@@ -1,11 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useRequest } from "ahooks";
 import { Loader2 } from "lucide-react";
 
 export default function Name() {
-  const { activeResume } = useResumeListStore();
-  const { updateResumeTitle } = useResumeListStore();
+  const { activeResume } = useResumeStore();
+  const { updateResumeTitle } = useResumeStore();
   const { loading, runAsync } = useRequest(
     async (title: string) => {
       await updateResumeTitle(title);

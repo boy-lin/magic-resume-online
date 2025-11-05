@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet-no-overlay";
 import { cn } from "@/lib/utils";
 import { DEFAULT_TEMPLATES } from "@/config";
-import useResumeListStore from "@/store/resume/useResumeListStore";
+import useResumeStore from "@/store/resume/useResumeStore";
 import classic from "@/assets/images/template-cover/classic.jpg";
 import modern from "@/assets/images/template-cover/modern.jpg";
 import leftRight from "@/assets/images/template-cover/left-right.jpg";
@@ -28,7 +28,7 @@ const templateImages: { [key: string]: any } = {
 
 const TemplateSheet = () => {
   const t = useTranslations("templates");
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { setTemplate } = useResumeSettingsStore();
   const currentTemplate =
     DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||

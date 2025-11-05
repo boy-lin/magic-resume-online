@@ -1,17 +1,15 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEME_COLORS } from "@/types/resume";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 import { useTranslations } from "next-intl";
 import { debounce } from "lodash";
-import { SettingCard } from "./SettingCard";
 
 export function ColorSetting() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const { setThemeColor } = useResumeSettingsStore();
   const { globalSettings = {} } = activeResume || {};
   const { themeColor = THEME_COLORS[0] } = globalSettings;

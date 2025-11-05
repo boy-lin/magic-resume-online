@@ -7,7 +7,7 @@ import {
   ResumeSection,
   ResumeSectionContent,
 } from "@/types/resume";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 interface ProjectItemProps {
   project: ResumeSectionContent;
@@ -126,7 +126,7 @@ const ProjectSection: React.FC<ProjectSectionProps> = ({
   globalSettings,
   showTitle = true,
 }) => {
-  const { setActiveSection } = useResumeEditorStore();
+  const { setActiveSection } = useResumeStore();
 
   const visibleProjects = section?.content;
 

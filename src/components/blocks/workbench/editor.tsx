@@ -20,8 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PreviewDock from "@/components/preview/PreviewDock";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 
 import { viewZoomRange } from "@/constants/view";
@@ -164,9 +163,9 @@ export default function Editor() {
   const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
   const viewerRef = useRef<any>(null);
   const [editPanelShow, setEditPanelShow] = useState(true);
-  const { setActiveSection } = useResumeEditorStore();
+  const { setActiveSection } = useResumeStore();
   const { setResumeView } = useResumeSettingsStore();
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const activeSection =
     typeof activeResume?.activeSection === "string"
       ? activeResume.activeSection

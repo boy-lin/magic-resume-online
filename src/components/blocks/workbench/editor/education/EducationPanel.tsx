@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import { Reorder } from "framer-motion";
 import { PlusCircle } from "lucide-react";
@@ -14,7 +14,7 @@ import { educationContentDefault } from "@/config";
 
 const EducationPanel = ({ section }: { section: ResumeSection }) => {
   const t = useTranslations("workbench.educationPanel");
-  const { updateSectionEducation } = useResumeEditorStore();
+  const { updateSectionEducation } = useResumeStore();
 
   const updateSectionEducationContent = (item) => {
     updateSectionEducation({

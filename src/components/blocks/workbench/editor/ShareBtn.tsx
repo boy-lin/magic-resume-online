@@ -9,7 +9,7 @@ import { Share, Link2, Globe } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { isSupportClipboardWrite, textToBlob } from "@/utils/copy";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import {
   Select,
   SelectTrigger,
@@ -36,7 +36,7 @@ const ShareBtn = () => {
   const [loading, setLoading] = useState(null);
   const t = useTranslations("common");
   const ts = useTranslations("share");
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const [permission, setPermission] = useState("view");
   const [openPassword, setOpenPassword] = useState(false);
   const [password, setPassword] = useState("");

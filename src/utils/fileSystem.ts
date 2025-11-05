@@ -93,26 +93,3 @@ export const getConfig = async (key: string): Promise<any> => {
     request.onsuccess = () => resolve(request.result);
   });
 };
-
-export const verifyPermission = async (
-  handle: FileSystemHandle,
-  mode: FileSystemPermissionMode = "readwrite"
-): Promise<boolean> => {
-  if (!handle) {
-    return false;
-  }
-
-  const options = { mode };
-
-  // 检查当前权限
-  if ((await handle.queryPermission(options)) === "granted") {
-    return true;
-  }
-
-  // 请求权限
-  if ((await handle.requestPermission(options)) === "granted") {
-    return true;
-  }
-
-  return false;
-};

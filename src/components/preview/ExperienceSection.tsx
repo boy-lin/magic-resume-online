@@ -7,7 +7,7 @@ import {
   ResumeSectionContent,
 } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 import { FieldComponent } from "../templates/components/Filed";
 import { cn } from "@/lib/utils";
 
@@ -89,7 +89,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({
   globalSettings,
   showTitle = true,
 }) => {
-  const { setActiveSection } = useResumeEditorStore();
+  const { setActiveSection } = useResumeStore();
 
   const visibleExperiences = section?.content?.filter((item) => item.visible);
 

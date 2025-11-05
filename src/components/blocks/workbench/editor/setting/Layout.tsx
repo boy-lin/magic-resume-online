@@ -1,19 +1,18 @@
 import React from "react";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
+import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import { cn } from "@/lib/utils";
 import LayoutSetting from "../layout/LayoutSetting";
 import { useTranslations } from "next-intl";
 
 export default function SettingLayout() {
-  const { activeResume } = useResumeListStore();
+  const { activeResume } = useResumeStore();
   const {
     updateMenuSections,
     setActiveSection,
     reorderSections,
     toggleSectionVisibility,
-  } = useResumeEditorStore();
+  } = useResumeStore();
 
   const t = useTranslations("workbench.sidePanel");
 
@@ -31,14 +30,7 @@ export default function SettingLayout() {
       <h3 className={cn("dark:text-neutral-200", "text-gray-700")}>
         {t("layout.title")}
       </h3>
-      <LayoutSetting
-        menuSections={menuSections}
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        toggleSectionVisibility={toggleSectionVisibility}
-        updateMenuSections={updateMenuSections}
-        reorderSections={reorderSections}
-      />
+      <LayoutSetting />
     </div>
   );
 }
