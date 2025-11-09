@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, pickObjectsFromList } from "@/lib/utils";
 import { useResumeStore } from "@/store/resume/useResumeStore";
 
 import {
@@ -26,7 +26,8 @@ interface ProjectEditorProps {
 
 const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
   const t = useTranslations("workbench.projectItem");
-  const [position, role, link, date, description] = fields;
+  const { position, role, link, date, description } =
+    pickObjectsFromList(fields);
 
   return (
     <div className="space-y-5">

@@ -116,11 +116,8 @@ export const getResumeById = cache(async (supabase: SupabaseClient, id) => {
     basic: JSON.parse(val.basic),
     templateId: val.template_id,
     customData: JSON.parse(val.custom_data),
-    education: JSON.parse(val.education),
-    experience: JSON.parse(val.experience),
     globalSettings: JSON.parse(val.global_settings),
     menuSections: JSON.parse(val.menu_sections),
-    projects: JSON.parse(val.projects),
     isPublic: val.is_public,
     publicPassword: val.public_password,
   };

@@ -1,8 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useResumeStore } from "@/store/resume/useResumeStore";
-import { Education, ResumeSection, ResumeSectionContent } from "@/types/resume";
+import { ResumeSection, ResumeSectionContent } from "@/types/resume";
 import {
   useDragControls,
   Reorder,
@@ -11,6 +10,7 @@ import {
 } from "framer-motion";
 import { GripVertical, Eye, EyeOff, ChevronDown, Trash2 } from "lucide-react";
 import { useState, useCallback } from "react";
+import { pickObjectsFromList } from "@/lib/utils";
 import Field from "../Field";
 import ThemeModal from "@/components/shared/ThemeModal";
 import { useTranslations } from "next-intl";
@@ -38,8 +38,9 @@ const EducationFiled: React.FC<EducationEditorProps> = ({
       }),
     });
   };
-  const [major, degree, startDate, endDate, description] =
-    education.fields || [];
+
+  const { school, major, degree, startDate, endDate, description } =
+    pickObjectsFromList(education.fields);
 
   return (
     <div className="space-y-5">
@@ -47,12 +48,9 @@ const EducationFiled: React.FC<EducationEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.school")}
-            value={education.value}
+            value={school?.value}
             onChange={(value) => {
-              updateSectionEducationContent({
-                ...education,
-                value,
-              });
+              handleFiledChange({ ...school, value });
             }}
             placeholder={t("placeholders.school")}
             required

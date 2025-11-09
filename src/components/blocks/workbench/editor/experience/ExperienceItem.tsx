@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, pickObjectsFromList } from "@/lib/utils";
 import {
   AnimatePresence,
   motion,
@@ -27,7 +27,9 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
   updateSectionExperienceContent,
 }) => {
   const t = useTranslations("workbench.experienceItem");
-  const [company, position, date, description] = experience.fields || [];
+  const { company, position, date, description } = pickObjectsFromList(
+    experience.fields
+  );
 
   const handleChange = (field: ResumeFieldType) => {
     updateSectionExperienceContent({

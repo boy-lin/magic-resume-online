@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
+import * as Icons from "lucide-react";
 import { ResumeData, MenuSectionId, ResumeSection } from "@/types/resume";
 import { ResumeTemplate } from "@/types/template";
 import Base64Image from "@/components/photo/base64";
 import { motion } from "framer-motion";
-import { cn } from "@/utils/cn";
-import { useTranslations } from "next-intl";
-import * as Icons from "lucide-react";
+import { cn, formatDate, pickObjectsFromList } from "@/lib/utils";
+
 import { getFlexDirection } from "./utils";
 import { FieldComponent } from "./components/Filed";
 
@@ -19,25 +19,38 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
   template,
 }) => {
   const { globalSettings } = data;
-  const t = useTranslations("workbench.basicPanel");
   const { colorScheme } = template;
+  const { basic, ...otherSectionMap } = useMemo(() => {
+    return pickObjectsFromList(data.menuSections);
+  }, [data.menuSections]);
 
-  const [section1, ...otherSections] = data.menuSections;
-  const [name, title, photo, github, ...otherSection1Fields] = section1.content;
+  const { name, title, photo, github, ...otherFieldsMap } = useMemo(() => {
+    return pickObjectsFromList(basic?.content);
+  }, [basic.content]);
+  const otherBasicSectionFields = Object.values(otherFieldsMap);
 
-  const leftSection = otherSections.slice(
-    0,
-    Math.floor(otherSections.length / 2)
-  );
-  const rightSection = otherSections.slice(
-    Math.floor(otherSections.length / 2)
-  );
-  const useIconMode = globalSettings?.useIconMode ?? false;
+  const [leftSection, rightSection] = useMemo(() => {
+    const otherSections = Object.values(otherSectionMap);
+    return [
+      otherSections.slice(0, Math.floor(otherSections.length / 2)),
+      otherSections.slice(Math.floor(otherSections.length / 2)),
+    ];
+  }, [otherSectionMap]);
+
   const getIcon = (iconName: string | undefined) => {
     const IconComponent = Icons[
       iconName as keyof typeof Icons
     ] as React.ElementType;
     return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
+  };
+
+  const cardTitleStyle = {
+    color: colorScheme.text,
+    borderColor: colorScheme.primary,
+  };
+
+  const cardItemTitleStyle = {
+    fontSize: `${globalSettings?.subheaderSize || 16}px`,
   };
 
   const renderIntroduction = (section: ResumeSection) => {
@@ -46,10 +59,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
       <>
         <h2
           className="text-lg font-bold pb-2 mb-4 border-b"
-          style={{
-            color: colorScheme.text,
-            borderColor: colorScheme.primary,
-          }}
+          style={cardTitleStyle}
         >
           {section.title}
         </h2>
@@ -68,25 +78,30 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
       <>
         <h2
           className="text-lg font-bold pb-2 mb-4 border-b"
-          style={{
-            color: colorScheme.text,
-            borderColor: colorScheme.primary,
-          }}
+          style={cardTitleStyle}
         >
           {section.title}
         </h2>
         <div className="space-y-4">
           {list.map((exp) => {
+            const { company, position, date, ...otherFieldMap } =
+              pickObjectsFromList(exp.fields);
             return (
               <div
                 key={exp.id}
                 className={cn(
-                  "flex flex-wrap justify-between space-y-2",
-                  exp.visible ? "flex" : "hidden"
+                  "flex flex-col space-y-1",
+                  exp.visible ? "" : "hidden"
                 )}
               >
-                <div className="w-full">{exp.value}</div>
-                {exp.fields.map((exp) => (
+                <div className="" style={cardItemTitleStyle}>
+                  {company.value}
+                </div>
+                <div className="flex justify-between text-subtitleFont text-sm">
+                  <div>{position.value}</div>
+                  <FieldComponent item={date} />
+                </div>
+                {Object.values(otherFieldMap).map((exp) => (
                   <FieldComponent item={exp} className="text-sm" />
                 ))}
               </div>
@@ -103,23 +118,34 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
       <>
         <h2
           className="text-lg font-bold pb-2 mb-4 border-b"
-          style={{
-            color: colorScheme.text,
-            borderColor: colorScheme.primary,
-          }}
+          style={cardTitleStyle}
         >
           {section.title}
         </h2>
         <div className="space-y-4">
           {list.map((edu) => {
+            const {
+              school,
+              major,
+              degree,
+              startDate,
+              endDate,
+              ...otherFieldMap
+            } = pickObjectsFromList(edu.fields);
             return (
-              <div
-                key={edu.id}
-                className="flex flex-wrap justify-between space-y-2"
-              >
-                <div className="w-full">{edu.value}</div>
-                {edu.fields.map((edu) => (
-                  <FieldComponent item={edu} className="text-sm" />
+              <div key={edu.id} className="flex flex-col space-y-1">
+                <div className="flex justify-between">
+                  <div style={cardItemTitleStyle}>{school?.value}</div>
+                  <div className="text-subtitleFont text-sm">
+                    {major?.value}
+                  </div>
+                  <div className="text-sm">
+                    {formatDate(new Date(startDate?.value))} -{" "}
+                    {formatDate(new Date(endDate?.value))}
+                  </div>
+                </div>
+                {Object.values(otherFieldMap).map((item) => (
+                  <FieldComponent item={item} className="text-sm" />
                 ))}
               </div>
             );
@@ -135,16 +161,13 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
       <>
         <h2
           className="text-lg font-bold pb-2 mb-4 border-b"
-          style={{
-            color: colorScheme.text,
-            borderColor: colorScheme.primary,
-          }}
+          style={cardTitleStyle}
         >
           {section.title}
         </h2>
-        <div>
+        <div className="space-y-2 text-sm">
           {list.map((it) => (
-            <FieldComponent item={it} className="text-sm" />
+            <FieldComponent item={it} />
           ))}
         </div>
       </>
@@ -157,21 +180,38 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
       <>
         <h2
           className="text-lg font-bold pb-2 mb-4 border-b"
-          style={{
-            color: colorScheme.text,
-            borderColor: colorScheme.primary,
-          }}
+          style={cardTitleStyle}
         >
           {section.title}
         </h2>
         <div className="space-y-4">
           {list.map((pj) => {
+            const { name, role, date, link, ...otherFieldMap } =
+              pickObjectsFromList(pj.fields);
             return (
-              <div key={pj.id}>
-                <FieldComponent item={pj} className="text-sm" />
-                {pj.fields.map((pj) => (
-                  <FieldComponent item={pj} className="text-sm" />
-                ))}
+              <div key={pj.id} className="flex flex-col space-y-1">
+                <div className="flex justify-between">
+                  <div style={cardItemTitleStyle}>
+                    {link?.value ? (
+                      <a
+                        className="underline"
+                        href={link?.value}
+                        target="_blank"
+                      >
+                        {name?.value}
+                      </a>
+                    ) : (
+                      name?.value
+                    )}
+                  </div>
+                  <div className="text-subtitleFont text-sm">{role?.value}</div>
+                  <div className="text-sm">{date?.value}</div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  {Object.values(otherFieldMap).map((item) => (
+                    <FieldComponent item={item} />
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -231,24 +271,22 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           style={{
             backgroundColor: colorScheme.background,
             borderColor: colorScheme.secondary,
-            flexDirection: getFlexDirection(section1.config?.layout),
+            flexDirection: getFlexDirection(basic.config?.layout),
           }}
         >
           {/* 姓名和职位 */}
           <div
             className={cn(
               "flex h-full justify-around gap-2",
-              section1.config?.layout === "center"
-                ? "flex-row gap-8"
-                : "flex-col",
-              section1.config?.layout === "center" ? "order-2" : "order-1"
+              basic.config?.layout === "center" ? "flex-row gap-8" : "flex-col",
+              basic.config?.layout === "center" ? "order-2" : "order-1"
             )}
           >
             <h1
               className="text-3xl font-bold"
               style={{ color: colorScheme.text }}
             >
-              {name.value}
+              {name?.value}
             </h1>
             <div
               className="text-white px-4 py-2 inline-block whitespace-nowrap"
@@ -266,10 +304,10 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
               fontSize: `${globalSettings?.baseFontSize || 14}px`,
               color: colorScheme.text,
               maxWidth: "600px",
-              order: section1.config?.layout === "center" ? 3 : 1,
+              order: basic.config?.layout === "center" ? 3 : 1,
             }}
           >
-            {otherSection1Fields.map((item) => (
+            {otherBasicSectionFields.map((item) => (
               <motion.div
                 key={item.id}
                 className={cn(
@@ -277,7 +315,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                 )}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  {section1.config?.useIconMode ? (
+                  {basic.config?.useIconMode ? (
                     getIcon(item.icon)
                   ) : (
                     <span>{item.label}:</span>
@@ -293,7 +331,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           <div
             className="justify-end"
             style={{
-              order: section1.config?.layout === "center" ? 1 : 1,
+              order: basic.config?.layout === "center" ? 1 : 1,
               display: photo.config?.visible ? "flex" : "none",
             }}
           >

@@ -1,16 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { throttle } from "lodash";
-import { useParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 import { useRequest } from "ahooks";
 import SkeletonCard from "@/components/ui-lab/skeleton-card";
 import DownloadBtn from "@/components/blocks/workbench/editor/share/download-btn";
@@ -19,41 +9,25 @@ import ImageBtn from "@/components/blocks/workbench/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
 import ResumeTemplateComponent from "@/components/templates";
 import PageBreakLines from "@/components/preview/PageBreakLines";
-import { Button } from "@/components/ui-lab/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import ShowError from "@/components/error/show";
 import useResumeStore from "@/store/resume/useResumeStore";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
-  const params = useParams();
-  const { getResumeFullById } = useResumeStore();
-  const [password, setPassword] = useState("");
-
+  const { getResumeFullByIdMock } = useResumeStore();
   const {
     loading,
     error,
     data: resumeData,
   } = useRequest(async () => {
-    const res = await getResumeFullById(params.id as string);
+    const res = await getResumeFullByIdMock();
     return res;
   });
 
   const template = useMemo(() => {
-    return (
-      DEFAULT_TEMPLATES.find((t) => t.id === resumeData?.templateId) ||
-      DEFAULT_TEMPLATES[0]
-    );
-  }, [resumeData?.templateId]);
+    return DEFAULT_TEMPLATES[4];
+  }, []);
 
   const resumeContentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
@@ -129,95 +103,11 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
     return { pageHeightPx, pageBreakCount };
   }, [contentHeight, resumeData?.globalSettings?.pagePadding]);
 
-  const formSchema = React.useMemo(
-    () =>
-      z.object({
-        password: z.string().min(5, { message: "密码错误" }),
-      }),
-    []
-  );
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      password: "",
-    },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("values", values);
-    setPassword(values.password);
-  }
-
   console.log("resumeData", resumeData);
 
   if (loading || !resumeData) return <SkeletonCard />;
 
   if (error) return <ShowError error={error} />;
-
-  if (!resumeData || !resumeData.isPublic) {
-    return (
-      <div className="w-full h-full p-4">
-        <div className="flex flex-col space-y-3">
-          <div className="flex flex-col space-y-3 justify-center items-center">
-            <div className="text-2xl font-bold">无法查看</div>
-            <div className="text-sm text-gray-500">该简历未公开或已删除</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (
-    resumeData.isPublic &&
-    resumeData.publicPassword &&
-    password !== resumeData.publicPassword
-  ) {
-    return (
-      <div className="w-full h-full p-4">
-        <div className="flex flex-col space-y-3 justify-center items-center">
-          <Card className="w-full max-w-sm">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <CardHeader>
-                  <CardTitle>查看密码</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-6">
-                    <div className="grid gap-2">
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="password"
-                                placeholder="请输入密码"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex-col gap-2">
-                  <Button type="submit" className="w-full">
-                    查看简历
-                  </Button>
-                </CardFooter>
-              </form>
-            </Form>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  console.log("resumeData", resumeData);
 
   return (
     <div className="">

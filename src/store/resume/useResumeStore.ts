@@ -37,7 +37,7 @@ interface ResumeStore {
   deleteResume: (resume: ResumeData) => Promise<void>;
   duplicateResume: (resumeId: string) => string;
   getResumeFullById: (id: string) => Promise<any>;
-
+  getResumeFullByIdMock: () => Promise<any>;
   updateSectionById: (sectionId: string, data: Partial<ResumeSection>) => void;
 
   // 菜单和章节管理
@@ -46,6 +46,10 @@ interface ResumeStore {
   setActiveSection: (sectionId: string) => void;
   updateMenuSections: (sections: ResumeSection[]) => void;
   addMenuSection: () => void;
+  updateSectionBasic: (section: Partial<ResumeSection>) => void;
+  updateSectionEducation: (section: Partial<ResumeSection>) => void;
+  updateSectionExperience: (section: Partial<ResumeSection>) => void;
+  updateSectionProjects: (section: Partial<ResumeSection>) => void;
 }
 
 export const useResumeStore = create<ResumeStore>()(
@@ -189,10 +193,26 @@ export const useResumeStore = create<ResumeStore>()(
         }
       },
 
+      getResumeFullByIdMock: async () => {
+        const resumeData = await fetch("/api/mock/resume").then((res) =>
+          res.json()
+        );
+        const newResume: ResumeData = {
+          activeSection: "basic",
+          ...resumeData,
+        };
+
+        // set((state) => ({
+        //   activeResumeId: resumeData.id,
+        //   activeResume: newResume,
+        // }));
+
+        return newResume;
+      },
+
       getResumeFullById: async (id) => {
         const client = createClient();
         const resumeData = await getResumeById(client, id);
-        // const resumeData = require("../../../mock/index").resumeData;
         const newResume: ResumeData = {
           activeSection: "basic",
           ...resumeData,
@@ -212,7 +232,6 @@ export const useResumeStore = create<ResumeStore>()(
         if (!activeResumeId) return;
         if (!activeResume) return;
 
-        console.log("data", sectionId, data);
         updateResume(activeResumeId, {
           ...activeResume,
           menuSections: activeResume?.menuSections.map((s) =>
@@ -237,12 +256,12 @@ export const useResumeStore = create<ResumeStore>()(
         get().updateMenuSections([...activeResume.menuSections, section]);
       },
       // 基础信息编辑
-      updateSectionBasic: (section: ResumeSection) => {
-        get().updateSectionById("basic", section);
+      updateSectionBasic: (vals) => {
+        get().updateSectionById("basic", vals);
       },
       // 教育经历编辑
-      updateSectionEducation: (section: ResumeSection) => {
-        get().updateSectionById("education", section);
+      updateSectionEducation: (vals) => {
+        get().updateSectionById("education", vals);
       },
 
       updateEducationBatch: (educations: ResumeSectionContent[]) => {
@@ -251,29 +270,11 @@ export const useResumeStore = create<ResumeStore>()(
 
       // 工作经验编辑
       updateSectionExperience: (vals) => {
-        const { activeResumeId, activeResume, updateResume } = get();
-
-        if (!activeResumeId) return;
-        if (!activeResume) return;
-
-        updateResume(activeResumeId, {
-          menuSections: activeResume.menuSections.map((s) =>
-            s.id === "experience" ? { ...s, ...vals } : s
-          ),
-        });
+        get().updateSectionById("experience", vals);
       },
 
-      updateSectionProjects: (project) => {
-        const { activeResumeId, activeResume, updateResume } = get();
-
-        if (!activeResumeId) return;
-        if (!activeResume) return;
-
-        updateResume(activeResumeId, {
-          menuSections: activeResume.menuSections.map((s) =>
-            s.id === "projects" ? { ...s, ...project } : s
-          ),
-        });
+      updateSectionProjects: (vals) => {
+        get().updateSectionById("projects", vals);
       },
 
       reorderSections: (newOrder) => {

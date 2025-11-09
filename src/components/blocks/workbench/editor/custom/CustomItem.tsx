@@ -25,7 +25,7 @@ const CustomItemEditor = ({
       fields: item.fields?.map((f) => (f.id === it.id ? { ...f, ...it } : f)),
     });
   };
-  console.log("item.fields", item.fields);
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4">

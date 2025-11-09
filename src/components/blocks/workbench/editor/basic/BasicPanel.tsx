@@ -18,6 +18,7 @@ import {
   ResumeSection,
 } from "@/types/resume";
 import { TransitionOpacity } from "@/components/transition/opacity";
+import { pickObjectsFromList } from "@/lib/utils";
 import { InputName } from "./input-name";
 
 const itemAnimations = {
@@ -29,7 +30,11 @@ const itemAnimations = {
 
 const BasicPanel: React.FC<{ section: ResumeSection }> = ({ section }) => {
   const { updateSectionBasic } = useResumeStore();
-  const [name, title, photo, github, ...otherFields] = section.content;
+  const { name, title, photo, github, ...otherFieldsMap } = pickObjectsFromList(
+    section.content
+  );
+  const otherFields = Object.values(otherFieldsMap);
+
   const t = useTranslations("workbench.basicPanel");
 
   const updateSectionBasicContent = (item: ResumeSectionContent) => {

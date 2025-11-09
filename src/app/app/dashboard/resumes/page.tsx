@@ -105,7 +105,10 @@ const ResumeCard: React.FC<{
   };
   if (viewMode === "list") {
     return (
-      <Card className="group border transition-all duration-200 hover:shadow-md">
+      <Card
+        key={id}
+        className="group border transition-all duration-200 hover:shadow-md"
+      >
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -166,6 +169,7 @@ const ResumeCard: React.FC<{
   // Grid 视图
   return (
     <Card
+      key={id}
       className={cn(
         "group border transition-all duration-200 h-[280px] flex flex-col relative",
         "hover:border-primary/50 hover:shadow-md",
@@ -383,6 +387,11 @@ const ResumeWorkbench = () => {
     return filtered;
   }, [resumes, searchQuery, filterStatus, sortBy]);
 
+  console.log("filteredResumes", {
+    filteredResumes,
+    resumes,
+  });
+
   const handleCreateResume = () => {
     router.push("/app/dashboard/templates");
   };
@@ -410,7 +419,7 @@ const ResumeWorkbench = () => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/app/preview/${id}`);
+    router.push(`/preview/${id}`);
   };
 
   const handleDownload = (id: string) => {
@@ -420,163 +429,163 @@ const ResumeWorkbench = () => {
 
   return (
     <TransitionOpacity className="flex-1 space-y-6">
-      <AnimatePresence>
-        {/* 页面头部 */}
-        <TransitionTopToBottom className="px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {t("dashboard.resumes.myResume")}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                管理您的简历，创建专业的求职材料
-              </p>
+      {/* <AnimatePresence> */}
+      {/* 页面头部 */}
+      <TransitionTopToBottom className="px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t("dashboard.resumes.myResume")}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              管理您的简历，创建专业的求职材料
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <Button onClick={handleCreateResume} className="bg-primary">
+                <Plus className="mr-2 h-4 w-4" />
+                {t("dashboard.resumes.create")}
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </TransitionTopToBottom>
+
+      {/* 搜索和过滤工具栏 */}
+      <TransitionBottomToTop className="px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex flex-1 gap-3 max-w-md">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="搜索简历..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <div className="flex items-center space-x-2">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-[120px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部</SelectItem>
+                <SelectItem value="public">公开</SelectItem>
+                <SelectItem value="private">私有</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt">创建时间</SelectItem>
+                <SelectItem value="updatedAt">更新时间</SelectItem>
+                <SelectItem value="title">标题</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+                className="h-8 w-8 p-0"
               >
-                <Button onClick={handleCreateResume} className="bg-primary">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t("dashboard.resumes.create")}
-                </Button>
-              </motion.div>
+                <Grid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="h-8 w-8 p-0"
+              >
+                <List className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </TransitionTopToBottom>
+        </div>
+      </TransitionBottomToTop>
 
-        {/* 搜索和过滤工具栏 */}
-        <TransitionBottomToTop className="px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-1 gap-3 max-w-md">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="搜索简历..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[120px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部</SelectItem>
-                  <SelectItem value="public">公开</SelectItem>
-                  <SelectItem value="private">私有</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* 简历列表 */}
+      <TransitionBottomToTop className="flex-1 w-full p-3 sm:p-6">
+        <div
+          className={cn(
+            "gap-4",
+            viewMode === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+              : "flex flex-col space-y-4"
+          )}
+        >
+          {loading ? (
+            // 加载骨架屏
+            Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton
+                key={`skeleton-${i}`}
+                className={cn(
+                  "rounded-lg",
+                  viewMode === "grid" ? "h-[280px]" : "h-[120px]"
+                )}
+              />
+            ))
+          ) : filteredResumes.length > 0 ? (
+            <>
+              {/* 简历列表 */}
+              {filteredResumes.map(([id, resume], index) => (
+                <TransitionB2TScale key={id} index={index}>
+                  <ResumeCard
+                    id={id}
+                    resume={resume}
+                    viewMode={viewMode}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                    onDownload={handleDownload}
+                  />
+                </TransitionB2TScale>
+              ))}
+            </>
+          ) : (
+            // 空状态
+            <Card className="border col-span-full">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">
+                  {searchQuery ? "未找到匹配的简历" : "还没有简历"}
+                </h3>
+                <p className="text-muted-foreground text-center mb-4">
+                  {searchQuery
+                    ? "尝试调整搜索条件或筛选器"
+                    : "创建您的第一个专业简历"}
+                </p>
+                {!searchQuery && (
+                  <Button onClick={handleCreateResume}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    创建简历
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </TransitionBottomToTop>
 
-            <div className="flex items-center gap-2">
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="createdAt">创建时间</SelectItem>
-                  <SelectItem value="updatedAt">更新时间</SelectItem>
-                  <SelectItem value="title">标题</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="h-8 w-8 p-0"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="h-8 w-8 p-0"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+      {/* 分页 */}
+      {filteredResumes.length > 0 && (
+        <TransitionBottomToTop>
+          <PaginationLab {...pagination} />
         </TransitionBottomToTop>
-
-        {/* 简历列表 */}
-        <TransitionBottomToTop className="flex-1 w-full p-3 sm:p-6">
-          <div
-            className={cn(
-              "gap-4",
-              viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
-                : "flex flex-col space-y-4"
-            )}
-          >
-            {loading ? (
-              // 加载骨架屏
-              Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className={cn(
-                    "rounded-lg",
-                    viewMode === "grid" ? "h-[280px]" : "h-[120px]"
-                  )}
-                />
-              ))
-            ) : filteredResumes.length > 0 ? (
-              <>
-                {/* 简历列表 */}
-                {filteredResumes.map(([id, resume], index) => (
-                  <TransitionB2TScale key={id} index={index}>
-                    <ResumeCard
-                      id={id}
-                      resume={resume}
-                      viewMode={viewMode}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onView={handleView}
-                      onDownload={handleDownload}
-                    />
-                  </TransitionB2TScale>
-                ))}
-              </>
-            ) : (
-              // 空状态
-              <Card className="border col-span-full">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">
-                    {searchQuery ? "未找到匹配的简历" : "还没有简历"}
-                  </h3>
-                  <p className="text-muted-foreground text-center mb-4">
-                    {searchQuery
-                      ? "尝试调整搜索条件或筛选器"
-                      : "创建您的第一个专业简历"}
-                  </p>
-                  {!searchQuery && (
-                    <Button onClick={handleCreateResume}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      创建简历
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </TransitionBottomToTop>
-
-        {/* 分页 */}
-        {filteredResumes.length > 0 && (
-          <TransitionBottomToTop>
-            <PaginationLab {...pagination} />
-          </TransitionBottomToTop>
-        )}
-      </AnimatePresence>
+      )}
+      {/* </AnimatePresence> */}
     </TransitionOpacity>
   );
 };
