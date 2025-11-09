@@ -245,6 +245,10 @@
         "name": "模块标题背景色",
         "description": "模块标题背景鲜明，突出美观特色"
       },
+      "twoColumn": {
+        "name": "两栏布局",
+        "description": "两栏布局，突出个人特色"
+      },
       "timeline": {
         "name": "时间轴布局",
         "description": "时间轴风格，突出经历的时间顺序"

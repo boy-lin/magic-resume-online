@@ -3,8 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { GlobalSettings, ResumeSection } from "@/types/resume";
 import SectionTitle from "./SectionTitle";
 import { useResumeStore } from "@/store/resume/useResumeStore";
-
-import { useLocale } from "next-intl";
+import { formatDate, pickObjectsFromList } from "@/lib/utils";
 
 interface EducationSectionProps {
   section?: ResumeSection;
@@ -18,7 +17,6 @@ const EducationSection = ({
   showTitle = true,
 }: EducationSectionProps) => {
   const { setActiveSection } = useResumeStore();
-  const locale = useLocale();
 
   return (
     <motion.div
@@ -44,13 +42,8 @@ const EducationSection = ({
       ></SectionTitle>
       <AnimatePresence mode="popLayout">
         {section?.content?.map((item) => {
-          const school = {
-            value: item.value,
-            id: "school",
-            type: "text",
-          };
-          const [major, degree, startDate, endDate, description] =
-            item.fields || [];
+          const { school, major, degree, startDate, endDate, description } =
+            pickObjectsFromList(item.fields);
           return (
             <motion.div
               layout="position"
@@ -71,7 +64,7 @@ const EducationSection = ({
                     fontSize: `${globalSettings?.subheaderSize || 16}px`,
                   }}
                 >
-                  <span>{school.value}</span>
+                  <span>{school?.value || ""}</span>
                 </div>
 
                 {globalSettings?.centerSubtitle && (
@@ -84,9 +77,9 @@ const EducationSection = ({
                   className="text-subtitleFont shrink-0"
                   suppressHydrationWarning
                 >
-                  {`${new Date(startDate.value).toLocaleDateString(
-                    locale
-                  )} - ${new Date(endDate.value).toLocaleDateString(locale)}`}
+                  {`${formatDate(new Date(startDate.value))} - ${formatDate(
+                    new Date(endDate.value)
+                  )}`}
                 </span>
               </motion.div>
 
@@ -107,7 +100,9 @@ const EducationSection = ({
                     fontSize: `${globalSettings?.baseFontSize || 14}px`,
                     lineHeight: globalSettings?.lineHeight || 1.6,
                   }}
-                  dangerouslySetInnerHTML={{ __html: description.value }}
+                  dangerouslySetInnerHTML={{
+                    __html: description.value,
+                  }}
                 />
               )}
             </motion.div>

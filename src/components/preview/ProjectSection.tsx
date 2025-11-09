@@ -8,6 +8,7 @@ import {
   ResumeSectionContent,
 } from "@/types/resume";
 import { useResumeStore } from "@/store/resume/useResumeStore";
+import { pickObjectsFromList } from "@/lib/utils";
 
 interface ProjectItemProps {
   project: ResumeSectionContent;
@@ -17,8 +18,9 @@ interface ProjectItemProps {
 const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
   ({ project, globalSettings }, ref) => {
     const centerSubtitle = globalSettings?.centerSubtitle;
-    const [name, role, date, link, description] = project.fields || [];
-
+    const { name, role, date, link, description } = pickObjectsFromList(
+      project.fields
+    );
     return (
       <motion.div
         style={{
@@ -39,7 +41,7 @@ const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
             </h3>
           </div>
 
-          {link && !centerSubtitle && (
+          {link.value && !centerSubtitle && (
             <a
               href={
                 link.value.startsWith("http")

@@ -20,14 +20,14 @@ const basicDefault: ResumeSection = {
       id: "name",
       type: "text",
       label: "姓名",
-      value: "张明",
+      value: "你的名字",
       visible: true,
     },
     {
       id: "title",
       type: "text",
       label: "职位",
-      value: "资深Java开发工程师",
+      value: "你的职位",
       visible: true,
     },
     {
@@ -61,7 +61,7 @@ const basicDefault: ResumeSection = {
       id: "email",
       type: "email",
       label: "邮箱",
-      value: "zhangming@example.com",
+      value: "你的邮箱",
       visible: true,
       icon: "Mail",
     },
@@ -69,7 +69,7 @@ const basicDefault: ResumeSection = {
       id: "phone",
       type: "tel",
       label: "电话",
-      value: "138xxxx5678",
+      value: "你的电话",
       visible: true,
       icon: "Phone",
     },
@@ -77,7 +77,7 @@ const basicDefault: ResumeSection = {
       id: "location",
       type: "text",
       label: "所在地",
-      value: "上海",
+      value: "你的所在地",
       visible: true,
       icon: "MapPin",
     },
@@ -109,7 +109,7 @@ const introductionDefault: ResumeSection = {
     {
       id: "description",
       type: "textarea",
-      value: "自我介绍",
+      value: "简单的介绍你自己",
     },
   ],
 };
@@ -123,12 +123,7 @@ const skillsDefault: ResumeSection = {
     {
       id: "description",
       type: "textarea",
-      value: `<div class="skill-content">
-<ul class="custom-list">
-<li>前端框架：熟悉 React、Vue.js，熟悉 Next.js、Nuxt.js 等 SSR 框架</li>
-<li>开发语言：TypeScript、JavaScript(ES6+)、HTML5、CSS3</li>
-</ul>
-</div>`,
+      value: `<ul class="custom-list"><li><p>熟练使用各种AI开发工具</p></li></ul>`,
     },
   ],
 };
@@ -141,12 +136,12 @@ export const experienceContentDefault: ResumeSectionContent = {
     {
       id: "company",
       type: "text",
-      value: "字节跳动",
+      value: "你的公司",
     },
     {
       id: "position",
       type: "text",
-      value: "高级前端工程师",
+      value: "你的职位",
     },
     {
       id: "date",
@@ -157,7 +152,7 @@ export const experienceContentDefault: ResumeSectionContent = {
       id: "description",
       type: "textarea",
       value: `<ul class="custom-list">
-<li>负责抖音创作者平台的开发与维护，主导多个核心功能的技术方案设计</li>
+<li>简单的描述你的工作内容</li>
 </ul>`,
     },
   ],
@@ -178,12 +173,12 @@ export const projectContentDefault: ResumeSectionContent = {
     {
       id: "name",
       type: "text",
-      value: "抖音创作者中台",
+      value: "你的项目名称",
     },
     {
       id: "role",
       type: "text",
-      value: "前端负责人",
+      value: "你的角色",
     },
     {
       id: "date",
@@ -199,7 +194,7 @@ export const projectContentDefault: ResumeSectionContent = {
       id: "description",
       type: "textarea",
       value: `<ul class="custom-list">
-  <li>基于 React 开发的创作者数据分析和内容管理平台，服务百万级创作者群体</li>
+  <li>简单的描述你的项目内容</li>
 </ul>`,
     },
   ],
@@ -215,30 +210,30 @@ const projectsDefault: ResumeSection = {
     {
       ...projectContentDefault,
       id: "p2",
-      value: "微信小程序开发者工具",
+      value: "你的项目名称",
     },
     {
       ...projectContentDefault,
       id: "p3",
-      value: "前端监控平台",
+      value: "你的项目名称",
     },
   ],
 };
 export const educationContentDefault: ResumeSectionContent = {
   id: "1",
   type: "education",
-  value: "北京大学",
   visible: true,
   fields: [
-    { id: "major", type: "text", value: "计算机科学与技术" },
-    { id: "degree", type: "text", value: "本科" },
+    { id: "school", type: "text", value: "你的学校" },
+    { id: "major", type: "text", value: "你的专业" },
+    { id: "degree", type: "text", value: "你的学位" },
     { id: "start-date", type: "text", value: "2013-09" },
     { id: "end-date", type: "text", value: "2017-06" },
     {
       id: "description",
       type: "textarea",
       value: `<ul class="custom-list">
-<li>主修课程：数据结构、算法设计、操作系统、计算机网络</li>
+<li>主修课程：数据结构</li>
 </ul>`,
     },
   ],

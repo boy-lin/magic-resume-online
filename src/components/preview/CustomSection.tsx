@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import { GlobalSettings, ResumeSection } from "@/types/resume";
 import { useResumeStore } from "@/store/resume/useResumeStore";
+import { pickObjectsFromList } from "@/lib/utils";
 
 interface CustomSectionProps {
   section: ResumeSection;
@@ -14,6 +15,7 @@ const CustomSection = ({ section, globalSettings }: CustomSectionProps) => {
   const visibleItems = section?.content;
   const centerSubtitle = globalSettings?.centerSubtitle;
   const gridColumns = centerSubtitle ? 3 : 2;
+
   return (
     <motion.div
       className="hover:cursor-pointer hover:bg-gray-100 rounded-md transition-all duration-300 ease-in-out hover:shadow-md"
@@ -31,8 +33,8 @@ const CustomSection = ({ section, globalSettings }: CustomSectionProps) => {
       />
       <AnimatePresence mode="popLayout">
         {visibleItems.map((item) => {
-          console.log("item::", item);
-          const [description, title, subtitle, dateRange] = item.fields || [];
+          const { description, title, subtitle, dateRange } =
+            pickObjectsFromList(item.fields);
           return (
             <motion.div
               key={item.id}
@@ -84,7 +86,9 @@ const CustomSection = ({ section, globalSettings }: CustomSectionProps) => {
                     fontSize: `${globalSettings?.baseFontSize || 14}px`,
                     lineHeight: globalSettings?.lineHeight || 1.6,
                   }}
-                  dangerouslySetInnerHTML={{ __html: description.value }}
+                  dangerouslySetInnerHTML={{
+                    __html: description.value,
+                  }}
                 />
               )}
             </motion.div>

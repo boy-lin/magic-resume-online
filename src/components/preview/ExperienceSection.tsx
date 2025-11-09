@@ -9,7 +9,7 @@ import {
 import SectionTitle from "./SectionTitle";
 import { useResumeStore } from "@/store/resume/useResumeStore";
 import { FieldComponent } from "../templates/components/Filed";
-import { cn } from "@/lib/utils";
+import { cn, pickObjectsFromList } from "@/lib/utils";
 
 interface ExperienceSectionProps {
   section?: ResumeSection;
@@ -24,9 +24,9 @@ interface ExperienceItemProps {
 
 const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
   ({ experience, globalSettings }, ref) => {
-    const centerSubtitle = globalSettings?.centerSubtitle;
-    const gridColumns = centerSubtitle ? 3 : 2;
-    const [company, position, date, description] = experience.fields || [];
+    const { company, position, date, description } = pickObjectsFromList(
+      experience.fields
+    );
     return (
       <motion.div
         layout="position"

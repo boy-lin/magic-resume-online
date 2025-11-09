@@ -76,21 +76,20 @@ interface ResumeStore {
   deleteResume: (resume: ResumeData) => Promise<void>;
   duplicateResume: (resumeId: string) => string;
   getResumeFullById: (id: string) => Promise<any>;
-  syncLocalResumesToRemote: () => Promise<void>;
+  getResumeFullByIdMock: () => Promise<any>;
   updateSectionById: (sectionId: string, data: Partial<ResumeSection>) => void;
   deleteSectionById: (sectionId: string) => void;
   addCustomSection: (section: ResumeSection) => void;
-  updateSectionBasic: (section: ResumeSection) => void;
-  updateSectionEducation: (section: ResumeSection) => void;
   updateEducationBatch: (educations: ResumeSectionContent[]) => void;
-  updateSectionExperience: (vals: Partial<ResumeSection>) => void;
-  updateSectionProjects: (project: Partial<ResumeSection>) => void;
   reorderSections: (newOrder: ResumeSection[]) => void;
   toggleSectionVisibility: (sectionId: string) => void;
   setActiveSection: (sectionId: string) => void;
   updateMenuSections: (sections: ResumeSection[]) => void;
   addMenuSection: () => void;
-  setActiveResume: (resumeId: string) => void;
+  updateSectionBasic: (section: Partial<ResumeSection>) => void;
+  updateSectionEducation: (section: Partial<ResumeSection>) => void;
+  updateSectionExperience: (section: Partial<ResumeSection>) => void;
+  updateSectionProjects: (section: Partial<ResumeSection>) => void;
 }
 
 export const useResumeStore = create<ResumeStore>()(
@@ -324,60 +323,25 @@ export const useResumeStore = create<ResumeStore>()(
         }
       },
 
-      setActiveResume: (resumeId) => {
-        const resume = get().activeResume;
-        if (resume) {
-          set({ activeResume: resume, activeResumeId: resumeId });
-        }
-      },
+      getResumeFullByIdMock: async () => {
+        const resumeData = await fetch("/api/mock/resume").then((res) =>
+          res.json(),
+        );
+        const newResume: ResumeData = {
+          activeSection: "basic",
+          ...resumeData,
+        };
 
-      getResumeList: async ({ current, pageSize }) => {
-        try {
-          const { data } = await withDataMode(
-            async () =>
-              getResumesByUserIdPrisma({
-                current,
-                pageSize,
-              }),
-            async () =>
-              localGetResumeList({
-                current,
-                pageSize,
-              }),
-          );
+        // set((state) => ({
+        //   activeResumeId: resumeData.id,
+        //   activeResume: newResume,
+        // }));
 
-          if (!data) return [];
-
-          const resumesMap: Record<string, any> = {};
-          data.forEach((it) => {
-            resumesMap[it.id] = {
-              id: it.id,
-              title: it.title,
-              createdAt: it.created_at,
-              updatedAt: it.updated_at || it.created_at,
-              templateId: it.template_id,
-              isPublic: Boolean(it.is_public),
-            };
-          });
-          return data;
-        } catch (error) {
-          logger.error("Failed to get resume list:", error);
-          return [];
-        }
+        return newResume;
       },
 
       getResumeFullById: async (id) => {
-        const resumeData = await withDataMode(
-          async () => getResumeByIdPrismaApi(id),
-          async () => {
-            const resume = await localGetResumeById(id);
-            if (!resume) {
-              throw new Error("Resume not found");
-            }
-            return resume;
-          },
-        );
-
+        const resumeData = await getResumeByIdPrismaApi(id);
         const newResume: ResumeData = {
           activeSection: "basic",
           ...resumeData,
@@ -425,7 +389,6 @@ export const useResumeStore = create<ResumeStore>()(
         if (!activeResumeId) return;
         if (!activeResume) return;
 
-        console.log("data", sectionId, data);
         updateResume(activeResumeId, {
           ...activeResume,
           menuSections: activeResume?.menuSections.map((s) =>
@@ -452,24 +415,12 @@ export const useResumeStore = create<ResumeStore>()(
         });
       },
       // 基础信息编辑
-      updateSectionBasic: (section: ResumeSection) => {
-        const { activeResume } = get();
-        if (!activeResume) return;
-        get().updateResume(activeResume.id, {
-          menuSections: activeResume?.menuSections.map((s) =>
-            s.id === "basic" ? { ...s, ...section } : s,
-          ),
-        });
+      updateSectionBasic: (vals) => {
+        get().updateSectionById("basic", vals);
       },
       // 教育经历编辑
-      updateSectionEducation: (section: ResumeSection) => {
-        const { activeResume } = get();
-        if (!activeResume) return;
-        get().updateResume(activeResume.id, {
-          menuSections: activeResume?.menuSections.map((s) =>
-            s.id === "education" ? { ...s, ...section } : s,
-          ),
-        });
+      updateSectionEducation: (vals) => {
+        get().updateSectionById("education", vals);
       },
 
       updateEducationBatch: (educations: ResumeSectionContent[]) => {
@@ -480,29 +431,11 @@ export const useResumeStore = create<ResumeStore>()(
 
       // 工作经验编辑
       updateSectionExperience: (vals) => {
-        const { activeResumeId, activeResume, updateResume } = get();
-
-        if (!activeResumeId) return;
-        if (!activeResume) return;
-
-        updateResume(activeResumeId, {
-          menuSections: activeResume.menuSections.map((s) =>
-            s.id === "experience" ? { ...s, ...vals } : s,
-          ),
-        });
+        get().updateSectionById("experience", vals);
       },
 
-      updateSectionProjects: (project) => {
-        const { activeResumeId, activeResume, updateResume } = get();
-
-        if (!activeResumeId) return;
-        if (!activeResume) return;
-
-        updateResume(activeResumeId, {
-          menuSections: activeResume.menuSections.map((s) =>
-            s.id === "projects" ? { ...s, ...project } : s,
-          ),
-        });
+      updateSectionProjects: (vals) => {
+        get().updateSectionById("projects", vals);
       },
 
       reorderSections: (newOrder) => {

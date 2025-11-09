@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, pickObjectsFromList } from "@/lib/utils";
 import {
   getBorderRadiusValue,
   GlobalSettings,
@@ -29,7 +29,11 @@ const BaseInfo = ({
 }: BaseInfoProps) => {
   const { setActiveSection } = useResumeStore();
   const useIconMode = globalSettings?.useIconMode ?? false;
-  const [name, title, photo, github, ...otherSection1Fields] = section.content;
+  const { name, title, photo, github, ...otherFieldMap } = useMemo(() => {
+    return pickObjectsFromList(section?.content);
+  }, [section.content]);
+
+  const otherBasicSectionFields = Object.values(otherFieldMap);
 
   const getIcon = (iconName: string | undefined) => {
     const IconComponent = Icons[
@@ -148,7 +152,7 @@ const BaseInfo = ({
         maxWidth: layout === "center" ? "none" : "600px",
       }}
     >
-      {otherSection1Fields.map((item) => (
+      {otherBasicSectionFields.map((item) => (
         <motion.div
           key={item.id}
           className={cn(baseFieldItemClass, isModernTemplate && "text-[#fff]")}
