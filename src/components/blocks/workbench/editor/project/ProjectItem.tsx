@@ -26,8 +26,7 @@ interface ProjectEditorProps {
 
 const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
   const t = useTranslations("workbench.projectItem");
-  const { position, role, link, date, description } =
-    pickObjectsFromList(fields);
+  const { name, role, link, date, description } = pickObjectsFromList(fields);
 
   return (
     <div className="space-y-5">
@@ -35,8 +34,8 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.name")}
-            value={position.value}
-            onChange={(value) => onSave({ ...position, value })}
+            value={name.value}
+            onChange={(value) => onSave({ ...name, value })}
             placeholder={t("placeholders.name")}
           />
           <Field

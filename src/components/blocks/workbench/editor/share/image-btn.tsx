@@ -20,7 +20,8 @@ export default function ImageBtn({
   const handleJsonExport = async () => {
     try {
       setIsLoading(true);
-      const previewDom = document.querySelector("#resume-preview");
+      const previewDom =
+        document.querySelector("#resume-preview").parentElement;
       if (!previewDom) {
         throw new Error("preview resume not found");
       }

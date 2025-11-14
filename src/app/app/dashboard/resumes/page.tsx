@@ -387,11 +387,6 @@ const ResumeWorkbench = () => {
     return filtered;
   }, [resumes, searchQuery, filterStatus, sortBy]);
 
-  console.log("filteredResumes", {
-    filteredResumes,
-    resumes,
-  });
-
   const handleCreateResume = () => {
     router.push("/app/dashboard/templates");
   };

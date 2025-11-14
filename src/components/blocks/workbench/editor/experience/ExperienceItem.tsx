@@ -30,7 +30,6 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
   const { company, position, date, description } = pickObjectsFromList(
     experience.fields
   );
-
   const handleChange = (field: ResumeFieldType) => {
     updateSectionExperienceContent({
       ...experience,

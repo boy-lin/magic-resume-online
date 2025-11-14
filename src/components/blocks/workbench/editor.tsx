@@ -187,7 +187,6 @@ export default function Editor() {
   };
 
   const updateLayout = (sizes: number[]) => {
-    console.log("updateLayout", sizes);
     setPanelSizes(sizes);
   };
 
