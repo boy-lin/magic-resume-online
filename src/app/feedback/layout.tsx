@@ -27,7 +27,6 @@ export default async function LocaleLayout({ children }: Props) {
   const locale = await getLocale();
 
   const messages = await getMessages();
-  console.debug("account LocaleLayout");
   return (
     <Document locale={locale} bodyClassName="text-letter antialiased">
       <NextIntlClientProvider messages={messages}>

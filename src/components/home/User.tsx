@@ -21,11 +21,11 @@ function User() {
   const user = useAppStore((state) => state.user) || {};
   const userLoading = useAppStore((state) => state.userLoading);
 
-  const fullName = user?.user_metadata?.full_name || "";
+  const fullName = user?.fullName || "";
   const fName = fullName.substr(0, 2).toUpperCase();
-  const avatarUrl = user?.user_metadata?.avatar_url || avatarUrlDefault;
+  const avatarUrl = user?.avatarUrl || avatarUrlDefault;
 
-  // console.log("aaa3", user, userLoading);
+  console.log("aaa3", user, userLoading);
 
   if (userLoading < 2)
     return (
@@ -40,7 +40,7 @@ function User() {
 
   return (
     <div className="">
-      {user?.aud === "authenticated" ? (
+      {user?.id ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="size-8">

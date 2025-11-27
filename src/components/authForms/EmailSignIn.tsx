@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signInWithPassword } from "@/utils/auth-helpers/server";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { isRememberKey, userEmailKey } from "@/config/key";
+import { getErrorRedirect, getStatusRedirect } from "@/utils/helpers";
 
 export default function EmailSignIn() {
   const router = useRouter();
@@ -47,8 +48,33 @@ export default function EmailSignIn() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      password: "",
     },
   });
+
+  async function signInWithPassword(values: z.infer<typeof formSchema>) {
+    const signInPath = "/account/signin";
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: values.email,
+      password: values.password,
+    });
+
+    if (!result) {
+      return getErrorRedirect(
+        signInPath,
+        "登录失败",
+        "登录服务暂时不可用，请稍后重试"
+      );
+    }
+
+    if (result.error) {
+      return getErrorRedirect(signInPath, "登录失败", result.error);
+    }
+
+    return getStatusRedirect("/", "成功", "您现在已登录");
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);

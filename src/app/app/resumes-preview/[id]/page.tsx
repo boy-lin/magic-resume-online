@@ -19,8 +19,7 @@ import ImageBtn from "@/components/blocks/workbench/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
 import ResumeTemplateComponent from "@/components/templates";
 import PageBreakLines from "@/components/preview/PageBreakLines";
-import { getResumeById } from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
+import { getResumeByIdPrismaApi } from "./utils.prisma";
 import { Button } from "@/components/ui-lab/button";
 import {
   Card,
@@ -42,7 +41,7 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   const [password, setPassword] = useState("");
 
   const { loading, error } = useRequest(async () => {
-    const data = await getResumeById(createClient(), params.id);
+    const data = await getResumeByIdPrismaApi(params.id as string);
     const newResume = {
       activeSection: "basic",
       draggingProjectId: null,

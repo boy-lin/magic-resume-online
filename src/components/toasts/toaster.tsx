@@ -23,6 +23,10 @@ export function Toaster() {
     const status_description = searchParams.get("status_description");
     const error = searchParams.get("error");
     const error_description = searchParams.get("error_description");
+    console.debug("aa Toaster error", error);
+    console.debug("aa Toaster status", status);
+    console.debug("aa Toaster error_description", error_description);
+    console.debug("aa Toaster status_description", status_description);
     if (error || status) {
       toast({
         title: error

@@ -8,7 +8,6 @@ import {
   useRef,
 } from "react";
 import { getUser } from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
 import { initialState, appContext } from "@/hooks/app";
 import { useAppStore } from "@/store/useApp";
 type Props = {
@@ -29,12 +28,11 @@ export function InitDataProvider({ children }: Props) {
     if (userRef.current !== null) return;
     userRef.current = true;
 
-    console.debug("aa Providers useLayoutEffect");
     async function getUserAsync() {
       setUserLoading(1);
-      const user = await getUser(createClient());
+      const user = await getUser();
+      console.log("user", user);
       setUserLoading(2);
-      console.debug("aa Providers setUser", user);
       setUser(user);
     }
 

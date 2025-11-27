@@ -20,17 +20,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui-lab/switch";
-import { createClient } from "@/utils/supabase/client";
 import DownloadBtn from "./share/download-btn";
 import PrintBtn from "./share/print-btn";
 import JsonBtn from "./share/json-btn";
 import ImageBtn from "./share/image-btn";
 import { cn } from "@/lib/utils";
 import { generateRandomString } from "@/utils";
-import {
-  publicResumeById,
-  setPublicResumeById,
-} from "@/utils/supabase/queries";
+import { publicResumeByIdApi, setPublicResumeByIdApi } from "@/components/blocks/workbench/editor/share/utils.prisma";
 
 const ShareBtn = () => {
   const [loading, setLoading] = useState(null);
@@ -78,14 +74,7 @@ const ShareBtn = () => {
   const onPublicChange = async (val) => {
     setOpenPublicLoading(true);
     try {
-      const supabase = createClient();
-      const res = await publicResumeById(supabase, activeResume.id, val);
-      if (res.error) {
-        toast.error(t("message.error"), {
-          description: res.error.message,
-        });
-        return;
-      }
+      await publicResumeByIdApi(activeResume.id, val);
       setOpenPublic(val);
     } finally {
       setOpenPublicLoading(false);
@@ -95,18 +84,7 @@ const ShareBtn = () => {
   const onPasswordChange = async (val) => {
     setOpenPasswordLoading(true);
     try {
-      const supabase = createClient();
-      const res = await setPublicResumeById(
-        supabase,
-        activeResume.id,
-        val ? password : ""
-      );
-      if (res.error) {
-        toast.error(t("message.error"), {
-          description: res.error.message,
-        });
-        return;
-      }
+      await setPublicResumeByIdApi(activeResume.id, val ? password : "");
       setOpenPassword(val);
     } finally {
       setOpenPasswordLoading(false);

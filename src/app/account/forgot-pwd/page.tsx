@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
-import { requestPasswordUpdate } from "@/utils/auth-helpers/server";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { getErrorRedirect, getFeedbackRedirect } from "@/utils/helpers";
+import { isValidEmail } from "@/utils/reg";
 import {
   Form,
   FormControl,
@@ -41,6 +42,52 @@ const ForgotPwdPage = () => {
       email: "",
     },
   });
+
+  async function requestPasswordUpdate(values: z.infer<typeof formSchema>) {
+    const email = values.email.trim();
+
+    if (!isValidEmail(email)) {
+      return getErrorRedirect(
+        "/account/forgot-pwd",
+        "电子邮件地址无效",
+        "请重试。"
+      );
+    }
+
+    try {
+      const res = await fetch("/api/external/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: email,
+          subject: "密码重置",
+          text: `请点击以下链接重置密码：${window.location.origin}/account/update-pwd`,
+        }),
+      });
+
+      if (!res.ok) {
+        return getErrorRedirect(
+          "/account/forgot-pwd",
+          "无法发送密码重置电子邮件。",
+          "请重试。"
+        );
+      }
+
+      return getFeedbackRedirect(
+        "/feedback/success",
+        "成功。",
+        "请查看您的电子邮件，获取密码重置链接。您现在可以关闭此页面了。"
+      );
+    } catch {
+      return getErrorRedirect(
+        "/account/forgot-pwd",
+        "无法发送密码重置电子邮件。",
+        "请重试。"
+      );
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);

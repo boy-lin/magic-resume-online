@@ -2,13 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ResumeData } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
-import {
-  upsertResumeById,
-  getResumesByUserId,
-  deleteResumeById,
-  getResumeById,
-} from "@/utils/supabase/queries";
-import { createClient } from "@/utils/supabase/client";
+import { getResumesByUserIdPrisma, getResumeByIdPrismaApi, upsertResumeByIdApi, deleteResumeByIdApi } from "@/store/resume/utils.prisma";
 import { getFileHandle, verifyPermission } from "@/utils/fileSystem";
 import {
   initialResumeState,
@@ -100,7 +94,7 @@ export const useResumeListStore = create(
           menuSections: template.menuSections,
         };
 
-        await upsertResumeById(createClient(), newResume);
+        await upsertResumeByIdApi(newResume);
         set((state) => ({
           resumes: {
             ...state.resumes,
@@ -138,24 +132,26 @@ export const useResumeListStore = create(
         const { activeResumeId } = get();
         let res;
         if (activeResumeId) {
-          res = await upsertResumeById(createClient(), resume);
+          res = await upsertResumeByIdApi(resume);
           get().updateResume(activeResumeId, resume, false);
         }
         return res;
       },
 
       updateResumeTitle: async (title) => {
-        const { activeResumeId } = get();
+        const { activeResumeId, resumes } = get();
         if (activeResumeId) {
-          const params = { id: activeResumeId, title };
-          await upsertResumeById(createClient(), params);
-          get().updateResume(activeResumeId, params, false);
+          const current = resumes[activeResumeId];
+          if (!current) return;
+          const updated = { ...current, title };
+          await upsertResumeByIdApi(updated);
+          get().updateResume(activeResumeId, { title }, false);
         }
       },
 
       deleteResume: async (resume) => {
         const resumeId = resume.id;
-        await deleteResumeById(createClient(), resumeId);
+        await deleteResumeByIdApi(resumeId);
         set((state) => {
           const { [resumeId]: _, activeResume, ...rest } = state.resumes;
           return {
@@ -230,13 +226,11 @@ export const useResumeListStore = create(
 
       getResumeList: async ({ current, pageSize }) => {
         try {
-          const client = createClient();
-          const { data, error } = await getResumesByUserId(client, {
+          const { data } = await getResumesByUserIdPrisma({
             current,
             pageSize,
           });
 
-          if (error) throw error;
           if (!data) return [];
 
           const resumesMap = {};
@@ -264,8 +258,7 @@ export const useResumeListStore = create(
       },
 
       getResumeFullById: async (id) => {
-        const client = createClient();
-        const resumeData = await getResumeById(client, id);
+        const resumeData = await getResumeByIdPrismaApi(id);
         const newResume: ResumeData = {
           activeSection: "basic",
           draggingProjectId: null,

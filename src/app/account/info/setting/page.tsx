@@ -18,8 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createClient } from "@/utils/supabase/client";
-import { updateUserInfoById } from "@/utils/supabase/queries";
+import { updateUserInfoById, getUser } from "@/utils/supabase/queries";
 import { useAppStore } from "@/store/useApp";
 import { DEFAULT_AVATAR } from "@/constants";
 
@@ -36,7 +35,6 @@ const Page = () => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [isDragging, setIsDragging] = useState(false);
   const user = useAppStore((state) => state.user) || {};
-  const supabase = createClient();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -216,16 +214,14 @@ const Page = () => {
     setIsSubmitting(true);
     try {
       // 更新数据库和Auth中的用户信息
-      const { error } = await updateUserInfoById(supabase, user.id, values);
+      const { error } = await updateUserInfoById(undefined, user.id, values);
       if (error) {
         toast.error(t("account.setting.error.update"));
         return;
       }
 
       // 重新获取用户信息并更新store
-      const {
-        data: { user: updatedUser },
-      } = await supabase.auth.getUser();
+      const updatedUser = await getUser();
       console.log("更新前的用户信息:", user);
       console.log("更新后的用户信息:", updatedUser);
       if (updatedUser) {

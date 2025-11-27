@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
-import { signUp } from "@/utils/auth-helpers/server";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -37,13 +37,16 @@ const RegisterPage = () => {
           .string()
           .min(5, { message: t("account.invalid.minFive") }),
       }),
-    []
+    [t]
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -54,10 +57,54 @@ const RegisterPage = () => {
       });
     }
 
-    setIsSubmitting(true);
-    const redirectUrl = await signUp(values);
-    setIsSubmitting(false);
-    router.push(redirectUrl);
+    try {
+      setIsSubmitting(true);
+
+      const res = await fetch("/api/account/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: values.fullName,
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        toast.error(t("common.message.error"), {
+          description:
+            data?.error || "注册失败，请检查信息后重试",
+        });
+        return;
+      }
+
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
+
+      if (!signInResult || signInResult.error) {
+        toast.error(t("common.message.error"), {
+          description:
+            signInResult?.error ||
+            "注册成功，但自动登录失败，请手动登录",
+        });
+        return;
+      }
+
+      toast.success(t("common.message.success"), {
+        description: "注册并登录成功",
+      });
+
+      router.push("/");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

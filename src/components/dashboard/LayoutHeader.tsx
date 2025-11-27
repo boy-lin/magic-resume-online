@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Bell,
   Settings,
@@ -28,14 +28,12 @@ import Logo from "@/components/shared/Logo";
 import { useAppStore } from "@/store/useApp";
 import { useTranslations } from "next-intl";
 import { avatarUrlDefault } from "@/config";
-import { handleRequest } from "@/utils/auth-helpers/client";
-import { SignOut } from "@/utils/auth-helpers/server";
 import { clearLocalStorage } from "@/utils/storage";
 import { toast } from "sonner";
-import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { useGlobalSidebar } from "@/hooks/useSidebar";
+import { signOut } from "next-auth/react";
 
 /**
  * Dashboard页面顶部Header组件
@@ -55,10 +53,13 @@ const LayoutHeader: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await handleRequest(null, SignOut, router);
       clearLocalStorage();
+      useAppStore.getState().setUser(null);
+      useAppStore.getState().setUserLoading(0);
+      await signOut({ callbackUrl: "/account/signin" });
       toast.success("已成功退出登录");
     } catch (error) {
+      console.error(error);
       toast.error("退出登录失败");
     }
   };
@@ -250,3 +251,4 @@ const LayoutHeader: React.FC = () => {
 };
 
 export default LayoutHeader; // Cursor
+
