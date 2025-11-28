@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/service/auth";
 import { getResumesByUserId } from "@/lib/repositories/resume";
 
 export async function GET(request: NextRequest) {
@@ -13,11 +13,13 @@ export async function GET(request: NextRequest) {
   const current = Number(searchParams.get("current") || "1");
   const pageSize = Number(searchParams.get("pageSize") || "20");
 
-  const result = await getResumesByUserId(session.user.id, { current, pageSize });
+  const result = await getResumesByUserId(session.user.id, {
+    current,
+    pageSize,
+  });
 
   return NextResponse.json({
     data: result.data,
     count: result.count,
   });
 }
-

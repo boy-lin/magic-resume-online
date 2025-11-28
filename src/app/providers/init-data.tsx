@@ -7,7 +7,7 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
-import { getUser } from "@/utils/supabase/queries";
+import { getUser } from "@/lib/service/queries";
 import { initialState, appContext } from "@/hooks/app";
 import { useAppStore } from "@/store/useApp";
 type Props = {

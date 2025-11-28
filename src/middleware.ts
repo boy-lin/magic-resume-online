@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { getToken } from "next-auth/jwt";
-import { secret } from "@/lib/auth";
+import { secret } from "@/lib/service/auth";
 import { routing } from "./i18n/routing.public";
 
 const langList = ["/zh", "/en"];

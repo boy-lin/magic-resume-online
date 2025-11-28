@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/service/auth";
 import {
   deleteResumeByIdPrisma,
   getResumeByIdPrisma,
@@ -70,4 +70,3 @@ export async function PATCH(
 
   return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 }
-

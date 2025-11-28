@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { hash } from "bcryptjs";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/service/auth";
+import { prisma } from "@/lib/service/prisma";
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -14,7 +14,11 @@ export async function PATCH(req: NextRequest) {
   try {
     const { password } = await req.json();
 
-    if (!password || typeof password !== "string" || password.trim().length < 5) {
+    if (
+      !password ||
+      typeof password !== "string" ||
+      password.trim().length < 5
+    ) {
       return NextResponse.json(
         { error: "密码长度至少为 5 位" },
         { status: 400 }
@@ -37,4 +41,3 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
-

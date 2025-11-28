@@ -10,7 +10,7 @@ import {
 import { ResumeTemplate } from "@/types/template";
 import Base64Image from "@/components/photo/base64";
 import { motion } from "framer-motion";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import * as Icons from "lucide-react";
 import { getFlexDirection } from "./utils";

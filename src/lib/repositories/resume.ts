@@ -1,6 +1,9 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/service/prisma";
 
-export async function getResumesByUserId(userId: string, params: { current: number; pageSize: number }) {
+export async function getResumesByUserId(
+  userId: string,
+  params: { current: number; pageSize: number }
+) {
   const skip = (params.current - 1) * params.pageSize;
   const take = params.pageSize;
 
@@ -46,7 +49,15 @@ export type ResumeUpsertInput = {
 };
 
 export async function upsertResumeByIdPrisma(input: ResumeUpsertInput) {
-  const { id, userId, title, templateId, customData, globalSettings, menuSections } = input;
+  const {
+    id,
+    userId,
+    title,
+    templateId,
+    customData,
+    globalSettings,
+    menuSections,
+  } = input;
 
   if (id) {
     return prisma.resume.upsert({
@@ -124,7 +135,10 @@ export async function publicResumeByIdPrisma(id: string, isPublic: boolean) {
   });
 }
 
-export async function setPublicResumeByIdPrisma(id: string, publicPassword: string | null) {
+export async function setPublicResumeByIdPrisma(
+  id: string,
+  publicPassword: string | null
+) {
   return prisma.resume.update({
     where: { id },
     data: {
@@ -132,4 +146,3 @@ export async function setPublicResumeByIdPrisma(id: string, publicPassword: stri
     },
   });
 }
-

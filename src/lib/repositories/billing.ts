@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/service/prisma";
 import { SubscriptionStatus } from "@prisma/client";
 
 export async function getActiveSubscription(userId: string) {
@@ -53,4 +53,3 @@ export async function getActiveProductsWithPrices() {
     ],
   });
 }
-

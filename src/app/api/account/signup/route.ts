@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/service/prisma";
 import { isValidEmail } from "@/utils/reg";
 
 export async function POST(request: Request) {
@@ -8,17 +8,11 @@ export async function POST(request: Request) {
     const { fullName, email, password } = await request.json();
 
     if (!fullName || !email || !password) {
-      return NextResponse.json(
-        { error: "参数不完整" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "参数不完整" }, { status: 400 });
     }
 
     if (!isValidEmail(email)) {
-      return NextResponse.json(
-        { error: "邮箱格式不正确" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "邮箱格式不正确" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -26,10 +20,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "该邮箱已被注册" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "该邮箱已被注册" }, { status: 400 });
     }
 
     const hashedPassword = await hash(password, 10);
@@ -54,4 +45,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

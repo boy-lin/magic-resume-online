@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/service/prisma";
 
 export async function getUserById(id: string) {
   return prisma.user.findUnique({
@@ -12,7 +12,10 @@ export async function getUserByEmail(email: string) {
   });
 }
 
-export async function updateUserProfileById(id: string, params: { fullName?: string; avatarUrl?: string }) {
+export async function updateUserProfileById(
+  id: string,
+  params: { fullName?: string; avatarUrl?: string }
+) {
   return prisma.user.update({
     where: { id },
     data: {
@@ -21,4 +24,3 @@ export async function updateUserProfileById(id: string, params: { fullName?: str
     },
   });
 }
-

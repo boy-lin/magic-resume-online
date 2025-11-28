@@ -18,7 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { updateUserInfoById, getUser } from "@/utils/supabase/queries";
+import { updateUserInfoById, getUser } from "@/lib/service/queries";
 import { useAppStore } from "@/store/useApp";
 import { DEFAULT_AVATAR } from "@/constants";
 

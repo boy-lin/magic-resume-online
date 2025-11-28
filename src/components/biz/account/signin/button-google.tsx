@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { signInWithOAuth } from "@/utils/auth-helpers/client";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import IconGoogle from "@/components/icon/google";
 import { clearLocalStorage } from "@/utils/storage";
@@ -14,11 +14,14 @@ const ButtonGoogle = () => {
 
   return (
     <Button
-      onClick={() => {
+      onClick={async () => {
+        if (loading) return;
+        setLoading(true);
         try {
-          setLoading(true);
-          signInWithOAuth("google");
           clearLocalStorage();
+          await signIn("google", {
+            callbackUrl: "/",
+          });
         } catch {
           setLoading(false);
         }

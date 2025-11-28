@@ -96,7 +96,7 @@ export const getConfig = async (key: string): Promise<any> => {
 
 export const verifyPermission = async (
   handle: FileSystemHandle,
-  mode: FileSystemPermissionMode = "readwrite"
+  mode = "readwrite"
 ): Promise<boolean> => {
   if (!handle) {
     return false;
