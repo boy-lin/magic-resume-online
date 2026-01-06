@@ -88,13 +88,14 @@
     "react-infinite-viewer": "^0.28.1",
     "react-resizable-panels": "^2.1.9",
     "recharts": "^2.15.3",
+    "sharp": "^0.34.5",
     "sonner": "^1.7.4",
     "stripe": "^17.7.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.5",
     "vaul": "^1.1.2",
-    "zod": "3.23.8",
+    "zod": "~3.23.8",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
