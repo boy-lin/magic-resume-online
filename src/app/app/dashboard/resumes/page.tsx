@@ -356,10 +356,15 @@ const ResumeWorkbench = () => {
     });
   };
 
-  const handleDelete = (resume: any) => {
+  const handleDelete = async (resume: any) => {
     if (confirm("确定要删除这个简历吗？")) {
-      deleteResume(resume);
-      toast.success("简历已删除");
+      try {
+        await deleteResume(resume);
+        toast.success("简历已删除");
+        mutate();
+      } catch (error: any) {
+        toast.error(error?.message || "删除失败");
+      }
     }
   };
 

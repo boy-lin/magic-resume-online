@@ -1,8 +1,13 @@
-import { create } from "zustand";
+﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ResumeData } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
-import { getResumesByUserIdPrisma, getResumeByIdPrismaApi, upsertResumeByIdApi, deleteResumeByIdApi } from "@/store/resume/utils.prisma";
+import {
+  getResumesByUserIdPrisma,
+  getResumeByIdPrismaApi,
+  upsertResumeByIdApi,
+  deleteResumeByIdApi,
+} from "@/store/resume/utils.prisma";
 import { getFileHandle, verifyPermission } from "@/utils/fileSystem";
 import {
   initialResumeState,
@@ -10,6 +15,45 @@ import {
 } from "@/config/initialResumeData";
 import { DEFAULT_TEMPLATES } from "@/config";
 import { validateResume, logger } from "./utils";
+import { useAppStore } from "@/store/useApp";
+import {
+  localDeleteResumeById,
+  localGetAllResumes,
+  localGetResumeById,
+  localGetResumeList,
+  localUpsertResume,
+} from "./utils.local";
+
+function isRemoteUser() {
+  return Boolean(useAppStore.getState().user?.id);
+}
+
+async function withDataMode<T>(
+  remoteFn: () => Promise<T>,
+  localFn: () => Promise<T>
+): Promise<T> {
+  const remote = isRemoteUser();
+  const { userLoading } = useAppStore.getState();
+
+  if (remote) {
+    try {
+      return await remoteFn();
+    } catch (error) {
+      logger.error("Remote mode failed, fallback to local mode:", error);
+      return await localFn();
+    }
+  }
+
+  if (userLoading !== 2) {
+    try {
+      return await remoteFn();
+    } catch {
+      return await localFn();
+    }
+  }
+
+  return await localFn();
+}
 
 /**
  * 简历列表状态管理
@@ -45,6 +89,7 @@ interface ResumeListStore {
     pageSize: number;
   }) => Promise<any>;
   getResumeFullById: (id: string) => Promise<any>;
+  syncLocalResumesToRemote: () => Promise<void>;
 }
 
 export const useResumeListStore = create(
@@ -72,14 +117,16 @@ export const useResumeListStore = create(
           ? DEFAULT_TEMPLATES.find((t) => t.id === templateId)
           : DEFAULT_TEMPLATES[0];
 
+        const now = new Date().toISOString();
         const newResume: ResumeData = {
           id,
           ...initialResumeData,
           activeSection: "basic",
           draggingProjectId: null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: now,
+          updatedAt: now,
           templateId: template?.id,
+          isNeedSync: isRemoteUser(),
           title: `${locale === "en" ? "New Resume" : "新建简历"} ${id.slice(
             0,
             6
@@ -94,7 +141,15 @@ export const useResumeListStore = create(
           menuSections: template.menuSections,
         };
 
-        await upsertResumeByIdApi(newResume);
+        await withDataMode(
+          async () => upsertResumeByIdApi(newResume),
+          async () => localUpsertResume(newResume)
+        );
+
+        await localUpsertResume(newResume).catch((error) =>
+          logger.error("Failed to cache resume in local DB:", error)
+        );
+
         set((state) => ({
           resumes: {
             ...state.resumes,
@@ -106,15 +161,22 @@ export const useResumeListStore = create(
         return id;
       },
 
-      updateResume: (resumeId, data, isNeedSync = true) => {
+      updateResume: (resumeId, data, isNeedSync) => {
         const resume = validateResume(resumeId, get().resumes);
+        const shouldSync = isNeedSync ?? isRemoteUser();
+        const updatedAt = new Date().toISOString();
 
         const updatedResume: ResumeData = {
           ...resume,
           ...data,
-          isNeedSync,
+          updatedAt,
+          isNeedSync: shouldSync,
           menuSections: data.menuSections ?? resume.menuSections,
         };
+
+        localUpsertResume(updatedResume).catch((error) =>
+          logger.error("Failed to persist resume locally:", error)
+        );
 
         set((state) => ({
           resumes: {
@@ -130,11 +192,34 @@ export const useResumeListStore = create(
 
       updateResumeAsync: async (resume) => {
         const { activeResumeId } = get();
-        let res;
-        if (activeResumeId) {
-          res = await upsertResumeByIdApi(resume);
-          get().updateResume(activeResumeId, resume, false);
+        if (!activeResumeId) return;
+
+        const nextResume = {
+          ...resume,
+          updatedAt: new Date().toISOString(),
+        };
+
+        let synced = false;
+        let res = null;
+
+        if (isRemoteUser()) {
+          try {
+            res = await upsertResumeByIdApi(nextResume);
+            synced = true;
+          } catch (error) {
+            logger.error("Failed to sync resume to remote:", error);
+          }
         }
+
+        await localUpsertResume({
+          ...nextResume,
+          isNeedSync: !synced && isRemoteUser(),
+        }).catch((error) =>
+          logger.error("Failed to persist resume locally:", error)
+        );
+
+        get().updateResume(activeResumeId, nextResume, !synced && isRemoteUser());
+
         return res;
       },
 
@@ -143,15 +228,48 @@ export const useResumeListStore = create(
         if (activeResumeId) {
           const current = resumes[activeResumeId];
           if (!current) return;
-          const updated = { ...current, title };
-          await upsertResumeByIdApi(updated);
-          get().updateResume(activeResumeId, { title }, false);
+          const updated = {
+            ...current,
+            title,
+            updatedAt: new Date().toISOString(),
+          };
+
+          let synced = false;
+          if (isRemoteUser()) {
+            try {
+              await upsertResumeByIdApi(updated);
+              synced = true;
+            } catch (error) {
+              logger.error("Failed to sync resume title to remote:", error);
+            }
+          }
+
+          await localUpsertResume({
+            ...updated,
+            isNeedSync: !synced && isRemoteUser(),
+          }).catch((error) =>
+            logger.error("Failed to persist resume title locally:", error)
+          );
+
+          get().updateResume(activeResumeId, { title }, !synced && isRemoteUser());
         }
       },
 
       deleteResume: async (resume) => {
         const resumeId = resume.id;
-        await deleteResumeByIdApi(resumeId);
+
+        if (isRemoteUser()) {
+          try {
+            await deleteResumeByIdApi(resumeId);
+          } catch (error) {
+            logger.error("Failed to delete remote resume:", error);
+          }
+        }
+
+        await localDeleteResumeById(resumeId).catch((error) =>
+          logger.error("Failed to delete local resume:", error)
+        );
+
         set((state) => {
           const { [resumeId]: _, activeResume, ...rest } = state.resumes;
           return {
@@ -194,6 +312,7 @@ export const useResumeListStore = create(
             })`,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            isNeedSync: isRemoteUser(),
           };
 
           const duplicatedResume: ResumeData = {
@@ -209,6 +328,10 @@ export const useResumeListStore = create(
             activeResumeId: newId,
             activeResume: duplicatedResume,
           }));
+
+          localUpsertResume(duplicatedResume).catch((error) =>
+            logger.error("Failed to persist duplicated resume locally:", error)
+          );
 
           return newId;
         } catch (error) {
@@ -226,20 +349,30 @@ export const useResumeListStore = create(
 
       getResumeList: async ({ current, pageSize }) => {
         try {
-          const { data } = await getResumesByUserIdPrisma({
-            current,
-            pageSize,
-          });
+          const { data } = await withDataMode(
+            async () =>
+              getResumesByUserIdPrisma({
+                current,
+                pageSize,
+              }),
+            async () =>
+              localGetResumeList({
+                current,
+                pageSize,
+              })
+          );
 
           if (!data) return [];
 
-          const resumesMap = {};
+          const resumesMap: Record<string, any> = {};
           data.forEach((it) => {
             resumesMap[it.id] = {
               id: it.id,
               title: it.title,
               createdAt: it.created_at,
+              updatedAt: it.updated_at || it.created_at,
               templateId: it.template_id,
+              isPublic: Boolean(it.is_public),
             };
           });
 
@@ -258,21 +391,61 @@ export const useResumeListStore = create(
       },
 
       getResumeFullById: async (id) => {
-        const resumeData = await getResumeByIdPrismaApi(id);
+        const resumeData = await withDataMode(
+          async () => getResumeByIdPrismaApi(id),
+          async () => {
+            const resume = await localGetResumeById(id);
+            if (!resume) {
+              throw new Error("Resume not found");
+            }
+            return resume;
+          }
+        );
+
         const newResume: ResumeData = {
           activeSection: "basic",
           draggingProjectId: null,
           ...resumeData,
         };
+
+        await localUpsertResume(newResume).catch((error) =>
+          logger.error("Failed to cache full resume locally:", error)
+        );
+
         set((state) => ({
           resumes: {
             ...state.resumes,
-            [resumeData.id]: newResume,
+            [newResume.id]: newResume,
           },
           activeResumeId: id,
           activeResume: newResume,
         }));
-        return resumeData;
+        return newResume;
+      },
+
+      syncLocalResumesToRemote: async () => {
+        if (!isRemoteUser()) return;
+
+        const localResumes = await localGetAllResumes().catch((error) => {
+          logger.error("Failed to read local resumes for sync:", error);
+          return [];
+        });
+
+        if (!localResumes?.length) return;
+
+        await Promise.all(
+          localResumes.map(async (resume) => {
+            try {
+              await upsertResumeByIdApi(resume);
+              await localUpsertResume({
+                ...resume,
+                isNeedSync: false,
+              });
+            } catch (error) {
+              logger.error(`Failed to sync local resume ${resume.id}:`, error);
+            }
+          })
+        );
       },
     }),
     {

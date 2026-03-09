@@ -10,6 +10,7 @@ import {
 import { getUser } from "@/lib/service/queries";
 import { initialState, appContext } from "@/hooks/app";
 import { useAppStore } from "@/store/useApp";
+import { useResumeListStore } from "@/store/resume/useResumeListStore";
 type Props = {
   children: React.ReactNode;
 };
@@ -34,6 +35,14 @@ export function InitDataProvider({ children }: Props) {
       console.log("user", user);
       setUserLoading(2);
       setUser(user);
+      if (user?.id) {
+        await useResumeListStore
+          .getState()
+          .syncLocalResumesToRemote()
+          .catch((error) => {
+            console.error("sync local resumes failed:", error);
+          });
+      }
     }
 
     getUserAsync();

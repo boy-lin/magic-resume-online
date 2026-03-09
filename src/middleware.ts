@@ -8,21 +8,20 @@ const langList = ["/zh", "/en"];
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log("aa middleware:request.url", request.nextUrl.pathname);
 
   if (pathname === "/" || langList.some((it) => pathname.startsWith(it))) {
     const i18nMiddleware = createMiddleware(routing);
     return i18nMiddleware(request);
   }
 
-  const token = await getToken({
-    req: request,
-    secret,
-  });
+  // const token = await getToken({
+  //   req: request,
+  //   secret,
+  // });
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/account/signin", request.url));
-  }
+  // if (!token) {
+  //   return NextResponse.redirect(new URL("/account/signin", request.url));
+  // }
   return NextResponse.next();
 }
 

@@ -24,10 +24,11 @@ import {
   ResumeSectionContent,
 } from "@/types/resume";
 import { Textarea } from "@/components/ui/textarea";
-import { useResumeEditorStore } from "@/store/resume/useResumeEditorStore";
 import { cn } from "@/lib/utils";
 import { useRequest } from "ahooks";
 import { DEFAULT_AVATAR, IMAGE_PROXY_URL } from "@/constants";
+import { getImageBase64 } from "@/utils/imageProxy";
+import { useAppStore } from "@/store/useApp";
 console.log("DEFAULT_AVATAR", DEFAULT_AVATAR);
 interface Props {
   isOpen: boolean;
@@ -57,6 +58,15 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     initialConfig || DEFAULT_CONFIG
   );
   const [isMobile, setIsMobile] = useState(false);
+  const isRemoteMode = Boolean(useAppStore((state) => state.user?.id));
+
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("read file failed"));
+      reader.readAsDataURL(file);
+    });
 
   useEffect(() => {
     const handleResize = () => {
@@ -98,6 +108,17 @@ const PhotoConfigDrawer: React.FC<Props> = ({
 
       if (!file.type.startsWith("image/")) {
         toast.error(t("upload.typeLimit"));
+        return;
+      }
+
+      if (!isRemoteMode) {
+        const base64 = await fileToBase64(file);
+        setPreviewUrl(base64);
+        setImageUrl(base64);
+        localStorage.setItem("photo", base64);
+        onPhotoChange({
+          value: base64,
+        });
         return;
       }
 
@@ -147,31 +168,39 @@ const PhotoConfigDrawer: React.FC<Props> = ({
     }
 
     try {
-      const proxyUrl = `${IMAGE_PROXY_URL}${encodeURIComponent(url)}`;
+      if (!isRemoteMode) {
+        const base64 = await getImageBase64({ url });
+        setPreviewUrl(base64);
+        onPhotoChange({
+          value: base64,
+        });
+      } else {
+        const proxyUrl = `${IMAGE_PROXY_URL}${encodeURIComponent(url)}`;
 
-      const img = new Image();
-      img.crossOrigin = "anonymous";
+        const img = new Image();
+        img.crossOrigin = "anonymous";
 
-      await new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          reject(new Error(t("upload.timeout")));
-        }, 10000);
+        await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => {
+            reject(new Error(t("upload.timeout")));
+          }, 10000);
 
-        img.onload = () => {
-          clearTimeout(timer);
-          resolve(undefined);
-        };
-        img.onerror = () => {
-          clearTimeout(timer);
-          reject(new Error(t("upload.loadError")));
-        };
-        img.src = proxyUrl;
-      });
+          img.onload = () => {
+            clearTimeout(timer);
+            resolve(undefined);
+          };
+          img.onerror = () => {
+            clearTimeout(timer);
+            reject(new Error(t("upload.loadError")));
+          };
+          img.src = proxyUrl;
+        });
 
-      setPreviewUrl(proxyUrl);
-      onPhotoChange({
-        value: proxyUrl,
-      });
+        setPreviewUrl(proxyUrl);
+        onPhotoChange({
+          value: proxyUrl,
+        });
+      }
     } catch (error) {
       toast.error(
         t("upload.invalidUrl", {

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { userInfoPath } from "@/utils/routesPath";
+import { userInfoPath } from "@/constants/routesPath";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppContext } from "@/hooks/app";
