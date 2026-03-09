@@ -8,12 +8,26 @@ import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import ElectricBorder from "@/components/ElectricBorder";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function HeroSection() {
   const t = useTranslations("home");
+  const { isMobile } = useIsMobile();
 
-  return (
-    <AuroraBackground className="relative min-h-[70vh] flex items-center justify-center pt-16 overflow-hidden">
+  const renderImage = () => {
+    return (
+      <img
+        src="/features/screenshot.gif"
+        alt="Resume Editor"
+        className="object-contain object-center -translate-x-[2px]"
+        sizes="(max-width: 768px)"
+        style={{ borderRadius: "1rem" }}
+      />
+    );
+  };
+
+  const renderContent = () => {
+    return (
       <motion.div
         initial={{ opacity: 0.0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -70,27 +84,35 @@ export default function HeroSection() {
             <AnimatedFeature delay={0.2}>
               <div className="relative h-[300px] lg:h-[400px] flex items-center justify-center">
                 <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
-                  <ElectricBorder
-                    color="#2383e2"
-                    speed={1}
-                    chaos={0.5}
-                    thickness={2}
-                    className="rounded-xl p-1"
-                  >
-                    <img
-                      src="/features/screenshot.gif"
-                      alt="Resume Editor"
-                      className="object-contain object-center -translate-x-[2px]"
-                      sizes="(max-width: 768px)"
-                      style={{ borderRadius: "1rem" }}
-                    />
-                  </ElectricBorder>
+                  {isMobile ? (
+                    renderImage()
+                  ) : (
+                    <ElectricBorder
+                      color="#2383e2"
+                      speed={1}
+                      chaos={0.5}
+                      thickness={2}
+                      className="rounded-xl p-1"
+                    >
+                      {renderImage()}
+                    </ElectricBorder>
+                  )}
                 </div>
               </div>
             </AnimatedFeature>
           </div>
         </div>
       </motion.div>
+    );
+  };
+
+  if (isMobile) {
+    return renderContent();
+  }
+
+  return (
+    <AuroraBackground className="relative min-h-[70vh] flex items-center justify-center pt-16 overflow-hidden">
+      {renderContent()}
     </AuroraBackground>
   );
 }
