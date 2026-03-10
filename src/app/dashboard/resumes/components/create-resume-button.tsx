@@ -17,6 +17,8 @@ import { upsertResumeByIdApi } from "@/store/resume/utils.prisma";
 import { useAppStore } from "@/store/useApp";
 import { generateUUID } from "@/utils/uuid";
 import type { ResumeData } from "@/types/resume";
+import { DEFAULT_TEMPLATES } from "@/config";
+import { initialResumeState } from "@/config/initialResumeData";
 
 type CreateResumeButtonProps = Omit<
   React.ComponentProps<typeof Button>,
@@ -59,12 +61,14 @@ export const CreateResumeButton: React.FC<CreateResumeButtonProps> = ({
       templateId:
         typeof data?.templateId === "string" && data.templateId
           ? data.templateId
-          : "classic",
+          : (DEFAULT_TEMPLATES[0]?.id ?? null),
       menuSections: Array.isArray(data?.menuSections) ? data.menuSections : [],
-      globalSettings:
-        data?.globalSettings && typeof data.globalSettings === "object"
+      globalSettings: {
+        ...initialResumeState.globalSettings,
+        ...(data?.globalSettings && typeof data.globalSettings === "object"
           ? data.globalSettings
-          : {},
+          : {}),
+      },
       isNeedSync: Boolean(useAppStore.getState().user?.id),
       isPublic: false,
     };
@@ -83,7 +87,8 @@ export const CreateResumeButton: React.FC<CreateResumeButtonProps> = ({
 
     try {
       setIsImporting(true);
-      const text = await file.text();
+      const buffer = await file.arrayBuffer();
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(buffer);
       const parsed = JSON.parse(text);
       const resume = normalizeImportedResume(parsed);
 

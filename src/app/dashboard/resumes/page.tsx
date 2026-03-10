@@ -3,7 +3,6 @@ import React, { startTransition, useState, useMemo, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
-  Plus,
   FileText,
   Search,
   Filter,
@@ -16,7 +15,7 @@ import {
   Eye,
   Download,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePagination } from "ahooks";
 import {
   Card,
@@ -48,13 +47,14 @@ import { TransitionOpacity } from "@/components/transition/opacity";
 import { TransitionTopToBottom } from "@/components/transition/top-to-bottom";
 import { TransitionBottomToTop } from "@/components/transition/bottom-to-top";
 import { TransitionB2TScale } from "@/components/transition/b2t-scale";
-import { TransitionSpringScale } from "@/components/transition/spring-scale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import PaginationLab from "@/components/ui-lab/pagination";
-import type { ResumeData } from "@/types/resume";
 
-import { getResumesByUserIdPrisma } from "@/store/resume/utils.prisma";
+import {
+  getResumesByUserIdPrisma,
+  type ResumeListItemDTO,
+} from "@/store/resume/utils.prisma";
 import {
   localDeleteResumeById,
   localGetResumeList,
@@ -63,13 +63,27 @@ import { useAppStore } from "@/store/useApp";
 import { deleteResumeByIdPrisma } from "@/lib/repositories/resume";
 import { CreateResumeButton } from "./components/create-resume-button";
 
+type ResumeListItem = {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt?: string;
+  templateId: string | null;
+  isPublic: boolean;
+};
+
+type ResumePaginationData = {
+  list: ResumeListItem[];
+  total: number;
+};
+
 // 简历卡片组"
 const ResumeCard: React.FC<{
   id: string;
-  resume: any;
+  resume: ResumeListItem;
   viewMode: "grid" | "list";
   onEdit: (id: string) => void;
-  onDelete: (resume: any) => void;
+  onDelete: (resume: ResumeListItem) => void;
   onView: (id: string) => void;
   onDownload: (id: string) => void;
 }> = ({ id, resume, viewMode, onEdit, onDelete, onView, onDownload }) => {
@@ -236,71 +250,11 @@ const ResumeCard: React.FC<{
   );
 };
 
-// 创建简历卡"
-const CreateResumeCard: React.FC<{
-  onClick: () => void;
-  viewMode: "grid" | "list";
-}> = ({ onClick, viewMode }) => {
-  const t = useTranslations();
-
-  if (viewMode === "list") {
-    return (
-      <Card className="border border-dashed cursor-pointer hover:border-primary/50 transition-all duration-200">
-        <CardContent className="flex items-center justify-center py-8">
-          <div className="text-center">
-            <motion.div
-              className="mb-4 p-4 rounded-full bg-primary/10 mx-auto w-fit"
-              whileHover={{ rotate: 90, scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Plus className="h-8 w-8 text-primary" />
-            </motion.div>
-            <h3 className="text-lg font-semibold mb-2">创建新简</h3>
-            <p className="text-sm text-muted-foreground">
-              选择模板开始创建专业简"
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      onClick={onClick}
-    >
-      <Card
-        className={cn(
-          "relative border border-dashed cursor-pointer h-[280px] transition-all duration-200",
-          "hover:border-primary/50 hover:bg-primary/5",
-        )}
-      >
-        <CardContent className="flex-1 pt-6 text-center flex flex-col items-center justify-center">
-          <motion.div
-            className="mb-4 p-4 rounded-full bg-primary/10"
-            whileHover={{ rotate: 90, scale: 1.1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Plus className="h-8 w-8 text-primary" />
-          </motion.div>
-          <CardTitle className="text-xl mb-2">创建新简</CardTitle>
-          <CardDescription className="text-sm">
-            选择模板开始创建专业简"
-          </CardDescription>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-};
-
 const ResumeWorkbench = () => {
   const t = useTranslations();
   const router = useRouter();
   const { userLoading } = useAppStore();
-  const [resumes, setResumes] = useState<Record<string, ResumeData | any>>({});
+  const [resumes, setResumes] = useState<Record<string, ResumeListItem>>({});
 
   // 状态管"
   const [searchQuery, setSearchQuery] = useState("");
@@ -308,13 +262,22 @@ const ResumeWorkbench = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [filterStatus, setFilterStatus] = useState("all");
 
+  const normalizeResumeListItem = (it: ResumeListItemDTO): ResumeListItem => ({
+    id: it.id,
+    title: it.title,
+    createdAt: new Date(it.created_at).toISOString(),
+    updatedAt: it.updated_at ? new Date(it.updated_at).toISOString() : undefined,
+    templateId: it.template_id,
+    isPublic: Boolean(it.is_public),
+  });
+
   const getResumeListLocal = async ({
     current,
     pageSize,
   }: {
     current: number;
     pageSize: number;
-  }) => {
+  }): Promise<ResumePaginationData> => {
     const user = useAppStore.getState().user;
     let res;
     if (!user) {
@@ -329,29 +292,22 @@ const ResumeWorkbench = () => {
       });
     }
     const safeData = res.data || [];
-    const resumesMap: Record<string, any> = {};
-    safeData.forEach((it: any) => {
-      resumesMap[it.id] = {
-        id: it.id,
-        title: it.title,
-        createdAt: it.created_at,
-        updatedAt: it.updated_at,
-        templateId: it.template_id,
-        isPublic: it.is_public,
-      };
+    const mappedList = safeData.map(normalizeResumeListItem);
+    const resumesMap: Record<string, ResumeListItem> = {};
+    mappedList.forEach((it) => {
+      resumesMap[it.id] = it;
     });
     setResumes((prev) => ({ ...prev, ...resumesMap }));
     return {
-      list: safeData,
+      list: mappedList,
       total: typeof res.count === "number" ? res.count : safeData.length,
-    } as any;
+    };
   };
 
   const {
     run: runGetResumeListLocal,
     loading,
     pagination,
-    mutate,
   } = usePagination(getResumeListLocal, {
     defaultPageSize: 12,
     onError: (e) => {
@@ -362,7 +318,7 @@ const ResumeWorkbench = () => {
   useEffect(() => {
     if (userLoading !== 2) return;
     runGetResumeListLocal({ current: 1, pageSize: 12 });
-  }, [userLoading]);
+  }, [userLoading, runGetResumeListLocal]);
 
   // 过滤和排序简历列"
   const filteredResumes = useMemo(() => {
@@ -371,7 +327,7 @@ const ResumeWorkbench = () => {
     // 搜索过滤
     if (searchQuery) {
       filtered = filtered.filter(
-        ([id, resume]) =>
+        ([, resume]) =>
           resume.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           resume.templateId?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
@@ -379,7 +335,7 @@ const ResumeWorkbench = () => {
 
     // 状态过"
     if (filterStatus !== "all") {
-      filtered = filtered.filter(([id, resume]) => {
+      filtered = filtered.filter(([, resume]) => {
         if (filterStatus === "public") return resume.isPublic;
         if (filterStatus === "private") return !resume.isPublic;
         return true;
@@ -414,7 +370,7 @@ const ResumeWorkbench = () => {
     });
   };
 
-  const handleDelete = async (resume: any) => {
+  const handleDelete = async (resume: ResumeListItem) => {
     if (!confirm("确定要删除这个简历吗")) return;
     try {
       const user = useAppStore.getState().user;
@@ -424,13 +380,13 @@ const ResumeWorkbench = () => {
         await deleteResumeByIdPrisma(resume.id);
       }
       setResumes((prev) => {
-        const next = { ...prev } as Record<string, any>;
+        const next = { ...prev };
         delete next[resume.id];
         return next;
       });
       toast.success("简历已删除");
-    } catch (e: any) {
-      toast.error(e?.message || "删除失败");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "删除失败");
     }
   };
 
@@ -438,7 +394,7 @@ const ResumeWorkbench = () => {
     router.push(`/preview/${id}`);
   };
 
-  const handleDownload = (id: string) => {
+  const handleDownload = (_id: string) => {
     // TODO: 实现下载功能
     toast.info("下载功能开发中...");
   };
@@ -454,7 +410,7 @@ const ResumeWorkbench = () => {
               {t("dashboard.resumes.myResume")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              管理您的简历，创建专业的求职材"
+              管理您的简历，创建专业的求职材
             </p>
           </div>
           <div className="flex items-center space-x-2">

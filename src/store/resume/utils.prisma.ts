@@ -1,5 +1,19 @@
 import { ResumeData } from "@/types/resume";
 
+export type ResumeListItemDTO = {
+  id: string;
+  title: string;
+  created_at: string | Date;
+  updated_at?: string | Date;
+  template_id: string | null;
+  is_public?: boolean;
+};
+
+export type ResumeListResponseDTO = {
+  data: ResumeListItemDTO[];
+  count: number;
+};
+
 export async function getResumesByUserIdPrisma(params: {
   current: number;
   pageSize: number;
@@ -18,7 +32,7 @@ export async function getResumesByUserIdPrisma(params: {
     throw new Error("Failed to fetch resumes");
   }
 
-  return res.json() as Promise<{ data: any[]; count: number }>;
+  return res.json() as Promise<ResumeListResponseDTO>;
 }
 
 export async function upsertResumeByIdApi(resume: ResumeData) {
@@ -41,7 +55,7 @@ export async function upsertResumeByIdApi(resume: ResumeData) {
     throw new Error("Failed to upsert resume");
   }
 
-  return res.json();
+  return res.json() as Promise<ResumeData>;
 }
 
 export async function deleteResumeByIdApi(id: string) {
@@ -67,5 +81,5 @@ export async function getResumeByIdPrismaApi(id: string) {
     throw new Error("Failed to fetch resume");
   }
 
-  return res.json();
+  return res.json() as Promise<ResumeData>;
 }

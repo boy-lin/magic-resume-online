@@ -15,7 +15,9 @@ interface ModernTemplateProps {
 
 const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, template }) => {
   const { colorScheme } = template;
-  const sortedSections = data.menuSections.sort((a, b) => a.order - b.order);
+  const sortedSections = [...data.menuSections].sort(
+    (a, b) => a.order - b.order,
+  );
 
   const renderSection = (section: ResumeSection) => {
     switch (section.id) {

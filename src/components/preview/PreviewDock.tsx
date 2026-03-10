@@ -19,6 +19,7 @@ import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
 import { Slider } from "@/components/ui/slider";
 import { useThrottleFn } from "ahooks";
+import { shallow } from "zustand/shallow";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
@@ -81,14 +82,26 @@ const PreviewDock = ({ viewerRef }) => {
     t,
   ]);
 
-  const { duplicateResume, activeResumeId } = useResumeStore();
-  const { setResumeView, resumeView } = useResumeSettingsStore();
+  const { duplicateResume, activeResumeId } = useResumeStore(
+    (state) => ({
+      duplicateResume: state.duplicateResume,
+      activeResumeId: state.activeResumeId,
+    }),
+    shallow,
+  );
+  const { setResumeView, resumeView } = useResumeSettingsStore(
+    (state) => ({
+      setResumeView: state.setResumeView,
+      resumeView: state.resumeView,
+    }),
+    shallow,
+  );
   const viewScale = resumeView?.zoomX ? [resumeView.zoomX * 100] : [100];
 
-  const handleCopyResume = useCallback(() => {
+  const handleCopyResume = useCallback(async () => {
     if (!activeResumeId) return;
     try {
-      const newId = duplicateResume(activeResumeId);
+      const newId = await duplicateResume(activeResumeId);
       toast.success(t("copyResume.success"));
       router.push(`/workbench/${newId}`);
     } catch (error) {

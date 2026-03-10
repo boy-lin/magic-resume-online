@@ -4,10 +4,17 @@ import { useTranslations } from "next-intl";
 import { FileJson } from "lucide-react";
 
 import { Button } from "@/components/ui-lab/button";
+import { useResumeStore } from "@/store/resume/useResumeStore";
+import type { ResumeData } from "@/types/resume";
 
-export default function JsonBtn({ activeResume }) {
+export default function JsonBtn({
+  activeResume,
+}: {
+  activeResume: ResumeData | null;
+}) {
   const t = useTranslations("share");
   const [isLoading, setIsLoading] = useState(false);
+  const activeSection = useResumeStore((state) => state.activeSection);
   const { title } = activeResume || {};
 
   const handleJsonExport = () => {
@@ -17,7 +24,11 @@ export default function JsonBtn({ activeResume }) {
         throw new Error("No active resume");
       }
 
-      const jsonStr = JSON.stringify(activeResume, null, 2);
+      const exportData = {
+        ...activeResume,
+        activeSection,
+      };
+      const jsonStr = JSON.stringify(exportData, null, 2);
       const blob = new Blob([jsonStr], { type: "application/json" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

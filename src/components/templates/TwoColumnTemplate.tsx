@@ -64,8 +64,12 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           {section.title}
         </h2>
         <div>
-          {list.map((it) => (
-            <FieldComponent item={it} className="text-sm" />
+          {list.map((it, index) => (
+            <FieldComponent
+              key={it.id ?? `introduction-${index}`}
+              item={it}
+              className="text-sm"
+            />
           ))}
         </div>
       </>
@@ -101,8 +105,12 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   <div>{position.value}</div>
                   <FieldComponent item={date} />
                 </div>
-                {Object.values(otherFieldMap).map((exp) => (
-                  <FieldComponent item={exp} className="text-sm" />
+                {Object.values(otherFieldMap).map((exp, index) => (
+                  <FieldComponent
+                    key={exp.id ?? `experience-extra-${index}`}
+                    item={exp}
+                    className="text-sm"
+                  />
                 ))}
               </div>
             );
@@ -144,8 +152,12 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                     {formatDate(new Date(endDate?.value))}
                   </div>
                 </div>
-                {Object.values(otherFieldMap).map((item) => (
-                  <FieldComponent item={item} className="text-sm" />
+                {Object.values(otherFieldMap).map((item, index) => (
+                  <FieldComponent
+                    key={item.id ?? `education-extra-${index}`}
+                    item={item}
+                    className="text-sm"
+                  />
                 ))}
               </div>
             );
@@ -166,8 +178,8 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
           {section.title}
         </h2>
         <div className="space-y-2 text-sm">
-          {list.map((it) => (
-            <FieldComponent item={it} />
+          {list.map((it, index) => (
+            <FieldComponent key={it.id ?? `skill-${index}`} item={it} />
           ))}
         </div>
       </>
@@ -208,8 +220,11 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   <div className="text-sm">{date?.value}</div>
                 </div>
                 <div className="space-y-2 text-sm">
-                  {Object.values(otherFieldMap).map((item) => (
-                    <FieldComponent item={item} />
+                  {Object.values(otherFieldMap).map((item, index) => (
+                    <FieldComponent
+                      key={item.id ?? `project-extra-${index}`}
+                      item={item}
+                    />
                   ))}
                 </div>
               </div>

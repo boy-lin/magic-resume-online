@@ -1,11 +1,7 @@
 import { useGrammarStore } from "@/store/useGrammarStore";
+import type { GrammarError } from "@/store/useGrammarStore";
 
-export interface GrammarError {
-  text: string;
-  message: string;
-  type: "spelling" | "grammar";
-  suggestions: string[];
-}
+export type { GrammarError };
 
 export const useGrammarCheck = () => {
   const {

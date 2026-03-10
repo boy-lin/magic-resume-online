@@ -1,4 +1,5 @@
 import { ResumeData } from "@/types/resume";
+import type { ResumeListResponseDTO } from "./utils.prisma";
 
 const DB_NAME = "magic-resume-local-db";
 const DB_VERSION = 1;
@@ -123,7 +124,7 @@ export async function localGetAllResumes() {
 export async function localGetResumeList(params: {
   current: number;
   pageSize: number;
-}) {
+}): Promise<ResumeListResponseDTO> {
   const { current, pageSize } = params;
   const all = await localGetAllResumes();
   const start = (current - 1) * pageSize;

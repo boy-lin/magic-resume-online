@@ -2,6 +2,7 @@
 import { Reorder } from "framer-motion";
 import LayoutItem from "./LayoutItem";
 import { useResumeStore } from "@/store/resume/useResumeStore";
+import { shallow } from "zustand/shallow";
 
 const LayoutSetting = () => {
   const {
@@ -9,14 +10,21 @@ const LayoutSetting = () => {
     toggleSectionVisibility,
     updateMenuSections,
     reorderSections,
-    activeResume,
-  } = useResumeStore();
-
-  const { menuSections, activeSection: rawActiveSection } = activeResume;
-
-  // 确保 activeSection 是字符串
-  const activeSection =
-    typeof rawActiveSection === "string" ? rawActiveSection : "";
+    menuSections,
+    activeSection,
+  } = useResumeStore(
+    (state) => ({
+      setActiveSection: state.setActiveSection,
+      toggleSectionVisibility: state.toggleSectionVisibility,
+      updateMenuSections: state.updateMenuSections,
+      reorderSections: state.reorderSections,
+      menuSections: state.activeResume?.menuSections || [],
+      activeSection: state.activeSection,
+    }),
+    shallow,
+  );
+  const activeResume = useResumeStore((state) => state.activeResume);
+  if (!activeResume) return null;
 
   const [basicSection, ...draggableSections] = menuSections;
 

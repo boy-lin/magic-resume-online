@@ -24,6 +24,24 @@ function isRemoteUser() {
   return Boolean(useAppStore.getState().user?.id);
 }
 
+function cloneDeep<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function getCurrentLocale(): string {
+  if (typeof document === "undefined") return "zh";
+  return (
+    document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("NEXT_LOCALE="))
+      ?.split("=")[1] || "zh"
+  );
+}
+
+function normalizeActiveSection(sectionId?: string): string {
+  return typeof sectionId === "string" && sectionId ? sectionId : "basic";
+}
+
 /**
  * 简历编辑器状态管理
  * 负责简历内容的编辑和更新
@@ -40,12 +58,12 @@ interface ResumeStore {
     data: Partial<ResumeData>,
     isNeedSync?: boolean,
   ) => void;
-  updateResumeAsync: (resume: ResumeData) => Promise<any>;
+  updateResumeAsync: (resume: ResumeData | null) => Promise<ResumeData | null>;
   updateResumeTitle: (title: string) => Promise<void>;
   deleteResume: (resume: ResumeData) => Promise<void>;
-  duplicateResume: (resumeId: string) => string;
-  getResumeFullById: (id: string) => Promise<any>;
-  getResumeFullByIdMock: () => Promise<any>;
+  duplicateResume: (resumeId: string) => Promise<string>;
+  getResumeFullById: (id: string) => Promise<ResumeData>;
+  getResumeFullByIdMock: () => Promise<ResumeData>;
   updateSectionById: (sectionId: string, data: Partial<ResumeSection>) => void;
   deleteSectionById: (sectionId: string) => void;
   addCustomSection: (section: ResumeSection) => void;
@@ -70,14 +88,7 @@ export const useResumeStore = create<ResumeStore>()(
       activeResume: null,
 
       createResume: async (templateId) => {
-        const user = useAppStore.getState().user;
-        const locale =
-          typeof document !== "undefined"
-            ? document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("NEXT_LOCALE="))
-                ?.split("=")[1] || "zh"
-            : "zh";
+        const locale = getCurrentLocale();
 
         const initialResumeData =
           locale === "en" ? initialResumeStateEn : initialResumeState;
@@ -87,15 +98,17 @@ export const useResumeStore = create<ResumeStore>()(
         const template = templateId
           ? DEFAULT_TEMPLATES.find((t) => t.id === templateId)
           : DEFAULT_TEMPLATES[0];
+        if (!template) {
+          throw new Error("Template not found");
+        }
 
-        const now = new Date().toISOString();
         const newResume: ResumeData = {
           id,
           ...initialResumeData,
           activeSection: "basic",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          templateId: template?.id,
+          templateId: template.id,
           isNeedSync: isRemoteUser(),
           title: `${locale === "en" ? "New Resume" : "新建简历"} ${id.slice(
             0,
@@ -108,7 +121,7 @@ export const useResumeStore = create<ResumeStore>()(
             paragraphSpacing: template.spacing.itemGap,
             pagePadding: template.spacing.contentPadding,
           },
-          menuSections: template.menuSections,
+          menuSections: cloneDeep(template.menuSections),
         };
 
         if (isRemoteUser()) {
@@ -118,6 +131,7 @@ export const useResumeStore = create<ResumeStore>()(
         }
 
         set((state) => ({
+          activeSection: normalizeActiveSection(newResume.activeSection),
           activeResumeId: id,
           activeResume: newResume,
         }));
@@ -126,17 +140,25 @@ export const useResumeStore = create<ResumeStore>()(
 
       updateResume: (resumeId, data, isNeedSync = true) => {
         const resume = get().activeResume;
+        if (!resume) return;
         const updatedAt = new Date().toISOString();
 
         const updatedResume: ResumeData = {
           ...resume,
           ...data,
+          activeSection: normalizeActiveSection(
+            data.activeSection ?? resume.activeSection,
+          ),
           updatedAt,
           isNeedSync,
           menuSections: data.menuSections ?? resume.menuSections,
         };
 
         set((state) => ({
+          activeSection:
+            state.activeResumeId === resumeId
+              ? normalizeActiveSection(updatedResume.activeSection)
+              : state.activeSection,
           activeResume:
             state.activeResumeId === resumeId
               ? updatedResume
@@ -146,7 +168,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       updateResumeAsync: async (resume) => {
         const { activeResumeId } = get();
-        if (!activeResumeId) return;
+        if (!activeResumeId || !resume) return null;
 
         const nextResume = {
           ...resume,
@@ -154,17 +176,15 @@ export const useResumeStore = create<ResumeStore>()(
           updatedAt: new Date().toISOString(),
         };
 
-        let res = null;
-
         if (isRemoteUser()) {
-          res = await upsertResumeByIdApi(nextResume);
+          await upsertResumeByIdApi(nextResume);
         } else {
-          res = await localUpsertResume(nextResume);
+          await localUpsertResume(nextResume);
         }
 
         get().updateResume(activeResumeId, nextResume, false);
 
-        return res;
+        return nextResume;
       },
 
       updateResumeTitle: async (title) => {
@@ -187,22 +207,20 @@ export const useResumeStore = create<ResumeStore>()(
         }
 
         set({
+          activeSection: "basic",
           activeResumeId: null,
           activeResume: null,
         });
       },
 
-      duplicateResume: (resumeId) => {
+      duplicateResume: async (resumeId) => {
         const newId = generateUUID();
         const originalResume = get().activeResume;
+        if (!originalResume || originalResume.id !== resumeId) {
+          throw new Error("Resume to duplicate not found");
+        }
 
-        const locale =
-          typeof document !== "undefined"
-            ? document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("NEXT_LOCALE="))
-                ?.split("=")[1] || "zh"
-            : "zh";
+        const locale = getCurrentLocale();
 
         const duplicatedResumeBase = {
           ...originalResume,
@@ -217,10 +235,18 @@ export const useResumeStore = create<ResumeStore>()(
 
         const duplicatedResume: ResumeData = {
           ...duplicatedResumeBase,
-          menuSections: [...(duplicatedResumeBase.menuSections || [])],
+          globalSettings: { ...(duplicatedResumeBase.globalSettings || {}) },
+          menuSections: cloneDeep(duplicatedResumeBase.menuSections || []),
         };
 
+        if (isRemoteUser()) {
+          await upsertResumeByIdApi(duplicatedResume);
+        } else {
+          await localUpsertResume(duplicatedResume);
+        }
+
         set({
+          activeSection: normalizeActiveSection(duplicatedResume.activeSection),
           activeResumeId: newId,
           activeResume: duplicatedResume,
         });
@@ -251,16 +277,19 @@ export const useResumeStore = create<ResumeStore>()(
           resumeData = await getResumeByIdPrismaApi(id);
         } else {
           resumeData = await localGetResumeById(id);
-          resumeData.isPublic = true;
         }
         if (!resumeData) {
           throw new Error("Resume not found");
+        }
+        if (!isRemoteUser()) {
+          resumeData.isPublic = true;
         }
         const newResume: ResumeData = {
           activeSection: "basic",
           ...resumeData,
         };
         set({
+          activeSection: normalizeActiveSection(newResume.activeSection),
           activeResumeId: id,
           activeResume: newResume,
         });
@@ -274,7 +303,6 @@ export const useResumeStore = create<ResumeStore>()(
         if (!activeResume) return;
 
         updateResume(activeResumeId, {
-          ...activeResume,
           menuSections: activeResume?.menuSections.map((s) =>
             s.id === sectionId ? { ...s, ...data } : s,
           ),
@@ -332,7 +360,7 @@ export const useResumeStore = create<ResumeStore>()(
           (section) => section.id === "basic",
         );
         const reorderedSections = [
-          basicInfoSection,
+          ...(basicInfoSection ? [basicInfoSection] : []),
           ...newOrder.filter((section) => section.id !== "basic"),
         ].map((section, index) => ({
           ...section,
@@ -362,12 +390,15 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       setActiveSection: (sectionId) => {
-        const { activeResumeId, updateResume } = get();
-        if (activeResumeId) {
-          updateResume(activeResumeId, {
-            activeSection: sectionId,
-          });
-        }
+        set((state) => ({
+          activeSection: normalizeActiveSection(sectionId),
+          activeResume: state.activeResume
+            ? {
+                ...state.activeResume,
+                activeSection: normalizeActiveSection(sectionId),
+              }
+            : state.activeResume,
+        }));
       },
 
       updateMenuSections: (sections) => {
@@ -382,6 +413,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       addMenuSection: () => {
         const { activeResumeId, updateResume, activeResume } = get();
+        if (!activeResume) return;
         const newSection = {
           id: generateUUID(),
           title: "未命名",

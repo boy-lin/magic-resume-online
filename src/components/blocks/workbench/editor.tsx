@@ -1,5 +1,4 @@
-import { useState, useEffect, memo, useRef } from "react";
-import { Eye, Edit2, PanelLeft, Minimize2 } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import InfiniteViewer from "react-infinite-viewer";
 import { EditorHeader } from "@/components/blocks/workbench/editor/header";
@@ -12,25 +11,12 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import PreviewDock from "@/components/preview/PreviewDock";
 import { useResumeStore } from "@/store/resume/useResumeStore";
 import { useResumeSettingsStore } from "@/store/resume/useResumeSettingsStore";
+import { shallow } from "zustand/shallow";
 
 import { viewZoomRange } from "@/constants/view";
-
-const LAYOUT_CONFIG = {
-  DEFAULT: [20, 32, 48],
-  SIDE_COLLAPSED: [50, 50],
-  EDIT_FOCUSED: [20, 80],
-  PREVIEW_FOCUSED: [20, 80],
-};
 
 const DragHandle = ({ show = true }) => {
   if (!show) return null;
@@ -58,171 +44,42 @@ const DragHandle = ({ show = true }) => {
   );
 };
 
-const LayoutControls = memo(
-  ({
-    sidePanelCollapsed,
-    editPanelCollapsed,
-    previewPanelCollapsed,
-    toggleSidePanel,
-    toggleEditPanel,
-    togglePreviewPanel,
-  }: {
-    sidePanelCollapsed: boolean;
-    editPanelCollapsed: boolean;
-    previewPanelCollapsed: boolean;
-    toggleSidePanel: () => void;
-    toggleEditPanel: () => void;
-    togglePreviewPanel: () => void;
-  }) => (
-    <div
-      className={cn(
-        "absolute bottom-6 left-1/2 -translate-x-1/2",
-        "flex items-center gap-2 z-10 p-2 rounded-full",
-        "dark:bg-neutral-900/80 dark:border dark:border-neutral-800 bg-white/80 border border-gray-200",
-        "backdrop-blur-sm shadow-lg",
-      )}
-    >
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={sidePanelCollapsed ? "secondary" : "ghost"}
-              size="icon"
-              className="h-9 w-9 rounded-full"
-              onClick={toggleSidePanel}
-            >
-              <PanelLeft className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-xs">
-              {sidePanelCollapsed ? "展开侧边栏" : "收起侧边栏"}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <div className={cn("h-5 w-px mx-1", "dark:bg-neutral-800 bg-gray-200")} />
-
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={editPanelCollapsed ? "secondary" : "ghost"}
-              size="icon"
-              className="h-9 w-9 rounded-full"
-              onClick={toggleEditPanel}
-            >
-              {editPanelCollapsed ? (
-                <Edit2 className="h-4 w-4" />
-              ) : (
-                <Minimize2 className="h-4 w-4" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-xs">
-              {editPanelCollapsed ? "展开编辑面板" : "收起编辑面板"}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={previewPanelCollapsed ? "secondary" : "ghost"}
-              size="icon"
-              className="h-9 w-9 rounded-full"
-              onClick={togglePreviewPanel}
-            >
-              {previewPanelCollapsed ? (
-                <Eye className="h-4 w-4" />
-              ) : (
-                <Minimize2 className="h-4 w-4" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-xs">
-              {previewPanelCollapsed ? "展开预览面板" : "收起预览面板"}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  ),
-);
-
-LayoutControls.displayName = "LayoutControls";
-
 export default function Editor() {
   const [editPanelCollapsed, setEditPanelCollapsed] = useState(false);
-  const [previewPanelCollapsed, setPreviewPanelCollapsed] = useState(false);
-  const [panelSizes, setPanelSizes] = useState<number[]>(LAYOUT_CONFIG.DEFAULT);
   const viewerRef = useRef<any>(null);
+  const lastZoomXRef = useRef<number>(1);
   const [editPanelShow, setEditPanelShow] = useState(true);
-  const { setActiveSection } = useResumeStore();
-  const { setResumeView } = useResumeSettingsStore();
-  const { activeResume } = useResumeStore();
-  const activeSection =
-    typeof activeResume?.activeSection === "string"
-      ? activeResume.activeSection
-      : "";
+  const { setActiveSection, activeSection } = useResumeStore(
+    (state) => ({
+      setActiveSection: state.setActiveSection,
+      activeSection: state.activeSection,
+    }),
+    shallow,
+  );
+  const setResumeView = useResumeSettingsStore((state) => state.setResumeView);
 
-  const toggleEditPanel = (section: any) => {
+  const toggleEditPanel = useCallback((section: { id: string }) => {
     setActiveSection(section.id);
-    let isEditPanelCollapsed = editPanelCollapsed;
+
+    // 同一分组二次点击切换折叠状态，不同分组始终展开编辑面板
     if (activeSection === section.id) {
-      setEditPanelCollapsed(!editPanelCollapsed);
-      isEditPanelCollapsed = !isEditPanelCollapsed;
+      setEditPanelCollapsed((prev) => {
+        const next = !prev;
+        setEditPanelShow(!next);
+        return next;
+      });
+      return;
     }
 
-    if (isEditPanelCollapsed) {
-      setEditPanelShow(false);
-    } else {
-      setEditPanelShow(true);
-    }
-  };
-
-  const updateLayout = (sizes: number[]) => {
-    setPanelSizes(sizes);
-  };
-
-  useEffect(() => {
-    let newSizes = [];
-    // 编辑区尺寸
-    if (editPanelCollapsed) {
-      newSizes.push(0);
-    } else {
-      newSizes.push(100);
-    }
-    // 预览区尺寸
-    if (editPanelCollapsed) {
-      newSizes.push(100);
-    } else {
-      newSizes.push(0);
-    }
-    // 确保总和为 100
-    const total = newSizes.reduce((a, b) => a + b, 0);
-    if (total < 100) {
-      const lastNonZeroIndex = newSizes
-        .map((size, index) => ({ size, index }))
-        .filter(({ size }) => size > 0)
-        .pop()?.index;
-      if (lastNonZeroIndex !== undefined) {
-        newSizes[lastNonZeroIndex] += 100 - total;
-      }
-    }
-    updateLayout([...newSizes]);
-  }, [editPanelCollapsed, previewPanelCollapsed]);
+    setEditPanelCollapsed(false);
+    setEditPanelShow(true);
+  }, [activeSection, setActiveSection]);
 
   useEffect(() => {
     if (viewerRef.current) {
       viewerRef.current.scrollCenter();
     }
-  }, [viewerRef.current]);
+  }, []);
 
   return (
     <main
@@ -234,7 +91,7 @@ export default function Editor() {
     >
       <EditorHeader />
       {/* 桌面端布局 */}
-      <div className="flex h-[calc(100vh-64px)] w-full">
+      <div className="hidden md:flex h-[calc(100vh-64px)] w-full">
         {/* 侧边栏面板 */}
         <div className="h-full flex-grow-0">
           <SidePanel
@@ -244,15 +101,15 @@ export default function Editor() {
               setEditPanelShow(true);
               setActiveSection(section.id);
             }}
-            onItemPointerLeave={(section) => {
+            onItemPointerLeave={() => {
               if (!editPanelCollapsed) return;
-              // setEditPanelShow(false);
-              // setActiveSection(section.id);
+              setEditPanelShow(false);
             }}
           />
         </div>
 
         <ResizablePanelGroup
+          key={editPanelCollapsed ? "collapsed" : "expanded"}
           direction="horizontal"
           className={cn(
             "h-full",
@@ -265,7 +122,7 @@ export default function Editor() {
           <ResizablePanel
             id="edit-panel"
             order={1}
-            defaultSize={panelSizes?.[0]}
+            defaultSize={editPanelCollapsed ? 0 : 40}
             className={cn(
               "w-[500px] max-w-[600px] min-w-[400px] h-full",
               {
@@ -286,7 +143,7 @@ export default function Editor() {
           {/* 预览面板 */}
           <ResizablePanel
             order={2}
-            defaultSize={panelSizes?.[1]}
+            defaultSize={editPanelCollapsed ? 100 : 60}
             minSize={48}
             className="bg-gray-100 relative border-0"
           >
@@ -304,6 +161,8 @@ export default function Editor() {
               zoomOnPinch
               zoomOnScroll
               onScroll={(e) => {
+                if (Math.abs(lastZoomXRef.current - e.zoomX) < 0.001) return;
+                lastZoomXRef.current = e.zoomX;
                 setResumeView({
                   zoomX: e.zoomX,
                 });
@@ -317,7 +176,7 @@ export default function Editor() {
       </div>
 
       {/* 移动端布局 */}
-      <div className="md:hidden h-[calc(100vh-64px)] w-full md:min-w-[1600px]">
+      <div className="block md:hidden h-[calc(100vh-64px)] w-full">
         <div className="h-full overflow-y-auto bg-gray-100">
           <PreviewPanel />
         </div>

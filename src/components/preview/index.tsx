@@ -6,13 +6,14 @@ import { DEFAULT_TEMPLATES } from "@/config";
 import { cn } from "@/lib/utils";
 import useResumeStore from "@/store/resume/useResumeStore";
 import ResumeTemplateComponent from "../templates";
+import { shallow } from "zustand/shallow";
 
 import PageBreakLines from "@/components/preview/PageBreakLines";
 
 interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
-  const { activeResume } = useResumeStore();
+  const activeResume = useResumeStore((state) => state.activeResume, shallow);
   const template = useMemo(() => {
     return (
       DEFAULT_TEMPLATES.find((t) => t.id === activeResume?.templateId) ||

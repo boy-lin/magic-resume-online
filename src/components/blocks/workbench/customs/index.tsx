@@ -29,9 +29,11 @@ export default function Customs() {
 
   const handleDeleteSection = () => {
     const index = menuSections.findIndex((it) => it.id === activeTab);
-    menuSections.splice(index, 1);
-    updateMenuSections(menuSections);
-    setActiveTab(menuSections[index - 1].id);
+    if (index < 0) return;
+    const nextSections = menuSections.filter((_, i) => i !== index);
+    updateMenuSections(nextSections);
+    const fallback = nextSections[Math.max(0, index - 1)];
+    setActiveTab(fallback?.id || "");
   };
 
   useEffect(() => {

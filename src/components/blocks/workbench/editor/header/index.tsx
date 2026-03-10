@@ -16,14 +16,20 @@ import { Button } from "@/components/ui-lab/button";
 import ShareBtn from "../ShareBtn";
 import Name from "./name";
 import { useEffect, useRef } from "react";
+import { shallow } from "zustand/shallow";
 
 interface EditorHeaderProps {
   isMobile?: boolean;
 }
 
 export function EditorHeader({ isMobile }: EditorHeaderProps) {
-  const { activeResume } = useResumeStore();
-  const { updateResumeAsync } = useResumeStore();
+  const { activeResume, updateResumeAsync } = useResumeStore(
+    (state) => ({
+      activeResume: state.activeResume,
+      updateResumeAsync: state.updateResumeAsync,
+    }),
+    shallow,
+  );
   const router = useRouter();
   const t = useTranslations("common");
   const timer = useRef<NodeJS.Timeout | null>(null);
@@ -42,32 +48,30 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
   );
 
   useEffect(() => {
-    const handler = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-      return "确定离开此页面吗？您的更改可能不会保存。";
-    };
-
-    if (isNeedSync) {
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-      timer.current = setTimeout(() => {
-        asyncResume();
-      }, 1000 * 30);
-      // 监听页面卸载事件
-      window.addEventListener("beforeunload", handler);
-    } else {
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-      window.removeEventListener("beforeunload", handler);
+    if (!isNeedSync) return;
+    if (timer.current) {
+      clearTimeout(timer.current);
     }
+    timer.current = setTimeout(() => {
+      asyncResume();
+    }, 1000 * 5);
 
     return () => {
       if (timer.current) {
         clearTimeout(timer.current);
       }
+    };
+  }, [isNeedSync, activeResume?.updatedAt]);
+
+  useEffect(() => {
+    if (!isNeedSync) return;
+    const handler = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+      return "确定离开此页面吗？您的更改可能不会保存。";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => {
       window.removeEventListener("beforeunload", handler);
     };
   }, [isNeedSync]);
@@ -108,13 +112,22 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium">语法检查结果</h4>
                   <div className="space-y-1">
-                    {errors.map((error: any, index: number) => (
+                    {errors.map((error, index: number) => {
+                      const message =
+                        error.message || error.error || error.text || "未知错误";
+                      const suggestions =
+                        error.suggestions && error.suggestions.length > 0
+                          ? error.suggestions
+                          : error.suggestion
+                            ? [error.suggestion]
+                            : [];
+                      return (
                       <div key={index} className="text-sm space-y-1">
                         <div className="flex items-start gap-2">
                           <AlertCircle className="w-4 h-4 mt-0.5 text-red-500 shrink-0" />
                           <div className="flex-1">
                             <div className="flex items-start justify-between gap-2">
-                              <p>{error.message}</p>
+                              <p>{message}</p>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -124,12 +137,12 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
                                 定位
                               </Button>
                             </div>
-                            {error.suggestions.length > 0 && (
+                            {suggestions.length > 0 && (
                               <div className="mt-1">
                                 <p className="text-xs text-muted-foreground font-medium">
                                   建议修改：
                                 </p>
-                                {error.suggestions.map((suggestion, i) => (
+                                {suggestions.map((suggestion, i) => (
                                   <p
                                     key={i}
                                     className="text-xs mt-1 px-2 py-1 bg-muted rounded"
@@ -142,7 +155,8 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </HoverCardContent>

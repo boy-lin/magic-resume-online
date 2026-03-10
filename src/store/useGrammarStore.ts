@@ -11,6 +11,8 @@ export interface GrammarError {
   context: string;
   type?: string;
   text?: string;
+  message?: string;
+  suggestions?: string[];
 }
 
 interface GrammarStore {

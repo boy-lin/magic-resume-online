@@ -20,6 +20,7 @@ import { TransitionLeftToRight } from "@/components/transition/left-to-right";
 import { sideSettings } from "@/constants/side";
 import LetterText from "@/components/icon/letterText";
 import BicepsFlexed from "@/components/icon/bicepsFlexed";
+import { shallow } from "zustand/shallow";
 
 export const iconMap = {
   basic: User,
@@ -40,20 +41,19 @@ export function SidePanel({
   onItemPointerEnter,
   onItemPointerLeave,
 }: {
-  toggleEditPanel: (section: any) => void;
-  onItemPointerEnter: (section: any) => void;
-  onItemPointerLeave: (section: any) => void;
+  toggleEditPanel: (section: { id: string }) => void;
+  onItemPointerEnter: (section: { id: string }) => void;
+  onItemPointerLeave: () => void;
 }) {
-  const { activeResume } = useResumeStore();
-  const templateId = activeResume?.templateId;
-
-  const activeSection = activeResume?.activeSection || "";
+  const { templateId, activeSection } = useResumeStore(
+    (state) => ({
+      templateId: state.activeResume?.templateId,
+      activeSection: state.activeSection,
+    }),
+    shallow,
+  );
 
   const t = useTranslations("workbench.sidePanel");
-
-  const onPointerLeave = (section) => {
-    onItemPointerLeave(section);
-  };
 
   const renderIcon = (section) => {
     const Component = iconMap[section.id];
@@ -78,7 +78,7 @@ export function SidePanel({
           className={cn("flex flex-col gap-2 p-2 items-center w-[5em]")}
           onClick={() => toggleEditPanel(customSection)}
           onPointerEnter={() => onItemPointerEnter(customSection)}
-          onPointerLeave={onPointerLeave}
+          onPointerLeave={onItemPointerLeave}
         >
           <span
             className={cn(
@@ -106,7 +106,7 @@ export function SidePanel({
               className={cn("flex flex-col gap-2 p-2 items-center w-[5em]")}
               onClick={() => toggleEditPanel({ id: item.id })}
               onPointerEnter={() => onItemPointerEnter({ id: item.id })}
-              onPointerLeave={onPointerLeave}
+              onPointerLeave={onItemPointerLeave}
             >
               <span
                 className={cn(
