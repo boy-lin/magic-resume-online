@@ -1,16 +1,8 @@
 "use client";
-import {
-  useEffect,
-  useState,
-  useMemo,
-  startTransition,
-  useLayoutEffect,
-  useRef,
-} from "react";
+import { useState, useEffect, useRef } from "react";
 import { getUser } from "@/lib/service/queries";
 import { initialState, appContext } from "@/hooks/app";
 import { useAppStore } from "@/store/useApp";
-import { useResumeListStore } from "@/store/resume/useResumeListStore";
 type Props = {
   children: React.ReactNode;
 };
@@ -25,23 +17,20 @@ export function InitDataProvider({ children }: Props) {
   const { setUser, setUserLoading } = useAppStore();
   const userRef = useRef(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (userRef.current !== null) return;
     userRef.current = true;
+    setUserLoading(1);
 
     async function getUserAsync() {
-      setUserLoading(1);
-      const user = await getUser();
-      console.log("user", user);
-      setUserLoading(2);
-      setUser(user);
-      if (user?.id) {
-        await useResumeListStore
-          .getState()
-          .syncLocalResumesToRemote()
-          .catch((error) => {
-            console.error("sync local resumes failed:", error);
-          });
+      try {
+        const user = await getUser();
+        console.log("user", user);
+        if (!user) throw new Error("User not found");
+        setUser(user);
+        setUserLoading(2);
+      } catch (error) {
+        setUserLoading(3);
       }
     }
 

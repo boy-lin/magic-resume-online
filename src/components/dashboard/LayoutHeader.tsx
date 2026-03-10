@@ -45,7 +45,7 @@ const LayoutHeader: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme, systemTheme } = useTheme();
-  const user = useAppStore((state) => state.user) || {};
+  const user = useAppStore((state) => state.user);
 
   const fullName = user?.user_metadata?.full_name || "";
   const fName = fullName.substr(0, 2).toUpperCase();
@@ -146,20 +146,20 @@ const LayoutHeader: React.FC = () => {
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{fullName}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
+                    {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleProfile}>
+
+              <DropdownMenuItem disabled={!user} onClick={handleProfile}>
                 <User className="mr-2 h-4 w-4" />
                 <span>{t("header.profile")}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSettings}>
+              <DropdownMenuItem disabled={!user} onClick={handleSettings}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>{t("header.settings")}</span>
               </DropdownMenuItem>
-
               {/* 主题切换区域 */}
               <DropdownMenuSeparator />
               <div className="px-2 py-1.5">
@@ -178,7 +178,7 @@ const LayoutHeader: React.FC = () => {
                         "p-1.5 rounded-md transition-all duration-200 relative group",
                         currentTheme === "light"
                           ? "bg-background text-foreground shadow-sm"
-                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground"
+                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground",
                       )}
                       title="浅色主题"
                     >
@@ -199,7 +199,7 @@ const LayoutHeader: React.FC = () => {
                         "p-1.5 rounded-md transition-all duration-200 relative group",
                         currentTheme === "dark"
                           ? "bg-background text-foreground shadow-sm"
-                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground"
+                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground",
                       )}
                       title="深色主题"
                     >
@@ -220,7 +220,7 @@ const LayoutHeader: React.FC = () => {
                         "p-1.5 rounded-md transition-all duration-200 relative group",
                         theme === "system"
                           ? "bg-background text-foreground shadow-sm"
-                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground"
+                          : "hover:bg-background/50 text-muted-foreground hover:text-foreground",
                       )}
                       title="跟随系统"
                     >
@@ -236,9 +236,8 @@ const LayoutHeader: React.FC = () => {
                   </div>
                 </div>
               </div>
-
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
+              <DropdownMenuItem disabled={!user} onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>{t("header.logout")}</span>
               </DropdownMenuItem>
@@ -251,4 +250,3 @@ const LayoutHeader: React.FC = () => {
 };
 
 export default LayoutHeader; // Cursor
-

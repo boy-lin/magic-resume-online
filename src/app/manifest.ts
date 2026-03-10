@@ -24,7 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
         name: "创建简历",
         short_name: "创建",
         description: "快速创建新简历",
-        url: "/app/dashboard?action=new",
+        url: "/dashboard?action=new",
         icons: [{ src: "/icon.png", sizes: "96x96" }],
       },
     ],

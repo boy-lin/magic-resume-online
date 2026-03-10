@@ -24,29 +24,29 @@ export interface SidebarMenuItem {
 export const SIDEBAR_MENU_ITEMS: Omit<SidebarMenuItem, "title">[] = [
   // {
   //   id: "home",
-  //   url: "/app/dashboard",
+  //   url: "/dashboard",
   //   icon: Home,
   // },
   {
     id: "resumes",
-    url: "/app/dashboard/resumes",
+    url: "/dashboard/resumes",
     icon: FileText,
     badge: "", // 动态获取简历数量
   },
   {
     id: "templates",
-    url: "/app/dashboard/templates",
+    url: "/dashboard/templates",
     icon: SwatchBook,
     badge: "",
   },
   {
     id: "ai",
-    url: "/app/dashboard/ai",
+    url: "/dashboard/ai",
     icon: Bot,
   },
   // {
   //   id: "settings",
-  //   url: "/app/dashboard/settings",
+  //   url: "/dashboard/settings",
   //   icon: Settings,
   // },
   // {

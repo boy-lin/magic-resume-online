@@ -38,7 +38,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
           description: error.message,
         });
       },
-    }
+    },
   );
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export function EditorHeader({ isMobile }: EditorHeaderProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => {
-              router.push("/app/dashboard");
+              router.push("/dashboard");
             }}
           >
             <span className="text-lg font-semibold">{t("title")}</span>

@@ -20,7 +20,7 @@ const loadHtml2Pdf = (): Promise<void> => {
 
     // 检查脚本是否正在加载
     const existingScript = document.querySelector(
-      'script[src="/javascript/html2pdf.bundle.min.js"]'
+      'script[src="/javascript/html2pdf.bundle.min.js"]',
     );
     if (existingScript) {
       // 等待脚本加载完成
@@ -102,8 +102,8 @@ export const usePdfExport = (props) => {
         ...Array.from(clonedElement.querySelectorAll("li")),
         ...Array.from(
           clonedElement.querySelectorAll(
-            ".experience-item, .project-item, .education-item, .skill-item"
-          )
+            ".experience-item, .project-item, .education-item, .skill-item",
+          ),
         ),
         ...Array.from(clonedElement.querySelectorAll("[data-section]")),
       ];
@@ -116,6 +116,25 @@ export const usePdfExport = (props) => {
       // 检查是否启用调试模式（通过URL参数或localStorage）
       const urlParams = new URLSearchParams(window.location.search);
       const debugMode = urlParams.get("pdfDebug") === "true";
+
+      // 为了确保 html2pdf 能正确处理，将克隆元素临时添加到 DOM（但隐藏）
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "fixed";
+      if (!debugMode) tempContainer.style.left = "-9999px";
+      tempContainer.style.top = "0";
+      tempContainer.style.width = "210mm"; // A4 宽度
+      tempContainer.style.overflow = "visible";
+      tempContainer.style.zIndex = "-1";
+
+      // 确保克隆元素有正确的宽度和样式，防止内容被截断
+      clonedElement.style.width = "210mm";
+      clonedElement.style.minWidth = "210mm";
+      clonedElement.style.maxWidth = "210mm";
+      clonedElement.style.overflow = "visible";
+      clonedElement.style.position = "relative";
+      clonedElement.style.padding = `${globalSettings?.pagePadding}px`;
+      clonedElement.style.boxSizing = "border-box";
+      tempContainer.appendChild(clonedElement);
 
       // 调试模式：打开HTML预览页面
       if (debugMode) {
@@ -140,7 +159,7 @@ export const usePdfExport = (props) => {
               </style>
             </head>
             <body>
-              ${clonedElement.outerHTML}
+              ${tempContainer.outerHTML}
             </body>
           </html>
         `;
@@ -150,30 +169,13 @@ export const usePdfExport = (props) => {
           previewWindow.document.close();
         }
         console.log(
-          `Total export took ${performance.now() - exportStartTime}ms`
+          `Total export took ${performance.now() - exportStartTime}ms`,
         );
         toast.success("调试模式：HTML预览已在新窗口打开");
         setIsExporting(false);
         return;
       }
 
-      // 为了确保 html2pdf 能正确处理，将克隆元素临时添加到 DOM（但隐藏）
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "fixed";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.top = "0";
-      tempContainer.style.width = "210mm"; // A4 宽度
-      tempContainer.style.overflow = "visible";
-      tempContainer.style.zIndex = "-1";
-
-      // 确保克隆元素有正确的宽度和样式，防止内容被截断
-      clonedElement.style.width = "210mm";
-      clonedElement.style.minWidth = "210mm";
-      clonedElement.style.maxWidth = "210mm";
-      clonedElement.style.overflow = "visible";
-      clonedElement.style.position = "relative";
-      clonedElement.style.padding = `${globalSettings?.pagePadding}px`;
-      tempContainer.appendChild(clonedElement);
       document.body.appendChild(tempContainer);
 
       try {

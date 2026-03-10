@@ -1,6 +1,9 @@
 import { ResumeData } from "@/types/resume";
 
-export async function getResumesByUserIdPrisma(params: { current: number; pageSize: number }) {
+export async function getResumesByUserIdPrisma(params: {
+  current: number;
+  pageSize: number;
+}) {
   const searchParams = new URLSearchParams({
     current: String(params.current),
     pageSize: String(params.pageSize),
@@ -29,7 +32,6 @@ export async function upsertResumeByIdApi(resume: ResumeData) {
       id: resume.id,
       title: resume.title,
       templateId: resume.templateId,
-      customData: resume.customData,
       globalSettings: resume.globalSettings,
       menuSections: resume.menuSections,
     }),
@@ -67,4 +69,3 @@ export async function getResumeByIdPrismaApi(id: string) {
 
   return res.json();
 }
-

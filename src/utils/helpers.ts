@@ -9,11 +9,11 @@ export const getURL = (path: string = "") => {
     process.env.NEXT_PUBLIC_SITE_URL.trim() !== ""
       ? process.env.NEXT_PUBLIC_SITE_URL
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-      process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-        process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
-      ? process.env.NEXT_PUBLIC_VERCEL_URL
-      : // If neither is set, default to localhost for local development.
-        "http://localhost:3000/";
+        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ""
+        ? process.env.NEXT_PUBLIC_VERCEL_URL
+        : // If neither is set, default to localhost for local development.
+          "http://localhost:3000/";
 
   // Trim the URL and remove trailing slash if exists.
   url = url.replace(/\/+$/, "");
@@ -51,7 +51,7 @@ export const toDateTime = (secs: number) => {
 };
 
 export const calculateTrialEndUnixTimestamp = (
-  trialPeriodDays: number | null | undefined
+  trialPeriodDays: number | null | undefined,
 ) => {
   // Check if trialPeriodDays is null, undefined, or less than 2 days
   if (
@@ -64,7 +64,7 @@ export const calculateTrialEndUnixTimestamp = (
 
   const currentDate = new Date(); // Current date and time
   const trialEnd = new Date(
-    currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000
+    currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000,
   ); // Add trial days
   return Math.floor(trialEnd.getTime() / 1000); // Convert to Unix timestamp in seconds
 };
@@ -80,7 +80,7 @@ const getToastRedirect = (
   toastName: string,
   toastDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ""
+  arbitraryParams: string = "",
 ): string => {
   const [nameKey, descriptionKey] = toastKeyMap[toastType];
 
@@ -88,7 +88,7 @@ const getToastRedirect = (
 
   if (toastDescription) {
     redirectPath += `&${descriptionKey}=${encodeURIComponent(
-      toastDescription
+      toastDescription,
     )}`;
   }
 
@@ -108,7 +108,7 @@ export const getStatusRedirect = (
   statusName: string,
   statusDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ""
+  arbitraryParams: string = "",
 ) =>
   getToastRedirect(
     path,
@@ -116,7 +116,7 @@ export const getStatusRedirect = (
     statusName,
     statusDescription,
     disableButton,
-    arbitraryParams
+    arbitraryParams,
   );
 
 export const getErrorRedirect = (
@@ -124,7 +124,7 @@ export const getErrorRedirect = (
   errorName: string,
   errorDescription: string = "",
   disableButton: boolean = false,
-  arbitraryParams: string = ""
+  arbitraryParams: string = "",
 ) =>
   getToastRedirect(
     path,
@@ -132,14 +132,68 @@ export const getErrorRedirect = (
     errorName,
     errorDescription,
     disableButton,
-    arbitraryParams
+    arbitraryParams,
   );
 
 export const getFeedbackRedirect = (
   path: string,
   title: string = "成功！",
-  des: string = ""
+  des: string = "",
 ) =>
   `${path}?title=${encodeURIComponent(title)}&description=${encodeURIComponent(
-    des
+    des,
   )}`;
+
+let catchLoadScript = new Map();
+
+/**
+ * 加载外部资源
+ * @param url 地址 例如 https://xx.com/xx.js
+ * @param type js 或 css
+ * @returns {Promise<unknown>}
+ */
+export function loadExternalResource(url: string, type: string) {
+  const key = encodeURIComponent(url + type);
+
+  if (document.querySelector(`script[src="${url}"]`)) {
+    return Promise.resolve(1);
+  }
+  const loadingRes = catchLoadScript.get(key);
+  if (loadingRes) return loadingRes;
+
+  const loadingPromise = new Promise((resolve, reject) => {
+    if (!url) return resolve(url);
+
+    let tag;
+
+    if (type === "css") {
+      tag = document.createElement("link");
+      tag.rel = "stylesheet";
+      tag.href = url;
+    } else if (type === "font") {
+      tag = document.createElement("link");
+      tag.rel = "preload";
+      tag.as = "font";
+      tag.href = url;
+    } else if (type === "js") {
+      tag = document.createElement("script");
+      tag.src = url;
+    }
+    if (tag) {
+      tag.onload = () => resolve(url);
+      tag.onerror = () => reject(url);
+      document.head.appendChild(tag);
+    }
+  });
+  catchLoadScript.set(key, loadingPromise);
+
+  return loadingPromise;
+}
+
+export const loadImage = (url: string) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img));
+    img.addEventListener("error", (err) => reject(err));
+    img.src = url;
+  });

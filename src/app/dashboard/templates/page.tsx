@@ -67,7 +67,7 @@ const TemplatesPage = () => {
 
     const resumeId = await createResume(templateId);
 
-    router.push(`/app/workbench/${resumeId}`);
+    router.push(`/workbench/${resumeId}`);
   };
 
   const { loading, run: handleCreateResume } = useRequest(createResumeAsync, {
@@ -197,7 +197,7 @@ const TemplatesPage = () => {
             "gap-6",
             viewMode === "grid"
               ? "grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
-              : "flex flex-col space-y-4"
+              : "flex flex-col space-y-4",
           )}
         >
           {filteredTemplates.map((template) => {
@@ -240,7 +240,7 @@ const TemplatesPage = () => {
                     previewTemplate.id === "left-right"
                       ? "leftRight"
                       : previewTemplate.id
-                  }.name`
+                  }.name`,
                 )}
               </DialogTitle>
               <div className="flex flex-col flex-grow-0 h-[80vh] overflow-y-auto">
@@ -253,7 +253,7 @@ const TemplatesPage = () => {
                           previewTemplate.id === "left-right"
                             ? "leftRight"
                             : previewTemplate.id
-                        }.name`
+                        }.name`,
                       )}
                       width={600}
                       height={848}

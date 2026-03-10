@@ -40,7 +40,7 @@ export default function Template({
     if (!template) return;
 
     const resumeId = await createResume(templateId);
-    router.push(`/app/workbench/${resumeId}`);
+    router.push(`/workbench/${resumeId}`);
   };
 
   const { loading, run: handleCreateResume } = useRequest(createResumeAsync, {
@@ -181,7 +181,7 @@ export default function Template({
       <Card
         className={cn(
           "group cursor-pointer overflow-hidden transition-all hover:shadow-lg max-w-[320px] mx-auto",
-          "border border-gray-200 hover:border-primary/40 dark:border-gray-800 rounded-xl"
+          "border border-gray-200 hover:border-primary/40 dark:border-gray-800 rounded-xl",
         )}
       >
         <CardContent className="p-0">

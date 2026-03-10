@@ -26,12 +26,17 @@ import JsonBtn from "./share/json-btn";
 import ImageBtn from "./share/image-btn";
 import { cn } from "@/lib/utils";
 import { generateRandomString } from "@/utils";
-import { publicResumeByIdApi, setPublicResumeByIdApi } from "@/components/blocks/workbench/editor/share/utils.prisma";
+import {
+  publicResumeByIdApi,
+  setPublicResumeByIdApi,
+} from "@/components/blocks/workbench/editor/share/utils.prisma";
+import { useAppStore } from "@/store/useApp";
 
 const ShareBtn = () => {
   const [loading, setLoading] = useState(null);
   const t = useTranslations("common");
   const ts = useTranslations("share");
+  const user = useAppStore((state) => state.user);
   const { activeResume } = useResumeStore();
   const [permission, setPermission] = useState("view");
   const [openPassword, setOpenPassword] = useState(false);
@@ -121,6 +126,7 @@ const ShareBtn = () => {
               <span>{ts("label.public")}</span>
               <span>
                 <Switch
+                  disabled={!user}
                   checked={openPublic}
                   onCheckedChange={onPublicChange}
                   loading={openPublicLoading}
@@ -156,7 +162,7 @@ const ShareBtn = () => {
               <span>{ts("label.password")}</span>
               <div>
                 <Switch
-                  disabled={!openPublic}
+                  disabled={!openPublic || !user}
                   checked={openPassword}
                   onCheckedChange={onPasswordChange}
                   loading={openPasswordLoading}

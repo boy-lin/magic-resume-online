@@ -25,7 +25,7 @@ interface ExperienceItemProps {
 const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
   ({ experience, globalSettings }, ref) => {
     const { company, position, date, description } = pickObjectsFromList(
-      experience.fields
+      experience.fields,
     );
     return (
       <motion.div
@@ -46,7 +46,7 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
               fontSize: `${globalSettings?.subheaderSize || 16}px`,
             }}
           >
-            <span>{company.value}</span>
+            <span>{company?.value}</span>
           </div>
 
           {globalSettings?.centerSubtitle && (
@@ -79,7 +79,7 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
         )}
       </motion.div>
     );
-  }
+  },
 );
 
 ExperienceItem.displayName = "ExperienceItem";

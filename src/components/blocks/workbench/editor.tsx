@@ -41,7 +41,7 @@ const DragHandle = ({ show = true }) => {
         className={cn(
           "absolute inset-y-0 left-1/2 w-1 -translate-x-1/2",
           "group-hover:bg-primary/20 group-data-[dragging=true]:bg-primary",
-          "dark:bg-neutral-700/50 bg-gray-200"
+          "dark:bg-neutral-700/50 bg-gray-200",
         )}
       />
       <div
@@ -49,7 +49,7 @@ const DragHandle = ({ show = true }) => {
           "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
           "w-4 h-8 rounded-full opacity-0 group-hover:opacity-100",
           "flex items-center justify-center",
-          "dark:bg-neutral-800 bg-gray-200"
+          "dark:bg-neutral-800 bg-gray-200",
         )}
       >
         <div className="w-0.5 h-4 bg-gray-400 rounded-full" />
@@ -79,7 +79,7 @@ const LayoutControls = memo(
         "absolute bottom-6 left-1/2 -translate-x-1/2",
         "flex items-center gap-2 z-10 p-2 rounded-full",
         "dark:bg-neutral-900/80 dark:border dark:border-neutral-800 bg-white/80 border border-gray-200",
-        "backdrop-blur-sm shadow-lg"
+        "backdrop-blur-sm shadow-lg",
       )}
     >
       <TooltipProvider>
@@ -152,7 +152,7 @@ const LayoutControls = memo(
         </Tooltip>
       </TooltipProvider>
     </div>
-  )
+  ),
 );
 
 LayoutControls.displayName = "LayoutControls";
@@ -187,7 +187,6 @@ export default function Editor() {
   };
 
   const updateLayout = (sizes: number[]) => {
-    console.log("updateLayout", sizes);
     setPanelSizes(sizes);
   };
 
@@ -230,7 +229,7 @@ export default function Editor() {
       className={cn(
         "w-full min-h-screen  overflow-hidden",
         "bg-white text-gray-900",
-        "dark:bg-neutral-900 dark:text-neutral-200"
+        "dark:bg-neutral-900 dark:text-neutral-200",
       )}
     >
       <EditorHeader />
@@ -259,7 +258,7 @@ export default function Editor() {
             "h-full",
             "w-auto",
             "border-0 border-gray-20",
-            "dark:border-neutral-800 dark:bg-neutral-900/50"
+            "dark:border-neutral-800 dark:bg-neutral-900/50",
           )}
         >
           {/* 编辑面板 */}
@@ -273,7 +272,7 @@ export default function Editor() {
                 "fixed left-[80px] p-2 h-auto top-16 bottom-0 z-10":
                   editPanelCollapsed,
               },
-              { hidden: !editPanelShow }
+              { hidden: !editPanelShow },
             )}
           >
             <EditPanel

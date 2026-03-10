@@ -50,7 +50,7 @@ const Field = ({
 
   const currentDate = useMemo(
     () => (value ? new Date(value) : undefined),
-    [value]
+    [value],
   );
 
   const renderLabel = () => {
@@ -60,7 +60,7 @@ const Field = ({
         <span
           className={cn(
             "block text-sm font-medium",
-            "text-gray-700 dark:text-neutral-300"
+            "text-gray-700 dark:text-neutral-300",
           )}
         >
           {label}
@@ -78,7 +78,7 @@ const Field = ({
     "focus:ring-2 focus:ring-inset focus:ring-primary",
     "dark:bg-neutral-900/30 dark:ring-neutral-700 dark:focus:ring-primary",
     "sm:text-sm sm:leading-6",
-    className
+    className,
   );
 
   if (type === "date") {
@@ -91,7 +91,7 @@ const Field = ({
               variant={"outline"}
               className={cn(
                 "w-full justify-start text-left font-normal mt-1.5",
-                !value && "text-muted-foreground"
+                !value && "text-muted-foreground",
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -154,8 +154,8 @@ const Field = ({
                 selectedModel === "doubao"
                   ? doubaoApiKey && doubaoModelId
                   : config.requiresModelId
-                  ? deepseekApiKey && deepseekModelId
-                  : deepseekApiKey;
+                    ? deepseekApiKey && deepseekModelId
+                    : deepseekApiKey;
 
               if (!isConfigured) {
                 toast.error(
@@ -163,11 +163,11 @@ const Field = ({
                     <span>{t("previewDock.grammarCheck.configurePrompt")}</span>
                     <Button
                       className="p-0 h-auto text-white"
-                      onClick={() => router.push("/app/dashboard/ai")}
+                      onClick={() => router.push("/dashboard/ai")}
                     >
                       {t("previewDock.grammarCheck.configureButton")}
                     </Button>
-                  </>
+                  </>,
                 );
                 return;
               }

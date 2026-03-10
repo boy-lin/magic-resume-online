@@ -1,8 +1,10 @@
 declare global {
   interface Window {
     showDirectoryPicker(
-      options?: FilePickerOptions
+      options?: FilePickerOptions,
     ): Promise<FileSystemDirectoryHandle>;
+
+    dompdf: any;
   }
 }
 

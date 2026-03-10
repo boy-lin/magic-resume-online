@@ -4,7 +4,6 @@ import { ResumeSection, ResumeSectionContent } from "@/types/resume";
 import { ResumeData } from "@/types/resume";
 import { generateUUID } from "@/utils/uuid";
 import {
-  getResumesByUserIdPrisma,
   getResumeByIdPrismaApi,
   upsertResumeByIdApi,
   deleteResumeByIdApi,
@@ -14,45 +13,15 @@ import {
   initialResumeStateEn,
 } from "@/config/initialResumeData";
 import { DEFAULT_TEMPLATES } from "@/config";
-import { logger } from "./utils";
 import { useAppStore } from "@/store/useApp";
 import {
   localDeleteResumeById,
-  localGetAllResumes,
   localGetResumeById,
-  localGetResumeList,
   localUpsertResume,
 } from "./utils.local";
 
 function isRemoteUser() {
   return Boolean(useAppStore.getState().user?.id);
-}
-
-async function withDataMode<T>(
-  remoteFn: () => Promise<T>,
-  localFn: () => Promise<T>,
-): Promise<T> {
-  const remote = isRemoteUser();
-  const { userLoading } = useAppStore.getState();
-
-  if (remote) {
-    try {
-      return await remoteFn();
-    } catch (error) {
-      logger.error("Remote mode failed, fallback to local mode:", error);
-      return await localFn();
-    }
-  }
-
-  if (userLoading !== 2) {
-    try {
-      return await remoteFn();
-    } catch {
-      return await localFn();
-    }
-  }
-
-  return await localFn();
 }
 
 /**
@@ -101,6 +70,7 @@ export const useResumeStore = create<ResumeStore>()(
       activeResume: null,
 
       createResume: async (templateId) => {
+        const user = useAppStore.getState().user;
         const locale =
           typeof document !== "undefined"
             ? document.cookie
@@ -141,14 +111,11 @@ export const useResumeStore = create<ResumeStore>()(
           menuSections: template.menuSections,
         };
 
-        await withDataMode(
-          async () => upsertResumeByIdApi(newResume),
-          async () => localUpsertResume(newResume),
-        );
-
-        await localUpsertResume(newResume).catch((error) =>
-          logger.error("Failed to cache resume in local DB:", error),
-        );
+        if (isRemoteUser()) {
+          await upsertResumeByIdApi(newResume);
+        } else {
+          await localUpsertResume(newResume);
+        }
 
         set((state) => ({
           activeResumeId: id,
@@ -157,22 +124,17 @@ export const useResumeStore = create<ResumeStore>()(
         return id;
       },
 
-      updateResume: (resumeId, data, isNeedSync) => {
+      updateResume: (resumeId, data, isNeedSync = true) => {
         const resume = get().activeResume;
-        const shouldSync = isNeedSync ?? isRemoteUser();
         const updatedAt = new Date().toISOString();
 
         const updatedResume: ResumeData = {
           ...resume,
           ...data,
           updatedAt,
-          isNeedSync: shouldSync,
+          isNeedSync,
           menuSections: data.menuSections ?? resume.menuSections,
         };
-
-        localUpsertResume(updatedResume).catch((error) =>
-          logger.error("Failed to persist resume locally:", error),
-        );
 
         set((state) => ({
           activeResume:
@@ -188,33 +150,19 @@ export const useResumeStore = create<ResumeStore>()(
 
         const nextResume = {
           ...resume,
+          isNeedSync: false,
           updatedAt: new Date().toISOString(),
         };
 
-        let synced = false;
         let res = null;
 
         if (isRemoteUser()) {
-          try {
-            res = await upsertResumeByIdApi(nextResume);
-            synced = true;
-          } catch (error) {
-            logger.error("Failed to sync resume to remote:", error);
-          }
+          res = await upsertResumeByIdApi(nextResume);
+        } else {
+          res = await localUpsertResume(nextResume);
         }
 
-        await localUpsertResume({
-          ...nextResume,
-          isNeedSync: !synced && isRemoteUser(),
-        }).catch((error) =>
-          logger.error("Failed to persist resume locally:", error),
-        );
-
-        get().updateResume(
-          activeResumeId,
-          nextResume,
-          !synced && isRemoteUser(),
-        );
+        get().updateResume(activeResumeId, nextResume, false);
 
         return res;
       },
@@ -224,34 +172,8 @@ export const useResumeStore = create<ResumeStore>()(
         if (activeResumeId) {
           const current = activeResume;
           if (!current) return;
-          const updated = {
-            ...current,
-            title,
-            updatedAt: new Date().toISOString(),
-          };
 
-          let synced = false;
-          if (isRemoteUser()) {
-            try {
-              await upsertResumeByIdApi(updated);
-              synced = true;
-            } catch (error) {
-              logger.error("Failed to sync resume title to remote:", error);
-            }
-          }
-
-          await localUpsertResume({
-            ...updated,
-            isNeedSync: !synced && isRemoteUser(),
-          }).catch((error) =>
-            logger.error("Failed to persist resume title locally:", error),
-          );
-
-          get().updateResume(
-            activeResumeId,
-            { title },
-            !synced && isRemoteUser(),
-          );
+          get().updateResume(activeResumeId, { title });
         }
       },
 
@@ -259,68 +181,51 @@ export const useResumeStore = create<ResumeStore>()(
         const resumeId = resume.id;
 
         if (isRemoteUser()) {
-          try {
-            await deleteResumeByIdApi(resumeId);
-          } catch (error) {
-            logger.error("Failed to delete remote resume:", error);
-          }
+          await deleteResumeByIdApi(resumeId);
+        } else {
+          await localDeleteResumeById(resumeId);
         }
 
-        await localDeleteResumeById(resumeId).catch((error) =>
-          logger.error("Failed to delete local resume:", error),
-        );
-
-        set((state) => {
-          return {
-            activeResumeId: null,
-            activeResume: null,
-          };
+        set({
+          activeResumeId: null,
+          activeResume: null,
         });
       },
 
       duplicateResume: (resumeId) => {
-        try {
-          const newId = generateUUID();
-          const originalResume = get().activeResume;
+        const newId = generateUUID();
+        const originalResume = get().activeResume;
 
-          const locale =
-            typeof document !== "undefined"
-              ? document.cookie
-                  .split("; ")
-                  .find((row) => row.startsWith("NEXT_LOCALE="))
-                  ?.split("=")[1] || "zh"
-              : "zh";
+        const locale =
+          typeof document !== "undefined"
+            ? document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("NEXT_LOCALE="))
+                ?.split("=")[1] || "zh"
+            : "zh";
 
-          const duplicatedResumeBase = {
-            ...originalResume,
-            id: newId,
-            title: `${originalResume.title} (${
-              locale === "en" ? "Copy" : "复制"
-            })`,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isNeedSync: isRemoteUser(),
-          };
+        const duplicatedResumeBase = {
+          ...originalResume,
+          id: newId,
+          title: `${originalResume.title} (${
+            locale === "en" ? "Copy" : "复制"
+          })`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isNeedSync: true,
+        };
 
-          const duplicatedResume: ResumeData = {
-            ...duplicatedResumeBase,
-            menuSections: [...(duplicatedResumeBase.menuSections || [])],
-          };
+        const duplicatedResume: ResumeData = {
+          ...duplicatedResumeBase,
+          menuSections: [...(duplicatedResumeBase.menuSections || [])],
+        };
 
-          set((state) => ({
-            activeResumeId: newId,
-            activeResume: duplicatedResume,
-          }));
+        set({
+          activeResumeId: newId,
+          activeResume: duplicatedResume,
+        });
 
-          localUpsertResume(duplicatedResume).catch((error) =>
-            logger.error("Failed to persist duplicated resume locally:", error),
-          );
-
-          return newId;
-        } catch (error) {
-          logger.error(`Failed to duplicate resume ${resumeId}:`, error);
-          throw error;
-        }
+        return newId;
       },
 
       getResumeFullByIdMock: async () => {
@@ -341,46 +246,25 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       getResumeFullById: async (id) => {
-        const resumeData = await getResumeByIdPrismaApi(id);
+        let resumeData = null;
+        if (isRemoteUser()) {
+          resumeData = await getResumeByIdPrismaApi(id);
+        } else {
+          resumeData = await localGetResumeById(id);
+          resumeData.isPublic = true;
+        }
+        if (!resumeData) {
+          throw new Error("Resume not found");
+        }
         const newResume: ResumeData = {
           activeSection: "basic",
           ...resumeData,
         };
-
-        await localUpsertResume(newResume).catch((error) =>
-          logger.error("Failed to cache full resume locally:", error),
-        );
-
-        set((state) => ({
+        set({
           activeResumeId: id,
           activeResume: newResume,
-        }));
-        return newResume;
-      },
-
-      syncLocalResumesToRemote: async () => {
-        if (!isRemoteUser()) return;
-
-        const localResumes = await localGetAllResumes().catch((error) => {
-          logger.error("Failed to read local resumes for sync:", error);
-          return [];
         });
-
-        if (!localResumes?.length) return;
-
-        await Promise.all(
-          localResumes.map(async (resume) => {
-            try {
-              await upsertResumeByIdApi(resume);
-              await localUpsertResume({
-                ...resume,
-                isNeedSync: false,
-              });
-            } catch (error) {
-              logger.error(`Failed to sync local resume ${resume.id}:`, error);
-            }
-          }),
-        );
+        return newResume;
       },
 
       updateSectionById: (sectionId, data) => {

@@ -36,12 +36,12 @@
             {
               "title": "My Resumes",
               "description": "View my resumes",
-              "href": "/app/dashboard/resumes"
+              "href": "/dashboard/resumes"
             },
             {
               "title": "Browse Templates",
               "description": "Browse all resume templates",
-              "href": "/app/dashboard/resumes"
+              "href": "/dashboard/resumes"
             },
             {
               "title": "Features",

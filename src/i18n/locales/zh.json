@@ -36,12 +36,12 @@
             {
               "title": "我的简历",
               "description": "查看我的简历",
-              "href": "/app/dashboard/resumes"
+              "href": "/dashboard/resumes"
             },
             {
               "title": "浏览模板",
               "description": "浏览所有简历模板",
-              "href": "/app/dashboard/resumes"
+              "href": "/dashboard/resumes"
             },
             {
               "title": "功能特色",

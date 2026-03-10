@@ -59,7 +59,7 @@ const BaseInfo = ({
           photo.config || {
             borderRadius: "none",
             customBorderRadius: 0,
-          }
+          },
         ),
         overflow: "hidden",
       }}
@@ -70,8 +70,7 @@ const BaseInfo = ({
   const baseContainerClass =
     "hover:cursor-pointer hover:outline hover:outline-2 hover:outline-primary rounded-md transition-all ease-in-out hover:shadow-md";
   const baseFieldsClass = "";
-  const baseFieldItemClass =
-    "flex items-center whitespace-nowrap overflow-hidden";
+  const baseFieldItemClass = "flex items-center whitespace-nowrap";
   const baseNameTitleClass = "flex flex-col";
 
   // 左对齐布局样式

@@ -28,7 +28,7 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
 }) => {
   const t = useTranslations("workbench.experienceItem");
   const { company, position, date, description } = pickObjectsFromList(
-    experience.fields
+    experience.fields,
   );
 
   const handleChange = (field: ResumeFieldType) => {
@@ -47,7 +47,7 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.company")}
-            value={company.value}
+            value={company?.value}
             onChange={(value) => {
               handleChange({
                 ...company,
@@ -124,7 +124,7 @@ const ExperienceItem = ({
       });
       setIsUpdating(false);
     },
-    [experience, updateSectionExperienceContent, isUpdating]
+    [experience, updateSectionExperienceContent, isUpdating],
   );
   const companyTitle = experience.fields[0].value;
   return (
@@ -138,7 +138,7 @@ const ExperienceItem = ({
         "bg-white hover:border-primary",
         "dark:bg-neutral-900/30",
         "border-gray-100 dark:border-neutral-800",
-        "dark:hover:border-primary"
+        "dark:hover:border-primary",
       )}
     >
       <div
@@ -151,7 +151,7 @@ const ExperienceItem = ({
           "border-gray-100 dark:border-neutral-800",
           expandedId === experience.id
             ? "cursor-not-allowed"
-            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50 group-hover:pointer-events-auto group-hover:flex group-hover:visible"
+            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50 group-hover:pointer-events-auto group-hover:flex group-hover:visible",
         )}
       >
         <GripVertical
@@ -159,7 +159,7 @@ const ExperienceItem = ({
             "w-4 h-4",
             "text-gray-400 dark:text-neutral-400",
             expandedId === experience.id && "opacity-50",
-            "transform transition-transform group-hover:scale-110"
+            "transform transition-transform group-hover:scale-110",
           )}
         />
       </div>
@@ -169,7 +169,7 @@ const ExperienceItem = ({
           className={cn(
             "px-4 py-4 flex items-center justify-between",
             expandedId === experience.id && "bg-gray-50 dark:bg-neutral-800/50",
-            "cursor-pointer select-none"
+            "cursor-pointer select-none",
           )}
           onClick={(e) => {
             if (expandedId === experience.id) {
@@ -183,7 +183,7 @@ const ExperienceItem = ({
             <h3
               className={cn(
                 "font-medium truncate",
-                "text-gray-700 dark:text-neutral-200"
+                "text-gray-700 dark:text-neutral-200",
               )}
             >
               {companyTitle}
@@ -198,7 +198,7 @@ const ExperienceItem = ({
                 "text-sm",
                 experience.visible
                   ? "hover:bg-gray-100 text-gray-500 dark:hover:bg-neutral-800 dark:text-neutral-400"
-                  : "hover:bg-gray-100 text-gray-400 dark:hover:bg-neutral-800 dark:text-neutral-600"
+                  : "hover:bg-gray-100 text-gray-400 dark:hover:bg-neutral-800 dark:text-neutral-600",
               )}
               onClick={handleVisibilityToggle}
             >
@@ -214,7 +214,7 @@ const ExperienceItem = ({
               size="sm"
               className={cn(
                 "text-sm",
-                "dark:hover:bg-red-900/50 dark:text-red-400 hover:bg-red-50 text-red-600"
+                "dark:hover:bg-red-900/50 dark:text-red-400 hover:bg-red-50 text-red-600",
               )}
               onClick={(e) => {
                 e.stopPropagation();
@@ -258,14 +258,14 @@ const ExperienceItem = ({
               <div
                 className={cn(
                   "px-4 pb-4 space-y-4",
-                  "border-gray-100 dark:border-neutral-800"
+                  "border-gray-100 dark:border-neutral-800",
                 )}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div
                   className={cn(
                     "h-px w-full",
-                    "bg-gray-100 dark:bg-neutral-800"
+                    "bg-gray-100 dark:bg-neutral-800",
                   )}
                 />
                 <ProjectEditor

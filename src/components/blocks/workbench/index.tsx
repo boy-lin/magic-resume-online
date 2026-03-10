@@ -12,7 +12,6 @@ import ShowError from "@/components/error/show";
 
 export function Workbench() {
   const { getResumeFullById } = useResumeStore();
-  const activeResumeId = useResumeStore().activeResumeId;
   const paramId = String(useParams().id);
 
   const { error, loading } = useRequest(() => getResumeFullById(paramId), {
@@ -23,7 +22,7 @@ export function Workbench() {
 
   if (error) return <ShowError error={error} />;
 
-  if (loading || !activeResumeId) {
+  if (loading) {
     return <SkeletonCard />;
   }
 

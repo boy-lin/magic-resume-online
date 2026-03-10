@@ -19,8 +19,16 @@ const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
   ({ project, globalSettings }, ref) => {
     const centerSubtitle = globalSettings?.centerSubtitle;
     const { name, role, date, link, description } = pickObjectsFromList(
-      project.fields
+      project.fields,
     );
+    console.log("ProjectItem", {
+      name,
+      role,
+      date,
+      link,
+      description,
+    });
+
     return (
       <motion.div
         style={{
@@ -37,11 +45,11 @@ const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
                 fontSize: `${globalSettings?.subheaderSize || 16}px`,
               }}
             >
-              {name.value}
+              {name?.value}
             </h3>
           </div>
 
-          {link.value && !centerSubtitle && (
+          {link?.value && !centerSubtitle && (
             <a
               href={
                 link.value.startsWith("http")
@@ -58,7 +66,7 @@ const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
                   const url = new URL(
                     link.value.startsWith("http")
                       ? link.value
-                      : `https://${link.value}`
+                      : `https://${link.value}`,
                   );
                   return url.hostname.replace(/^www\./, "");
                 } catch (e) {
@@ -112,7 +120,7 @@ const ProjectItem = React.forwardRef<HTMLDivElement, ProjectItemProps>(
         )}
       </motion.div>
     );
-  }
+  },
 );
 
 ProjectItem.displayName = "ProjectItem";

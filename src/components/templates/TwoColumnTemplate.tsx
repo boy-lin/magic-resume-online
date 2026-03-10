@@ -95,7 +95,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                 )}
               >
                 <div className="" style={cardItemTitleStyle}>
-                  {company.value}
+                  {company?.value}
                 </div>
                 <div className="flex justify-between text-subtitleFont text-sm">
                   <div>{position.value}</div>
@@ -310,11 +310,9 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
             {otherBasicSectionFields.map((item) => (
               <motion.div
                 key={item.id}
-                className={cn(
-                  "flex items-center whitespace-nowrap overflow-hidden",
-                )}
+                className={cn("flex items-center whitespace-nowrap")}
               >
-                <div className="flex items-center gap-2 overflow-hidden">
+                <div className="flex items-center gap-2">
                   {basic.config?.useIconMode ? (
                     getIcon(item.icon)
                   ) : (

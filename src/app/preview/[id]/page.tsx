@@ -19,7 +19,8 @@ import ImageBtn from "@/components/blocks/workbench/editor/share/image-btn";
 import { DEFAULT_TEMPLATES } from "@/config";
 import ResumeTemplateComponent from "@/components/templates";
 import PageBreakLines from "@/components/preview/PageBreakLines";
-import { getResumeByIdPrismaApi } from "./utils.prisma";
+import { getResumeByIdPrismaApi } from "@/store/resume/utils.prisma";
+import { localGetResumeById } from "@/store/resume/utils.local";
 import { Button } from "@/components/ui-lab/button";
 import {
   Card,
@@ -37,16 +38,11 @@ interface PreviewPanelProps {}
 
 const PreviewPanel = ({}: PreviewPanelProps) => {
   const params = useParams();
-  const { setActiveResume, activeResume } = useResumeStore();
+  const { getResumeFullById, activeResume } = useResumeStore();
   const [password, setPassword] = useState("");
 
   const { loading, error } = useRequest(async () => {
-    const data = await getResumeByIdPrismaApi(params.id as string);
-    const newResume = {
-      activeSection: "basic",
-      ...data,
-    };
-    setActiveResume(newResume);
+    await getResumeFullById(params.id as string);
   });
 
   const template = useMemo(() => {
@@ -146,7 +142,6 @@ const PreviewPanel = ({}: PreviewPanelProps) => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("values", values);
     setPassword(values.password);
   }
 

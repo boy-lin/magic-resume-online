@@ -45,18 +45,18 @@ const PreviewDock = ({ viewerRef }) => {
       selectedModel === "doubao"
         ? doubaoApiKey && doubaoModelId
         : config.requiresModelId
-        ? deepseekApiKey && deepseekModelId
-        : deepseekApiKey;
+          ? deepseekApiKey && deepseekModelId
+          : deepseekApiKey;
 
     if (!isConfigured) {
       const res = toast.error(t("grammarCheck.configurePrompt"));
       toast.error(
-        "error"
+        "error",
         // <>
         //   <span>{t("grammarCheck.configurePrompt")}</span>
         //   <Button
         //     className="p-0 h-auto text-white"
-        //     onClick={() => router.push("/app/dashboard/ai")}
+        //     onClick={() => router.push("/dashboard/ai")}
         //   >
         //     {t("grammarCheck.configureButton")}
         //   </Button>
@@ -90,7 +90,7 @@ const PreviewDock = ({ viewerRef }) => {
     try {
       const newId = duplicateResume(activeResumeId);
       toast.success(t("copyResume.success"));
-      router.push(`/app/workbench/${newId}`);
+      router.push(`/workbench/${newId}`);
     } catch (error) {
       toast.error(t("copyResume.error"));
     }
@@ -102,7 +102,7 @@ const PreviewDock = ({ viewerRef }) => {
         viewerRef.current.setZoom(val[0] / 100);
       }
     },
-    { wait: 100 }
+    { wait: 100 },
   );
 
   return (
@@ -118,7 +118,7 @@ const PreviewDock = ({ viewerRef }) => {
                       "flex cursor-pointer h-7 w-7 items-center justify-center rounded-lg",
                       "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
                       "transition-all duration-200",
-                      isChecking && "animate-pulse"
+                      isChecking && "animate-pulse",
                     )}
                     onClick={handleGrammarCheck}
                   >
@@ -142,7 +142,7 @@ const PreviewDock = ({ viewerRef }) => {
                   <div
                     className={cn(
                       "flex cursor-pointer h-7 w-7 items-center justify-center rounded-lg",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50"
+                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
                     )}
                     onClick={handleCopyResume}
                   >
@@ -162,9 +162,9 @@ const PreviewDock = ({ viewerRef }) => {
                   <div
                     className={cn(
                       "flex cursor-pointer h-7 w-7 items-center justify-center rounded-lg",
-                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50"
+                      "hover:bg-gray-100/50 dark:hover:bg-neutral-800/50",
                     )}
-                    onClick={() => router.push("/app/dashboard")}
+                    onClick={() => router.push("/dashboard")}
                   >
                     <Home className="h-4 w-4" />
                   </div>
