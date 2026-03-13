@@ -25,9 +25,9 @@ interface ProjectEditorProps {
 }
 
 const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
+  console.log("ProjectEditor", { fields });
   const t = useTranslations("workbench.projectItem");
-  const { position, role, link, date, description } =
-    pickObjectsFromList(fields);
+  const { name, role, link, date, description } = pickObjectsFromList(fields);
 
   return (
     <div className="space-y-5">
@@ -35,8 +35,8 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({ fields, onSave }) => {
         <div className="grid grid-cols-2 gap-4">
           <Field
             label={t("labels.name")}
-            value={position.value}
-            onChange={(value) => onSave({ ...position, value })}
+            value={name?.value}
+            onChange={(value) => onSave({ ...name, value })}
             placeholder={t("placeholders.name")}
           />
           <Field
@@ -107,7 +107,7 @@ const ProjectItem = ({
         "bg-white hover:border-primary",
         "dark:bg-neutral-900/30",
         "border-gray-100 dark:border-neutral-800",
-        "dark:hover:border-primary"
+        "dark:hover:border-primary",
       )}
     >
       <div
@@ -120,7 +120,7 @@ const ProjectItem = ({
           "border-gray-100 dark:border-neutral-800",
           expandedId === project.id
             ? "cursor-not-allowed"
-            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            : "cursor-grab hover:bg-gray-50 dark:hover:bg-neutral-800/50",
         )}
       >
         <GripVertical
@@ -128,7 +128,7 @@ const ProjectItem = ({
             "w-4 h-4",
             "text-gray-400 dark:text-neutral-400",
             expandedId === project.id && "opacity-50",
-            "transform transition-transform group-hover:scale-110"
+            "transform transition-transform group-hover:scale-110",
           )}
         />
       </div>
@@ -138,7 +138,7 @@ const ProjectItem = ({
           className={cn(
             "px-4 py-4 flex items-center justify-between",
             expandedId === project.id && "bg-gray-50 dark:bg-neutral-800/50",
-            "cursor-pointer select-none"
+            "cursor-pointer select-none",
           )}
           onClick={(e) => {
             if (expandedId === project.id) {
@@ -152,7 +152,7 @@ const ProjectItem = ({
             <h3
               className={cn(
                 "font-medium truncate",
-                "text-gray-700 dark:text-neutral-200"
+                "text-gray-700 dark:text-neutral-200",
               )}
             >
               {projectName}
@@ -166,7 +166,7 @@ const ProjectItem = ({
                 "text-sm",
                 project.visible
                   ? "hover:bg-gray-100 text-gray-500 dark:hover:bg-neutral-800 dark:text-neutral-400"
-                  : "hover:bg-gray-100 text-gray-400 dark:hover:bg-neutral-800 dark:text-neutral-600"
+                  : "hover:bg-gray-100 text-gray-400 dark:hover:bg-neutral-800 dark:text-neutral-600",
               )}
               onClick={handleVisibilityToggle}
             >
@@ -181,7 +181,7 @@ const ProjectItem = ({
               size="sm"
               className={cn(
                 "text-sm",
-                "dark:hover:bg-red-900/50 dark:text-red-400 hover:bg-red-50 text-red-600"
+                "dark:hover:bg-red-900/50 dark:text-red-400 hover:bg-red-50 text-red-600",
               )}
               onClick={(e) => {
                 e.stopPropagation();
@@ -211,7 +211,7 @@ const ProjectItem = ({
                 className={cn(
                   "w-5 h-5",
                   "dark:text-neutral-400",
-                  "text-gray-500"
+                  "text-gray-500",
                 )}
               />
             </motion.div>
@@ -229,14 +229,14 @@ const ProjectItem = ({
               <div
                 className={cn(
                   "px-4 pb-4 space-y-4",
-                  "dark:border-neutral-800 border-gray-100"
+                  "dark:border-neutral-800 border-gray-100",
                 )}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div
                   className={cn(
                     "h-px w-full",
-                    "dark:bg-neutral-800 bg-gray-100"
+                    "dark:bg-neutral-800 bg-gray-100",
                   )}
                 />
                 <ProjectEditor

@@ -58,7 +58,7 @@ const ProjectEditor: React.FC<ProjectEditorProps> = ({
           />
           <Field
             label={t("labels.position")}
-            value={position.value}
+            value={position?.value}
             onChange={(value) => {
               handleChange({
                 ...position,

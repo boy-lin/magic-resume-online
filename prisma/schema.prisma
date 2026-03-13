@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum PricingType {
@@ -173,4 +174,3 @@ model Resume {
   @@index([userId])
   @@map("resumes")
 }
-

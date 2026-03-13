@@ -1,14 +1,11 @@
 ﻿"use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import Logo from "@/components/shared/Logo";
-import { updatePassword } from "@/utils/auth-helpers/server";
 import { Button } from "@/components/ui-lab/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { setLocalStorageByName, getLocalStorageByName } from "@/utils/storage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,12 +25,13 @@ const formSchema = z.object({
     .min(5, { message: "Must be 5 or more characters long" }),
 });
 
+type UpdatePasswordForm = z.infer<typeof formSchema>;
+
 const ForgotPwdPage = () => {
-  const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<UpdatePasswordForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
@@ -41,16 +39,52 @@ const ForgotPwdPage = () => {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function updatePassword(values: UpdatePasswordForm) {
+    const res = await fetch("/api/account/password", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: values.password.trim(),
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      return {
+        error: data?.error || "密码更新失败，请稍后重试",
+      };
+    }
+
+    return { error: null as string | null };
+  }
+
+  async function onSubmit(values: UpdatePasswordForm) {
     if (values.password.trim() !== values.passwordConfirm.trim()) {
       return toast.error("更新密码错误", {
         description: "密码不匹配",
       });
     }
+
     setIsSubmitting(true);
-    const redirectUrl = await updatePassword(values);
-    setIsSubmitting(false);
-    router.push(redirectUrl);
+    try {
+      const result = await updatePassword(values);
+
+      if (result.error) {
+        toast.error("更新密码错误", {
+          description: result.error,
+        });
+        return;
+      }
+
+      toast.success("密码更新成功");
+      router.push("/account/signin");
+      router.refresh();
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

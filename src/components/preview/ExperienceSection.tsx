@@ -51,7 +51,7 @@ const ExperienceItem = React.forwardRef<HTMLDivElement, ExperienceItemProps>(
 
           {globalSettings?.centerSubtitle && (
             <motion.div layout="position" className="text-subtitleFont">
-              {position.value}
+              {position?.value}
             </motion.div>
           )}
 

@@ -102,7 +102,7 @@ const TwoColumnTemplate: React.FC<TwoColumnTemplateProps> = ({
                   {company?.value}
                 </div>
                 <div className="flex justify-between text-subtitleFont text-sm">
-                  <div>{position.value}</div>
+                  <div>{position?.value}</div>
                   <FieldComponent item={date} />
                 </div>
                 {Object.values(otherFieldMap).map((exp, index) => (
